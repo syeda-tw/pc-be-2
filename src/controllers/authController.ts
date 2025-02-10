@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import User from "../models/user"; // User model
+import User, { IUser } from "../models/user"; // User model and IUser interface
 import OtpVerification from "../models/otpVerification"; // OtpVerifications model
 import {
   generateOtp,
   generateToken,
   hashPassword,
+  isPasswordCorrect,
   validateEmail,
   validatePassword,
   verifyToken,
@@ -179,7 +180,7 @@ export const verifyRegistrationOtp = async (req: Request, res: Response) => {
     const user = (await User.create({
       email: otpVerification.email,
       password: otpVerification.password,
-      status: "onboarding",
+      status: "onboarding-step-1",
       is_admin: true,
       practice: newPractice._id,
     })) as { _id: string }; // Type assertion here
@@ -187,7 +188,8 @@ export const verifyRegistrationOtp = async (req: Request, res: Response) => {
     // Delete OTP verification record
     await OtpVerification.deleteOne({ email });
     // Generate JWT token
-    const token = generateToken({ userId: user._id.toString() });
+    const userId = user._id.toString();
+    const token: string = generateToken({ userId });
 
     return res.status(201).json({
       message: "Registration successful",
@@ -230,7 +232,7 @@ export const verifyUserToken = async (
     const decoded = verifyToken(token) as DecodedToken;
 
     // Fetch the user using the ID from the decoded token
-    const user = await User.findById(decoded.userId);
+    const user = (await User.findById(decoded.userId)) as IUser;
 
     if (!user) {
       return res.status(404).json({
@@ -239,15 +241,63 @@ export const verifyUserToken = async (
       });
     }
 
+    const userId = user._id.toString();
+
     return res.status(200).json({
       message: "Token is valid",
       user,
+      token,
     });
   } catch (err) {
     console.error(err);
     return res.status(401).json({
       message: "Invalid token",
       user: null,
+    });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  try {
+    // Validate email and password presence
+    if (!email || !password) {
+      return res.status(400).json({ message: missingEmailPassword });
+    }
+
+    // Validate email format
+    if (!validateEmail(email)) {
+      return res.status(400).json({ message: invalidEmailFormat });
+    }
+
+    // Find user by email
+    const user = await findUserByEmail(email);
+    if (!user) {
+      return res.status(401).json({ message: invalidCredentials });
+    }
+
+    // Validate password
+    const isPasswordValid = await isPasswordCorrect(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: invalidCredentials });
+    }
+
+    // Generate JWT token
+    const userId = user._id.toString();
+    const token: string = generateToken({ userId });
+
+    return res.status(200).json({
+      message: userLoggedInSuccess,
+      user,
+      token,
+    });
+  } catch (err) {
+    console.error(err);
+    return sendErrorResponse({
+      status: 500,
+      message: serverError,
+      res: err,
     });
   }
 };

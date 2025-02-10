@@ -37,3 +37,10 @@ export const verifyToken = (token: string): object | string => {
     throw new Error("Invalid token");
   }
 };
+
+export const isPasswordCorrect = async (
+  password: string,
+  userPassword: string
+): Promise<boolean> => {
+  return await bcrypt.compare(password, userPassword);
+};

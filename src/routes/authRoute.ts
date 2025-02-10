@@ -3,7 +3,8 @@ import {
   register,
   verifyRegistrationOtp,
   verifyUserToken,
-} from "../controllers/authController"; // Import register function
+  login,
+} from "../controllers/authController";
 
 const router = express.Router();
 /**
@@ -87,5 +88,37 @@ router.post("/verify-registration-otp", verifyRegistrationOtp);
 router.post("/verify-user-token", (req, res, next) => {
   verifyUserToken(req, res, next);
 });
+
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: Login a user
+ *     description: Login a user by providing email and password.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email address
+ *               password:
+ *                 type: string
+ *                 description: The user's password
+ *     responses:
+ *       200:
+ *         description: User successfully logged in
+ *       401:
+ *         description: Invalid email or password
+ *       500:
+ *         description: Server error
+ */
+router.post("/login", login);
 
 export default router;
