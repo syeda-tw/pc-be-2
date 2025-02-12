@@ -228,8 +228,25 @@ export const verifyUserToken = async (
       });
     }
 
-    // Type the decoded token
-    const decoded = verifyToken(token) as DecodedToken;
+    let decoded: DecodedToken;
+
+    try {
+      // Type the decoded token
+      decoded = verifyToken(token) as DecodedToken;
+
+      if (!decoded?.userId) {
+        return res.status(401).json({
+          message: "Invalid token",
+          user: null,
+        });
+      }
+    } catch (error) {
+      console.error("Token verification error:", error);
+      return res.status(401).json({
+        message: "Invalid token",
+        user: null,
+      });
+    }
 
     // Fetch the user using the ID from the decoded token
     const user = (await User.findById(decoded.userId)) as IUser;
@@ -240,8 +257,6 @@ export const verifyUserToken = async (
         user: null,
       });
     }
-
-    const userId = user._id.toString();
 
     return res.status(200).json({
       message: "Token is valid",

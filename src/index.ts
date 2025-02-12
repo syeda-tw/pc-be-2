@@ -2,7 +2,9 @@ import express, { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 const swaggerUi = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
-import authRoutes from "./routes/authRoute";
+import authRoutes from "./routes/authRoutes";
+import onboardingRoutes from "./routes/onboardingRoutes";
+
 import cors from "cors";
 
 dotenv.config();
@@ -39,6 +41,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 // Use the auth routes for authentication-related paths
 app.use("/auth", authRoutes);
+app.use("/onboarding", onboardingRoutes);
 
 // Root route
 app.get("/", (req: Request, res: Response) => {
