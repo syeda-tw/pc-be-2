@@ -50,11 +50,46 @@ export const onboardingStep1 = async (
     }
 
     // Update user with the provided data
-    const { title, pronouns, hourlyRate, gender } = req.body;
+    const {
+      title,
+      pronouns,
+      gender,
+      date_of_birth,
+      first_name,
+      last_name,
+      middle_name,
+    } = req.body;
+
+    // Validation checks
+    const errors: string[] = [];
+
+    if (!first_name) {
+      errors.push("First name is required");
+    }
+    if (!last_name) {
+      errors.push("Last name is required");
+    }
+    if (date_of_birth) {
+      const dob = new Date(date_of_birth);
+      const age = new Date().getFullYear() - dob.getFullYear();
+      if (age < 18) {
+        errors.push("User must be at least 18 years old");
+      }
+    } else {
+      errors.push("Date of birth is required");
+    }
+
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
+
     user.title = title;
     user.pronouns = pronouns;
-    user.hourly_rate = hourlyRate;
     user.gender = gender;
+    user.date_of_birth = date_of_birth;
+    user.first_name = first_name;
+    user.last_name = last_name;
+    user.middle_name = middle_name;
     user.status = "onboarding-step-2";
 
     await user.save();

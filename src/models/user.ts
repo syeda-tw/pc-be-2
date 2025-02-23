@@ -23,6 +23,10 @@ export interface IUser extends Document {
   password: string;
   status: UserStatus;
   email: string;
+  date_of_birth?: Date;
+  first_name?: string;
+  last_name?: string;
+  middle_name?: string;
 }
 
 const UserSchema = new Schema<IUser>({
@@ -46,7 +50,11 @@ const UserSchema = new Schema<IUser>({
     ],
     default: "onboarding-step-1",
   },
-  email: { type: String, required: true },
+  email: { type: String },
+  first_name: { type: String },
+  last_name: { type: String },
+  middle_name: { type: String },
+  date_of_birth: { type: Date },
 });
 
 export default mongoose.model<IUser>("User", UserSchema);
