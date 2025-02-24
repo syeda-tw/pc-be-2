@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import User, { IUser } from "../models/user"; // User model and IUser interface
 import { verifyToken } from "../helpers/auth";
+import { geoapifyValidateAddress } from "../helpers/address-validation";
 
 export const onboardingStep1 = async (
   req: Request,
@@ -54,23 +55,23 @@ export const onboardingStep1 = async (
       title,
       pronouns,
       gender,
-      date_of_birth,
-      first_name,
-      last_name,
-      middle_name,
+      dateOfBirth,
+      firstName,
+      lastName,
+      middleName,
     } = req.body;
 
     // Validation checks
     const errors: string[] = [];
 
-    if (!first_name) {
+    if (!firstName) {
       errors.push("First name is required");
     }
-    if (!last_name) {
+    if (!lastName) {
       errors.push("Last name is required");
     }
-    if (date_of_birth) {
-      const dob = new Date(date_of_birth);
+    if (dateOfBirth) {
+      const dob = new Date(dateOfBirth);
       const age = new Date().getFullYear() - dob.getFullYear();
       if (age < 18) {
         errors.push("User must be at least 18 years old");
@@ -86,10 +87,10 @@ export const onboardingStep1 = async (
     user.title = title;
     user.pronouns = pronouns;
     user.gender = gender;
-    user.date_of_birth = date_of_birth;
-    user.first_name = first_name;
-    user.last_name = last_name;
-    user.middle_name = middle_name;
+    user.date_of_birth = dateOfBirth;
+    user.first_name = firstName;
+    user.last_name = lastName;
+    user.middle_name = middleName;
     user.status = "onboarding-step-2";
 
     await user.save();
@@ -98,6 +99,25 @@ export const onboardingStep1 = async (
       message: "User updated successfully",
       user,
     });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const validateAddress = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { address } = req.body;
+
+    const data = await geoapifyValidateAddress(address);
+
+    return res.status(200).json(data);
   } catch (err) {
     console.error(err);
     return res.status(500).json({

@@ -1,3 +1,4 @@
+import { validateAddress } from "../controllers/onboardingController";
 import checkValidToken from "../middleware/authMiddleware";
 
 const express = require("express");
@@ -10,8 +11,6 @@ const { onboardingStep1 } = require("../controllers/onboardingController");
  *   post:
  *     summary: Onboarding step 1
  *     tags: [Onboarding]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -32,4 +31,28 @@ const { onboardingStep1 } = require("../controllers/onboardingController");
 // Route for onboarding step 1
 router.post("/onboarding-step-1", checkValidToken, onboardingStep1);
 
+/**
+ * @swagger
+ * /onboarding/validate-address:
+ *   post:
+ *     summary: Validate address
+ *     tags: [Onboarding]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               address:
+ *                 type: string
+ *                 description: The address to validate
+ *     responses:
+ *       200:
+ *         description: Success
+ *       401:
+ *         description: Unauthorized
+ */
+
+router.post("/validate-address", checkValidToken, validateAddress);
 export default router;

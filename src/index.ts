@@ -33,6 +33,20 @@ const swaggerOptions = {
       version: "1.0.0",
       description: "A sample Express.js API built with TypeScript and Swagger",
     },
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
   },
   apis: ["./src/routes/*.ts"],
 };
