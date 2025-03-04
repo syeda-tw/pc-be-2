@@ -2,47 +2,18 @@ import { Request, Response, NextFunction } from "express";
 import User, { IUser } from "../models/user"; // User model and IUser interface
 import { verifyToken } from "../helpers/auth";
 import { geoapifyValidateAddress } from "../helpers/address-validation";
+import Practice from "../models/practice";
 
 export const onboardingStep1 = async (
-  req: Request,
+  req: Request & { user: { _id: string } },
   res: Response,
   next: NextFunction
 ) => {
   try {
     // Check if authorization header is present
-    if (!req.headers.authorization) {
-      return res.status(401).json({
-        message: "No token provided",
-      });
-    }
-
-    const token = req.headers.authorization.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({
-        message: "No token provided",
-      });
-    }
-
-    let decoded: { userId: string };
-
-    try {
-      // Type the decoded token
-      decoded = verifyToken(token) as { userId: string };
-
-      if (!decoded?.userId) {
-        return res.status(401).json({
-          message: "Invalid token",
-        });
-      }
-    } catch (error) {
-      console.error("Token verification error:", error);
-      return res.status(401).json({
-        message: "Invalid token",
-      });
-    }
 
     // Fetch the user using the ID from the decoded token
-    const user = await User.findById(decoded.userId);
+    const user = await User.findById(req.user._id);
 
     if (!user) {
       return res.status(404).json({
@@ -151,6 +122,39 @@ export const validateUsername = async (
     console.error(err);
     return res.status(500).json({
       isValid: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+export const onboardingIndividualStep2 = async (
+  req: Request & { user: { _id: string } },
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { website, address, businessName } = req.body;
+
+    const practice = await Practice.create({
+      business_name: businessName,
+      website,
+      addresses: [address],
+      is_company: false,
+    });
+
+    const user = await User.findByIdAndUpdate(req.user._id, {
+      practice: practice._id,
+      status: "onboarded",
+    });
+
+    return res.status(200).json({
+      message: "Practice created successfully",
+      practice,
+      user,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
       message: "Internal server error",
     });
   }

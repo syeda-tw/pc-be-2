@@ -1,43 +1,19 @@
-import mongoose, { Schema, Document } from "mongoose";
-
-interface IOffice {
-  address: {
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-    name: string;
-    country: string;
-  };
-  title: string;
-  phones: string[];
-}
+import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IPractice extends Document {
-  name: string;
+  _id: Types.ObjectId;
+  business_name: string;
   is_company: boolean;
   website?: string;
-  office: IOffice[];
+  addresses: string[];
 }
 
-const OfficeSchema = new Schema<IOffice>({
-  address: {
-    street: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
-    zip: { type: String, required: true },
-    name: { type: String, required: true },
-    country: { type: String, required: true },
-  },
-  title: { type: String, required: true },
-  phones: { type: [String], required: true },
-});
-
 const PracticeSchema = new Schema<IPractice>({
-  name: { type: String },
+  _id: { type: Schema.Types.ObjectId, required: true, auto: true },
+  business_name: { type: String },
   is_company: { type: Boolean },
   website: { type: String },
-  office: { type: [OfficeSchema] },
+  addresses: { type: [String] },
 });
 
 export default mongoose.model<IPractice>("Practice", PracticeSchema);

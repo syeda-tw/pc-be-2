@@ -15,7 +15,7 @@ function checkValidToken(req: AuthRequest, res: Response, next: NextFunction) {
   const token = authHeader.split(" ")[1]; // Extract token after "Bearer"
   console.log("token", token);
 
-  try {
+  try { 
     const decoded = verifyToken(token);
     req.user = decoded;
     next();

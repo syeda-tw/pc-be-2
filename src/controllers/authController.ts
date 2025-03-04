@@ -67,7 +67,7 @@ export const otpInvalid = "Invalid OTP";
 
 // Define an interface for the decoded token
 interface DecodedToken {
-  userId: string;
+  _id: string;
 }
 
 // Register function
@@ -188,8 +188,8 @@ export const verifyRegistrationOtp = async (req: Request, res: Response) => {
     // Delete OTP verification record
     await OtpVerification.deleteOne({ email });
     // Generate JWT token
-    const userId = user._id.toString();
-    const token: string = generateToken({ userId });
+    const _id = user._id.toString();
+    const token: string = generateToken({ _id });
 
     return res.status(201).json({
       message: "Registration successful",
@@ -234,7 +234,7 @@ export const verifyUserToken = async (
       // Type the decoded token
       decoded = verifyToken(token) as DecodedToken;
 
-      if (!decoded?.userId) {
+      if (!decoded?._id) {
         return res.status(401).json({
           message: "Invalid token",
           user: null,
@@ -249,7 +249,7 @@ export const verifyUserToken = async (
     }
 
     // Fetch the user using the ID from the decoded token
-    const user = (await User.findById(decoded.userId)) as IUser;
+    const user = (await User.findById(decoded._id)) as IUser;
 
     if (!user) {
       return res.status(404).json({
@@ -299,8 +299,8 @@ export const login = async (req: Request, res: Response) => {
     }
 
     // Generate JWT token
-    const userId = user._id.toString();
-    const token: string = generateToken({ userId });
+    const _id = user._id.toString();
+    const token: string = generateToken({ _id });
 
     return res.status(200).json({
       message: userLoggedInSuccess,

@@ -37,7 +37,7 @@ const UserSchema = new Schema<IUser>({
   hourly_rate: { type: Number },
   gender: { type: String },
   qualifications: { type: [{ type: Schema.Types.Mixed }], default: [] },
-  practice: { type: Schema.Types.ObjectId, ref: "Practice", required: true },
+  practice: { type: Schema.Types.ObjectId, ref: "Practice" },
   password: { type: String, required: true },
   status: {
     type: String,

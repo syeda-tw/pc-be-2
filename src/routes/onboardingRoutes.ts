@@ -1,4 +1,5 @@
 import {
+  onboardingIndividualStep2,
   validateAddress,
   validateUsername,
 } from "../controllers/onboardingController";
@@ -84,4 +85,40 @@ router.post("/validate-address", checkValidToken, validateAddress);
 
 router.post("/validate-username", checkValidToken, validateUsername);
 
+/**
+ * @swagger
+ * /onboarding/onboarding-individual-step-2:
+ *   post:
+ *     summary: Onboarding individual step 2
+ *     tags: [Onboarding]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               website:
+ *                 type: string
+ *                 description: The website of the practice
+ *               address:
+ *                 type: string
+ *                 description: The address of the practice
+ *               businessName:
+ *                 type: string
+ *                 description: The business name of the practice
+ *     responses:
+ *       200:
+ *         description: Success
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post(
+  "/onboarding-individual-step-2",
+  checkValidToken,
+  onboardingIndividualStep2
+);
 export default router;
