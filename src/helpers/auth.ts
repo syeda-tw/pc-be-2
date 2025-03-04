@@ -26,15 +26,16 @@ export const generateToken = (payload: object): string => {
   return jwt.sign(payload, secret, { expiresIn: "1h" });
 };
 
-export const verifyToken = (token: string): object | string => {
+export const verifyToken = (token: string): object | string | null => {
   const secret = process.env.JWT_SECRET as string;
   if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }
   try {
     return jwt.verify(token, secret);
-  } catch (err) {
-    throw new Error("Invalid token");
+  } catch (err: any) {
+    console.error("Invalid token:", err.message);
+    return null;
   }
 };
 

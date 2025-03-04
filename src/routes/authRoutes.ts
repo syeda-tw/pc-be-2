@@ -12,6 +12,7 @@ const router = express.Router();
  * /auth/register:
  *   post:
  *     summary: Register a new user
+ *     tags: [Authentication]
  *     description: Register a new user by providing email and password.
  *     requestBody:
  *       required: true
@@ -44,6 +45,7 @@ router.post("/register", register);
  * /auth/verify-registration-otp:
  *   post:
  *     summary: Verify registration OTP
+ *     tags: [Authentication]
  *     description: Verify the OTP code for user registration
  *     requestBody:
  *       required: true
@@ -76,6 +78,7 @@ router.post("/verify-registration-otp", verifyRegistrationOtp);
  * /auth/verify-user-token:
  *   post:
  *     summary: Verify user token
+ *     tags: [Authentication]
  *     description: Verify the user token
  *     responses:
  *       200:
@@ -94,6 +97,7 @@ router.post("/verify-user-token", (req, res, next) => {
  * /auth/login:
  *   post:
  *     summary: Login a user
+ *     tags: [Authentication]
  *     description: Login a user by providing email and password.
  *     requestBody:
  *       required: true

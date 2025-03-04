@@ -15,22 +15,20 @@ export async function geoapifyValidateAddress(address: string) {
     // Check if result exists
     if (!result) {
       return {
-        isValid: null,
+        isValid: false,
         isOutsideUS: null,
         isComplete: null,
         message: "Address is not valid. Please enter a valid address.",
-        isError: true,
       };
     }
 
     // Check if features array exists in result
     if (!result.features || !Array.isArray(result.features)) {
       return {
-        isValid: null,
+        isValid: false,
         isOutsideUS: null,
         isComplete: null,
         message: "Address is not valid. Please enter a valid address.",
-        isError: true,
       };
     }
 
@@ -51,7 +49,6 @@ export async function geoapifyValidateAddress(address: string) {
         isOutsideUS: null,
         isComplete: null,
         message: "Address is not valid. Please enter a valid address.",
-        isError: true,
       };
     }
 
@@ -60,12 +57,11 @@ export async function geoapifyValidateAddress(address: string) {
 
     if (isOutsideUS) {
       return {
-        isValid: true,
+        isValid: false,
         isOutsideUS: true,
         isComplete: null,
         message:
           "Address is not valid. Please enter an Address in the United States.",
-        isError: true,
       };
     }
 
@@ -83,11 +79,10 @@ export async function geoapifyValidateAddress(address: string) {
 
     if (!isComplete) {
       return {
-        isValid: true,
+        isValid: false,
         isOutsideUS: false,
         isComplete: false,
         message: "Address is not complete. Please enter a complete address.",
-        isError: true,
       };
     }
 
@@ -95,7 +90,6 @@ export async function geoapifyValidateAddress(address: string) {
       isValid: true,
       isOutsideUS: false,
       isComplete: true,
-      isError: false,
     };
   } catch (error) {
     console.log("error", error);

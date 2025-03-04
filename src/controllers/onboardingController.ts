@@ -125,3 +125,33 @@ export const validateAddress = async (
     });
   }
 };
+
+export const validateUsername = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { username } = req.body;
+
+    const user = await User.findOne({ username });
+
+    if (user) {
+      return res.status(400).json({
+        isValid: false,
+        message: "Username already exists",
+      });
+    }
+
+    return res.status(200).json({
+      isValid: true,
+      message: "Username is available",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      isValid: false,
+      message: "Internal server error",
+    });
+  }
+};
