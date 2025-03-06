@@ -5,9 +5,9 @@ import {
 } from "../controllers/onboardingController";
 import checkValidToken from "../middleware/authMiddleware";
 
-const express = require("express");
+import express from "express";
 const router = express.Router();
-const { onboardingStep1 } = require("../controllers/onboardingController");
+import { onboardingStep1 } from "../controllers/onboardingController";
 
 /**
  * @swagger

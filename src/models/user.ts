@@ -27,6 +27,7 @@ export interface IUser extends Document {
   first_name?: string;
   last_name?: string;
   middle_name?: string;
+  forms: [{ name: string; created_at: Date; s3_url: string }];
 }
 
 const UserSchema = new Schema<IUser>({
@@ -55,6 +56,10 @@ const UserSchema = new Schema<IUser>({
   last_name: { type: String },
   middle_name: { type: String },
   date_of_birth: { type: Date },
+  forms: {
+    type: [{ name: String, created_at: Date, s3_url: String }],
+    default: [],
+  },
 });
 
 export default mongoose.model<IUser>("User", UserSchema);
