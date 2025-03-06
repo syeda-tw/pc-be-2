@@ -23,7 +23,7 @@ export const generateToken = (payload: object): string => {
   if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }
-  return jwt.sign(payload, secret, { expiresIn: "1h" });
+  return jwt.sign(payload, secret, { expiresIn: "200h" });
 };
 
 export const verifyToken = (token: string): object | string | null => {

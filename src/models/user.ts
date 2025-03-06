@@ -27,7 +27,7 @@ export interface IUser extends Document {
   first_name?: string;
   last_name?: string;
   middle_name?: string;
-  forms: [{ name: string; created_at: Date; s3_url: string }];
+  forms: [{ _id: string; name: string; created_at: Date; s3_url: string }];
 }
 
 const UserSchema = new Schema<IUser>({
@@ -57,7 +57,7 @@ const UserSchema = new Schema<IUser>({
   middle_name: { type: String },
   date_of_birth: { type: Date },
   forms: {
-    type: [{ name: String, created_at: Date, s3_url: String }],
+    type: [{ _id: String, name: String, created_at: Date, s3_url: String }],
     default: [],
   },
 });
