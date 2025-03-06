@@ -118,7 +118,10 @@ router.post("/validate-username", checkValidToken, validateUsername);
 
 router.post(
   "/onboarding-individual-step-2",
+  //@ts-ignore
   checkValidToken,
   onboardingIndividualStep2
 );
+
+
 export default router;

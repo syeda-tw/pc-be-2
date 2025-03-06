@@ -4,6 +4,7 @@ import {
   addIntakeForm,
   getIntakeForms,
   getSingleIntakeForm,
+  deleteForm,
 } from "../controllers/intakeFormsController";
 import checkValidToken from "../middleware/authMiddleware";
 
@@ -102,6 +103,38 @@ router.get(
   //@ts-ignore
   checkValidToken,
   getSingleIntakeForm
+);
+
+/**
+ * @swagger
+ * /intake-forms/{formId}:
+ *   delete:
+ *     summary: Delete a form for the authenticated user
+ *     tags: [Intake Forms]
+ *     parameters:
+ *       - in: path
+ *         name: formId
+ *         required: true
+ *         description: ID of the form to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Form deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: Form not found
+ *       500:
+ *         description: Internal server error
+ */
+
+//@ts-ignore
+router.delete(
+  "/:formId",
+  //@ts-ignore
+  checkValidToken,
+  deleteForm
 );
 
 export default router;
