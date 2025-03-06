@@ -1,28 +1,27 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../helpers/auth";
+import { verifyToken } from "../helpers/auth"; // Your token verification logic
 
-interface AuthRequest extends Request {
-  user?: any; // Change `any` to a proper type if you have a User type
-}
+export default function checkValidToken(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const authHeader = req.headers.authorization;
 
-function checkValidToken(req: AuthRequest, res: Response, next: NextFunction) {
-  const authHeader = req.headers["authorization"];
-
-  if (!authHeader) {
-    return res.status(401).json({ message: "No token provided" });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Unauthorized: No token provided" });
   }
 
-  const token = authHeader.split(" ")[1]; // Extract token after "Bearer"
-  console.log("token", token);
+  const token = authHeader.split(" ")[1];
 
-  try { 
+  try {
     const decoded = verifyToken(token);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    console.error("Token verification error:", err);
-    return res.status(401).json({ message: "Invalid token" });
+    if (!decoded) {
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    }
+    (req as any).user = decoded; // Attach user to request
+    next(); // Proceed to next middleware/route handler
+  } catch (error) {
+    return res.status(401).json({ message: "Unauthorized: Invalid token" });
   }
 }
-
-export default checkValidToken;
