@@ -74,6 +74,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.listen(3000, '0.0.0.0', () => {
+  console.log('Server is running on http://0.0.0.0:3000');
 });

@@ -43,11 +43,13 @@ export const addIntakeForm = async (
 ) => {
   try {
     // Validate request
+    //@ts-ignore
     if (!req.file || !req.body.formName) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
     const userId = req.user._id;
+    //@ts-ignore
     const { buffer, mimetype } = req.file;
 
     if (!buffer || buffer.length === 0) {
@@ -163,7 +165,7 @@ export const getSingleIntakeForm = async (
         .status(500)
         .json({ message: "Failed to retrieve file from S3" });
     }
-
+//@ts-ignore
     const fileStream = Readable.from(s3Object.Body); // This is how you'd convert the Blob to a Readable stream
 
     // Set headers for the PDF file

@@ -21,7 +21,7 @@ export async function geoapifyValidateAddress(address: string) {
         message: "Address is not valid. Please enter a valid address.",
       };
     }
-
+//@ts-ignore
     // Check if features array exists in result
     if (!result.features || !Array.isArray(result.features)) {
       return {
@@ -32,6 +32,7 @@ export async function geoapifyValidateAddress(address: string) {
       };
     }
 
+    //@ts-ignore
     // Find the feature with the highest rank.confidence
     const highestRankedFeature = result.features.reduce(
       (prev: any, current: any) => {

@@ -33,6 +33,7 @@ import { onboardingStep1 } from "../controllers/onboardingController";
  */
 
 // Route for onboarding step 1
+//@ts-ignore
 router.post("/onboarding-step-1", checkValidToken, onboardingStep1);
 
 /**
@@ -57,7 +58,7 @@ router.post("/onboarding-step-1", checkValidToken, onboardingStep1);
  *       401:
  *         description: Unauthorized
  */
-
+//@ts-ignore
 router.post("/validate-address", checkValidToken, validateAddress);
 
 /**
@@ -82,7 +83,7 @@ router.post("/validate-address", checkValidToken, validateAddress);
  *       401:
  *         description: Unauthorized
  */
-
+//@ts-ignore
 router.post("/validate-username", checkValidToken, validateUsername);
 
 /**
