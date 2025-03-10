@@ -204,7 +204,7 @@ export const deleteForm = async (
     }
 
     // Find the form by ID
-    const form = user.forms.id(formId);
+    const form = user.forms.find((form) => form._id === formId);
 
     if (!form) {
       return res.status(404).json({ message: "Form not found" });
