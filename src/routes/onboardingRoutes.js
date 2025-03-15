@@ -1,13 +1,12 @@
+import checkValidToken from "../middleware/authMiddleware.js";
 import {
-  onboardingIndividualStep2,
+  onboardingStep1,
   validateAddress,
   validateUsername,
-} from "../controllers/onboardingController";
-import checkValidToken from "../middleware/authMiddleware";
-
+  onboardingIndividualStep2,
+} from "../controllers/onboardingController.js";
 import express from "express";
 const router = express.Router();
-import { onboardingStep1 } from "../controllers/onboardingController";
 
 /**
  * @swagger
@@ -119,10 +118,8 @@ router.post("/validate-username", checkValidToken, validateUsername);
 
 router.post(
   "/onboarding-individual-step-2",
-  //@ts-ignore
   checkValidToken,
   onboardingIndividualStep2
 );
-
 
 export default router;

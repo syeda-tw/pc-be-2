@@ -5,8 +5,8 @@ import {
   getIntakeForms,
   getSingleIntakeForm,
   deleteForm,
-} from "../controllers/intakeFormsController";
-import checkValidToken from "../middleware/authMiddleware";
+} from "../controllers/intakeFormsController.js";
+import checkValidToken from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() }); // Store file in memory

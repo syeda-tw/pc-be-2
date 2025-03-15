@@ -1,36 +1,8 @@
-import mongoose, { Schema, Document, Types } from "mongoose";
+import mongoose from "mongoose";
 
-export type UserStatus =
-  | "onboarding-step-1"
-  | "onboarding-step-2"
-  | "onboarding-step-3"
-  | "verified"
-  | "disabled";
+const { Schema } = mongoose;
 
-interface IQualification {
-  [key: string]: any; // Placeholder for qualification fields
-}
-
-export interface IUser extends Document {
-  _id: Types.ObjectId;
-  title?: string;
-  is_admin: boolean;
-  pronouns?: string;
-  hourly_rate?: number;
-  gender?: string;
-  qualifications: IQualification[];
-  practice: Types.ObjectId;
-  password: string;
-  status: UserStatus;
-  email: string;
-  date_of_birth?: Date;
-  first_name?: string;
-  last_name?: string;
-  middle_name?: string;
-  forms: [{ _id: string; name: string; created_at: Date; s3_url: string }];
-}
-
-const UserSchema = new Schema<IUser>({
+const UserSchema = new Schema({
   _id: { type: Schema.Types.ObjectId, required: true, auto: true },
   title: { type: String },
   is_admin: { type: Boolean, default: false },
@@ -56,10 +28,24 @@ const UserSchema = new Schema<IUser>({
   last_name: { type: String },
   middle_name: { type: String },
   date_of_birth: { type: Date },
+  availability: {
+    type: [{ type: Schema.Types.Mixed }],
+    default: [
+      {
+        Monday: [],
+        Tuesday: [],
+        Wednesday: [],
+        Thursday: [],
+        Friday: [],
+        Saturday: [],
+        Sunday: [],
+      },
+    ],
+  },
   forms: {
     type: [{ _id: String, name: String, created_at: Date, s3_url: String }],
     default: [],
   },
 });
 
-export default mongoose.model<IUser>("User", UserSchema);
+export default mongoose.model("User", UserSchema);

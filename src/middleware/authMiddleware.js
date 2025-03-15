@@ -1,11 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import { verifyToken } from "../helpers/auth"; // Your token verification logic
+import { verifyToken } from "../helpers/auth.js"; // Your token verification logic
 
-export default function checkValidToken(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+export default function checkValidToken(req, res, next) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -19,7 +14,7 @@ export default function checkValidToken(
     if (!decoded) {
       return res.status(401).json({ message: "Unauthorized: Invalid token" });
     }
-    (req as any).user = decoded; // Attach user to request
+    req.user = decoded; // Attach user to request
     next(); // Proceed to next middleware/route handler
   } catch (error) {
     return res.status(401).json({ message: "Unauthorized: Invalid token" });

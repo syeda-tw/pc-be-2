@@ -1,6 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import User, { IUser } from "../models/user"; // User model and IUser interface
-import OtpVerification from "../models/otpVerification"; // OtpVerifications model
+import User from "../models/user.js"; // User model
+import OtpVerification from "../models/otpVerification.js"; // OtpVerifications model
 import {
   generateOtp,
   generateToken,
@@ -9,22 +8,22 @@ import {
   validateEmail,
   validatePassword,
   verifyToken,
-} from "../helpers/auth";
+} from "../helpers/auth.js";
 import {
   generateEmailHtml,
   sendEmail,
   sendErrorResponse,
-} from "../helpers/common";
-import practice from "../models/practice";
+} from "../helpers/common.js";
+import practice from "../models/practice.js";
 
 // Queries
-const findUserByEmail = (email: string) => User.findOne({ email });
-const findOtpVerificationByEmail = (email: string) =>
+const findUserByEmail = (email) => User.findOne({ email });
+const findOtpVerificationByEmail = (email) =>
   OtpVerification.findOne({ email });
 const createOtpVerification = (
-  email: string,
-  hashedPassword: string,
-  otp: string
+  email,
+  hashedPassword,
+  otp
 ) => {
   const newOtpVerification = new OtpVerification({
     email,
@@ -65,13 +64,8 @@ export const unauthorizedAccess = "Unauthorized access";
 export const otpSent = "OTP sent to the email address";
 export const otpInvalid = "Invalid OTP";
 
-// Define an interface for the decoded token
-interface DecodedToken {
-  _id: string;
-}
-
 // Register function
-export const register = async (req: Request, res: Response) => {
+export const register = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -146,7 +140,7 @@ export const register = async (req: Request, res: Response) => {
 };
 
 // Verify OTP and complete registration
-export const verifyRegistrationOtp = async (req: Request, res: Response) => {
+export const verifyRegistrationOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
 
@@ -177,19 +171,19 @@ export const verifyRegistrationOtp = async (req: Request, res: Response) => {
     Object.assign(otpVerification, { practice: newPractice._id });
 
     // Create new user
-    const user = (await User.create({
+    const user = await User.create({
       email: otpVerification.email,
       password: otpVerification.password,
       status: "onboarding-step-1",
       is_admin: true,
       practice: newPractice._id,
-    })) as { _id: string }; // Type assertion here
+    });
 
     // Delete OTP verification record
     await OtpVerification.deleteOne({ email });
     // Generate JWT token
     const _id = user._id.toString();
-    const token: string = generateToken({ _id });
+    const token = generateToken({ _id });
 
     return res.status(201).json({
       message: "Registration successful",
@@ -207,9 +201,9 @@ export const verifyRegistrationOtp = async (req: Request, res: Response) => {
 };
 
 export const verifyUserToken = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req,
+  res,
+  next
 ) => {
   try {
     // Check if authorization header is present
@@ -228,11 +222,11 @@ export const verifyUserToken = async (
       });
     }
 
-    let decoded: DecodedToken;
+    let decoded;
 
     try {
       // Type the decoded token
-      decoded = verifyToken(token) as DecodedToken;
+      decoded = verifyToken(token);
 
       if (!decoded?._id) {
         return res.status(401).json({
@@ -249,7 +243,7 @@ export const verifyUserToken = async (
     }
 
     // Fetch the user using the ID from the decoded token
-    const user = (await User.findById(decoded._id)) as IUser;
+    const user = await User.findById(decoded._id);
 
     if (!user) {
       return res.status(404).json({
@@ -272,7 +266,7 @@ export const verifyUserToken = async (
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -300,7 +294,7 @@ export const login = async (req: Request, res: Response) => {
 
     // Generate JWT token
     const _id = user._id.toString();
-    const token: string = generateToken({ _id });
+    const token = generateToken({ _id });
 
     return res.status(200).json({
       message: userLoggedInSuccess,

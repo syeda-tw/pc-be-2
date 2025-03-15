@@ -1,14 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import User, { IUser } from "../models/user"; // User model and IUser interface
-import { verifyToken } from "../helpers/auth";
-import { geoapifyValidateAddress } from "../helpers/address-validation";
-import Practice from "../models/practice";
+import User from "../models/user.js"; // User model
+import { geoapifyValidateAddress } from "../helpers/address-validation.js";
+import Practice from "../models/practice.js";
 
-export const onboardingStep1 = async (
-  req: Request & { user: { _id: string } },
-  res: Response,
-  next: NextFunction
-) => {
+export const onboardingStep1 = async (req, res, next) => {
   try {
     // Check if authorization header is present
 
@@ -33,7 +27,7 @@ export const onboardingStep1 = async (
     } = req.body;
 
     // Validation checks
-    const errors: string[] = [];
+    const errors = [];
 
     if (!firstName) {
       errors.push("First name is required");
@@ -78,11 +72,7 @@ export const onboardingStep1 = async (
   }
 };
 
-export const validateAddress = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const validateAddress = async (req, res, next) => {
   try {
     const { address } = req.body;
 
@@ -97,11 +87,7 @@ export const validateAddress = async (
   }
 };
 
-export const validateUsername = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const validateUsername = async (req, res, next) => {
   try {
     const { username } = req.body;
 
@@ -127,11 +113,7 @@ export const validateUsername = async (
   }
 };
 
-export const onboardingIndividualStep2 = async (
-  req: Request & { user: { _id: string } },
-  res: Response,
-  next: NextFunction
-) => {
+export const onboardingIndividualStep2 = async (req, res, next) => {
   try {
     const { website, address, businessName } = req.body;
 

@@ -1,15 +1,7 @@
 import { format } from "date-fns";
 import nodemailer from "nodemailer";
 
-export const sendErrorResponse = ({
-  status,
-  message,
-  res,
-}: {
-  status: number;
-  message: string;
-  res: any;
-}) => {
+export const sendErrorResponse = ({ status, message, res }) => {
   if (res && typeof res.status === 'function') {
     return res.status(status).json({ message });
   } else {
@@ -18,7 +10,7 @@ export const sendErrorResponse = ({
   }
 };
 
-export const formatDate = (date: Date): string => {
+export const formatDate = (date) => {
   return format(date, "yyyy-MM-dd HH:mm:ss");
 };
 
@@ -30,12 +22,7 @@ export const formatDate = (date: Date): string => {
  * @param html - HTML body of the email (optional)
  * @returns Promise indicating the email status
  */
-export const sendEmail = async (
-  to: string,
-  subject: string,
-  text: string,
-  html?: string
-): Promise<void> => {
+export const sendEmail = async (to, subject, text, html) => {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -66,10 +53,9 @@ export const sendEmail = async (
  * Generate an HTML email body with dynamic content
  * @param {string} heading - The dynamic heading for the email
  * @param {string} body - The dynamic body content for the email
- * @param {string} logoUrl - The URL to your app's logo
  * @returns {string} - The HTML email content with dynamic data injected
  */
-export const generateEmailHtml = (heading: string, body: string) => {
+export const generateEmailHtml = (heading, body) => {
   let htmlTemplate = `
        <!DOCTYPE html>
     <html lang="en">

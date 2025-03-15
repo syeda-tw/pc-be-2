@@ -1,5 +1,4 @@
-import { Request, Response } from "express";
-import User from "../models/user";
+import User from "../models/user.js";
 import {
   S3Client,
   PutObjectCommand,
@@ -37,19 +36,14 @@ const s3Client = new S3Client({
   },
 });
 
-export const addIntakeForm = async (
-  req: Request & { user: { _id: string } },
-  res: Response
-) => {
+export const addIntakeForm = async (req, res) => {
   try {
     // Validate request
-    //@ts-ignore
     if (!req.file || !req.body.formName) {
       return res.status(400).json({ message: "No file uploaded" });
     }
 
     const userId = req.user._id;
-    //@ts-ignore
     const { buffer, mimetype } = req.file;
 
     if (!buffer || buffer.length === 0) {
@@ -67,7 +61,7 @@ export const addIntakeForm = async (
 
     // **Upload to S3**
     const params = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME!,
+      Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: fileName,
       Body: buffer,
       ContentType: mimetype || "application/pdf",
@@ -107,10 +101,7 @@ export const addIntakeForm = async (
   }
 };
 
-export const getIntakeForms = async (
-  req: Request & { user: { _id: string } },
-  res: Response
-) => {
+export const getIntakeForms = async (req, res) => {
   try {
     const userId = req.user._id;
 
@@ -131,10 +122,7 @@ export const getIntakeForms = async (
   }
 };
 
-export const getSingleIntakeForm = async (
-  req: Request & { user: { _id: string } },
-  res: Response
-) => {
+export const getSingleIntakeForm = async (req, res) => {
   try {
     const userId = req.user._id;
     const { formId } = req.params;
@@ -165,7 +153,7 @@ export const getSingleIntakeForm = async (
         .status(500)
         .json({ message: "Failed to retrieve file from S3" });
     }
-//@ts-ignore
+
     const fileStream = Readable.from(s3Object.Body); // This is how you'd convert the Blob to a Readable stream
 
     // Set headers for the PDF file
@@ -190,10 +178,7 @@ export const getSingleIntakeForm = async (
   }
 };
 
-export const deleteForm = async (
-  req: Request & { user: { _id: string } },
-  res: Response
-) => {
+export const deleteForm = async (req, res) => {
   try {
     const userId = req.user._id;
     const { formId } = req.params; // Assuming formId is passed as a URL parameter
