@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import nodemailer from "nodemailer";
 
 export const sendErrorResponse = ({ status, message, res }) => {
-  if (res && typeof res.status === 'function') {
+  if (res && typeof res.status === "function") {
     return res.status(status).json({ message });
   } else {
     console.error("Invalid response object passed to sendErrorResponse");
@@ -12,6 +12,16 @@ export const sendErrorResponse = ({ status, message, res }) => {
 
 export const formatDate = (date) => {
   return format(date, "yyyy-MM-dd HH:mm:ss");
+};
+//THIS IS CREATED SO THAT TEST ACCOUNTS CAN BE CREATED WITH THE SAME EMAIL ADDRESS
+const getEmailForDevelopment = (email) => {
+  if (process.env.ENV === "development" && email.includes("+")) {
+    // Split by '+' and get the part before '@'
+    const beforeAt = email.split("+")[0];
+    const domain = email.split("@")[1];
+    return `${beforeAt}@${domain}`; // Reconstruct the email without the part between '+' and '@'
+  }
+  return email; // Return the email as is if not in development or no '+' found
 };
 
 /**
@@ -34,11 +44,12 @@ export const sendEmail = async (to, subject, text, html) => {
 
     const mailOptions = {
       from: process.env.NODEMAILER_EMAIL,
-      to,
+      to: getEmailForDevelopment(to) || to,
       subject,
       text,
       html: html || text,
     };
+    console.log("Sending email to:", mailOptions.to); // Log the recipient for debugging
 
     // Send mail using the defined transporter
     await transporter.sendMail(mailOptions);

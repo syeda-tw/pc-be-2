@@ -20,11 +20,7 @@ import practice from "../models/practice.js";
 const findUserByEmail = (email) => User.findOne({ email });
 const findOtpVerificationByEmail = (email) =>
   OtpVerification.findOne({ email });
-const createOtpVerification = (
-  email,
-  hashedPassword,
-  otp
-) => {
+const createOtpVerification = (email, hashedPassword, otp) => {
   const newOtpVerification = new OtpVerification({
     email,
     password: hashedPassword,
@@ -200,11 +196,7 @@ export const verifyRegistrationOtp = async (req, res) => {
   }
 };
 
-export const verifyUserToken = async (
-  req,
-  res,
-  next
-) => {
+export const verifyUserToken = async (req, res, next) => {
   try {
     // Check if authorization header is present
     if (!req.headers.authorization) {
