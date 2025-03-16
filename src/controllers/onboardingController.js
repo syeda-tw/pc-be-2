@@ -119,17 +119,24 @@ export const onboardingIndividualStep2 = async (req, res, next) => {
   try {
     const { website, address, businessName } = req.body;
 
-    const practice = await Practice.create({
-      business_name: businessName,
-      website,
-      addresses: [address],
-      is_company: false,
-    });
+    const practice = await Practice.create(
+      {
+        business_name: businessName,
+        website,
+        addresses: [address],
+        is_company: false,
+      },
+      { new: true }
+    );
 
-    const user = await User.findByIdAndUpdate(req.user._id, {
-      practice: practice._id,
-      status: "onboarded",
-    });
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        practice: practice._id,
+        status: "onboarded",
+      },
+      { new: true }
+    );
 
     return res.status(200).json({
       message: "Practice created successfully",

@@ -7,15 +7,7 @@ import {
 } from "@aws-sdk/client-s3";
 import * as dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
-import path from "path";
 
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-import { Readable } from "stream";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 dotenv.config();
 
@@ -37,6 +29,7 @@ const s3Client = new S3Client({
 });
 
 export const addIntakeForm = async (req, res) => {
+  console.log(req.file, req.body);
   try {
     // Validate request
     if (!req.file || !req.body.formName) {
@@ -53,11 +46,6 @@ export const addIntakeForm = async (req, res) => {
     // Generate unique ID and filename
     const _id = uuidv4();
     const fileName = `${_id}.pdf`;
-
-    // **Save to Local File for Debugging**
-    const debugPath = path.join(__dirname, `debug_${fileName}`);
-    fs.writeFileSync(debugPath, buffer);
-    console.log(`✅ Saved debug file: ${debugPath}`);
 
     // **Upload to S3**
     const params = {
@@ -92,8 +80,7 @@ export const addIntakeForm = async (req, res) => {
 
     return res.status(200).json({
       message: "Form uploaded successfully",
-      fileUrl,
-      user,
+      form: formDetails,
     });
   } catch (err) {
     console.error("🚨 Error uploading form:", err);

@@ -7,10 +7,9 @@ import {
   deleteForm,
 } from "../controllers/intakeFormsController.js";
 import checkValidToken from "../middleware/authMiddleware.js";
-
+const storage = multer.memoryStorage();
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() }); // Store file in memory
-
+const upload = multer({ storage });
 /**
  * @swagger
  * /intake-forms/add:
@@ -47,7 +46,7 @@ router.post(
   "/add",
   //@ts-ignore
   checkValidToken,
-  upload.single("formFile"),
+  upload.single("file"),
   addIntakeForm
 );
 
