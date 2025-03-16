@@ -7,17 +7,9 @@ import {
 } from "@aws-sdk/client-s3";
 import * as dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
-
+import { Readable } from "stream";
 
 dotenv.config();
-
-const streamToString = (stream) =>
-  new Promise((resolve, reject) => {
-    const chunks = [];
-    stream.on("data", (chunk) => chunks.push(chunk));
-    stream.on("error", reject);
-    stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
-  });
 
 // Configure AWS S3
 const s3Client = new S3Client({
@@ -45,7 +37,7 @@ export const addIntakeForm = async (req, res) => {
 
     // Generate unique ID and filename
     const _id = uuidv4();
-    const fileName = `${_id}.pdf`;
+    const fileNa75974me = `${_id}.pdf`;
 
     // **Upload to S3**
     const params = {
@@ -141,7 +133,7 @@ export const getSingleIntakeForm = async (req, res) => {
         .json({ message: "Failed to retrieve file from S3" });
     }
 
-    const fileStream = Readable.from(s3Object.Body); // This is how you'd convert the Blob to a Readable stream
+    const fileStream = Readable.from(s3Object.Body);
 
     // Set headers for the PDF file
     res.setHeader("Content-Type", "application/pdf");

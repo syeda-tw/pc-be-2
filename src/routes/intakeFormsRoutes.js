@@ -96,13 +96,7 @@ router.get(
  *         description: Internal server error
  */
 
-//@ts-ignore
-router.get(
-  "/:formId",
-  //@ts-ignore
-  checkValidToken,
-  getSingleIntakeForm
-);
+router.get("/:formId", checkValidToken, getSingleIntakeForm);
 
 /**
  * @swagger
