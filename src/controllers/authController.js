@@ -1,5 +1,9 @@
-import User from "../models/user.js"; // User model
-import OtpVerification from "../models/otpVerification.js"; // OtpVerifications model
+// Import models
+import User from "../models/user.js";
+import OtpVerification from "../models/otpVerification.js";
+import practice from "../models/practice.js";
+
+// Import helpers
 import {
   generateOtp,
   generateToken,
@@ -14,7 +18,6 @@ import {
   sendEmail,
   sendErrorResponse,
 } from "../helpers/common.js";
-import practice from "../models/practice.js";
 
 // Queries
 const findUserByEmail = (email) => User.findOne({ email });
@@ -29,67 +32,69 @@ const createOtpVerification = (email, hashedPassword, otp) => {
   return newOtpVerification.save();
 };
 
-// API RESPONSES
-
-// Success Messages
-export const userRegisteredSuccess =
-  "User successfully registered and verification email sent";
-export const userLoggedInSuccess = "User successfully logged in";
-export const dataFetchedSuccess = "Data fetched successfully";
-
-// Error Messages
-export const userAlreadyExists = "User already exists. Please sign in instead";
-export const invalidEmailFormat = "Invalid email format";
-export const invalidPasswordFormat =
-  "Password must be at least 8 characters long";
-export const serverError = "Internal server error";
-
-// Validation Messages
-export const missingEmailPassword = "Email and password are required";
-export const invalidCredentials = "Invalid email or password";
-export const missingRequiredFields = "Please fill all required fields";
-
-// Not Found Messages
-export const resourceNotFound = "Resource not found";
-export const endpointNotFound = "Endpoint not found";
-
-// Unauthorized Messages
-export const unauthorizedAccess = "Unauthorized access";
-
-// Miscellaneous Messages
-export const otpSent = "OTP sent to the email address";
-export const otpInvalid = "Invalid OTP";
+// API Response Messages
+const messages = {
+  success: {
+    userRegistered: "User successfully registered and verification email sent",
+    userLoggedIn: "User successfully logged in",
+    dataFetched: "Data fetched successfully",
+  },
+  error: {
+    userAlreadyExists: "User already exists. Please sign in instead",
+    invalidEmailFormat: "Invalid email format",
+    invalidPasswordFormat: "Password must be at least 8 characters long",
+    serverError: "Internal server error",
+  },
+  validation: {
+    missingEmailPassword: "Email and password are required",
+    invalidCredentials: "Invalid email or password",
+    missingRequiredFields: "Please fill all required fields",
+  },
+  notFound: {
+    resource: "Resource not found",
+    endpoint: "Endpoint not found",
+  },
+  unauthorized: {
+    access: "Unauthorized access",
+  },
+  misc: {
+    otpSent: "OTP sent to the email address",
+    otpInvalid: "Invalid OTP",
+  },
+};
 
 // Register function
 export const register = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Step 1: Validate email and password
+    // Validate email and password
     if (!validateEmail(email)) {
-      return res.status(400).json({ message: invalidEmailFormat });
+      return res
+        .status(400)
+        .json({ message: messages.error.invalidEmailFormat });
     }
-
     if (!validatePassword(password)) {
-      return res.status(400).json({ message: invalidPasswordFormat });
+      return res
+        .status(400)
+        .json({ message: messages.error.invalidPasswordFormat });
     }
 
-    // Step 2: Check if the user already exists in the User collection
+    // Check if the user already exists
     const existingUser = await findUserByEmail(email);
     if (existingUser) {
-      return res.status(400).json({ message: userAlreadyExists });
+      return res
+        .status(400)
+        .json({ message: messages.error.userAlreadyExists });
     }
 
-    // Step 3: Check if email exists in OtpVerifications
+    // Handle OTP verification
     const otp = generateOtp();
     const otpVerification = await findOtpVerificationByEmail(email);
     const hashedPassword = await hashPassword(password);
 
     if (otpVerification) {
-      // If email exists in OtpVerifications, update it
-      otpVerification.email = email;
-      otpVerification.password = hashedPassword;
-      otpVerification.otp = otp;
+      Object.assign(otpVerification, { email, password: hashedPassword, otp });
       await otpVerification.save();
     } else {
       await createOtpVerification(email, hashedPassword, otp);
@@ -103,33 +108,31 @@ export const register = async (req, res) => {
         "Secure OTP Code for Practicare",
         `Hello,
 
-          We received a request to verify your email address with Practicare. Please use the following One-Time Password (OTP) to complete the verification process:
+        We received a request to verify your email address with Practicare. Please use the following One-Time Password (OTP) to complete the verification process:
 
-          Your OTP Code: ${otp}
+        Your OTP Code: 
+        <h1 style="font-size: 24px; font-weight: bold; color: #000;">${otp}</h1>
+        This code is valid for the next 10 minutes. If you did not request this verification, please ignore this email.
 
-          This code is valid for the next 10 minutes. If you did not request this verification, please ignore this email.
+        If you need further assistance, feel free to contact our support team.
 
-          If you need further assistance, feel free to contact our support team.
+        Thank you for choosing Practicare!
 
-          Thank you for choosing Practicare!
-
-          Best regards,
-          The Practicare Team
-          www.practicare.co`
+        Best regards,
+        The Practicare Team
+        www.practicare.co`
       )
     );
 
     return res.status(200).json({
-      user: {
-        email: email,
-      },
-      message: otpSent,
+      user: { email },
+      message: messages.misc.otpSent,
     });
   } catch (err) {
     console.error(err);
     return sendErrorResponse({
       status: 500,
-      message: serverError,
+      message: messages.error.serverError,
       res: err,
     });
   }
@@ -177,25 +180,27 @@ export const verifyRegistrationOtp = async (req, res) => {
 
     // Delete OTP verification record
     await OtpVerification.deleteOne({ email });
+
     // Generate JWT token
     const _id = user._id.toString();
     const token = generateToken({ _id });
 
     return res.status(201).json({
       message: "Registration successful",
-      user: user,
+      user,
       token,
     });
   } catch (err) {
     console.error(err);
     return sendErrorResponse({
       status: 500,
-      message: serverError,
+      message: messages.error.serverError,
       res: err,
     });
   }
 };
 
+// Verify user token
 export const verifyUserToken = async (req, res, next) => {
   try {
     // Check if authorization header is present
@@ -258,30 +263,39 @@ export const verifyUserToken = async (req, res, next) => {
   }
 };
 
+// Login function
 export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     // Validate email and password presence
     if (!email || !password) {
-      return res.status(400).json({ message: missingEmailPassword });
+      return res
+        .status(400)
+        .json({ message: messages.validation.missingEmailPassword });
     }
 
     // Validate email format
     if (!validateEmail(email)) {
-      return res.status(400).json({ message: invalidEmailFormat });
+      return res
+        .status(400)
+        .json({ message: messages.error.invalidEmailFormat });
     }
 
     // Find user by email
     const user = await findUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ message: invalidCredentials });
+      return res
+        .status(401)
+        .json({ message: messages.validation.invalidCredentials });
     }
 
     // Validate password
     const isPasswordValid = await isPasswordCorrect(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).json({ message: invalidCredentials });
+      return res
+        .status(401)
+        .json({ message: messages.validation.invalidCredentials });
     }
 
     // Generate JWT token
@@ -289,7 +303,7 @@ export const login = async (req, res) => {
     const token = generateToken({ _id });
 
     return res.status(200).json({
-      message: userLoggedInSuccess,
+      message: messages.success.userLoggedIn,
       user,
       token,
     });
@@ -297,8 +311,128 @@ export const login = async (req, res) => {
     console.error(err);
     return sendErrorResponse({
       status: 500,
-      message: serverError,
+      message: messages.error.serverError,
       res: err,
     });
+  }
+};
+
+// Request password reset
+export const requestResetPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const token = generateToken({ _id: user._id.toString() }, "1h"); // Token valid for 1 hour
+
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+
+    await sendEmail(
+      email,
+      "Password Reset Request",
+      generateEmailHtml(
+        "Password Reset Request",
+        `Hello,
+
+        We received a request to reset your password. Please use the following link to reset your password:
+
+        <a href="${resetLink}">Reset Password</a>
+
+        This link is valid for the next 1 hour. If you did not request this, please ignore this email.
+
+        Best regards,
+        The Practicare Team`
+      )
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Password reset link sent to your email" });
+  } catch (err) {
+    console.error("Error requesting password reset:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Reset password
+export const resetPassword = async (req, res) => {
+  const { token, password } = req.body;
+
+  try {
+    const decoded = verifyToken(token);
+
+    if (!decoded?._id) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    if (!validatePassword(password)) {
+      return res.status(400).json({ message: "Invalid password format" });
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    const user = await User.findByIdAndUpdate(
+      decoded._id,
+      { password: hashedPassword },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate JWT token
+    const loginToken = generateToken({ _id: user._id.toString() });
+
+    return res.status(200).json({
+      user,
+      message: "Password reset successfully",
+      token: loginToken,
+    });
+  } catch (err) {
+    console.error("Error resetting password:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Change password
+export const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  const userId = req.user._id;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isOldPasswordValid = await isPasswordCorrect(
+      oldPassword,
+      user.password
+    );
+
+    if (!isOldPasswordValid) {
+      return res.status(400).json({ message: "Old password is incorrect" });
+    }
+
+    if (!validatePassword(newPassword)) {
+      return res.status(400).json({ message: "Invalid password format" });
+    }
+
+    const hashedPassword = await hashPassword(newPassword);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (err) {
+    console.error("Error changing password:", err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };

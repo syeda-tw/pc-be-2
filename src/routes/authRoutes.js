@@ -4,6 +4,9 @@ import {
   verifyRegistrationOtp,
   verifyUserToken,
   login,
+  requestResetPassword,
+  resetPassword,
+  changePassword,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -124,5 +127,100 @@ router.post("/verify-user-token", (req, res, next) => {
  *         description: Server error
  */
 router.post("/login", login);
+
+/**
+ * @swagger
+ * /auth/request-password-reset:
+ *   post:
+ *     summary: Request password reset
+ *     tags: [Authentication]
+ *     description: Request a password reset link to be sent to the user's email
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email address
+ *     responses:
+ *       200:
+ *         description: Password reset link sent
+ *       400:
+ *         description: Invalid email format
+ *       500:
+ *         description: Server error
+ */
+router.post("/request-reset-password", requestResetPassword);
+
+/**
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Reset password
+ *     tags: [Authentication]
+ *     description: Reset the user's password using the reset link
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - newPassword
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The user's email address
+ *               newPassword:
+ *                 type: string
+ *                 description: The user's new password
+ *     responses:
+ *       200:
+ *         description: Password reset successful
+ *       400:
+ *         description: Invalid email or new password format
+ *       500:
+ *         description: Server error
+ */
+router.post("/reset-password", resetPassword);
+
+/**
+ * @swagger
+ * /auth/change-password:
+ *   post:
+ *     summary: Change password
+ *     tags: [Authentication]
+ *     description: Change the user's password
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - oldPassword
+ *               - newPassword
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 description: The user's old password
+ *               newPassword:
+ *                 type: string
+ *                 description: The user's new password
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Old password is incorrect or invalid password format
+ *       500:
+ *         description: Server error
+ */
+router.post("/change-password", changePassword);
 
 export default router;
