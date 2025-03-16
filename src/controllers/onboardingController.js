@@ -24,6 +24,7 @@ export const onboardingStep1 = async (req, res, next) => {
       firstName,
       lastName,
       middleName,
+      username,
     } = req.body;
 
     // Validation checks
@@ -57,6 +58,7 @@ export const onboardingStep1 = async (req, res, next) => {
     user.last_name = lastName;
     user.middle_name = middleName;
     user.status = "onboarding-step-2";
+    user.username = username;
 
     await user.save();
 
@@ -128,6 +130,40 @@ export const onboardingIndividualStep2 = async (req, res, next) => {
       practice: practice._id,
       status: "onboarded",
     });
+
+    return res.status(200).json({
+      message: "Practice created successfully",
+      practice,
+      user,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const onboardingCompanyStep2 = async (req, res, next) => {
+  try {
+    const { website, address, businessName, members } = req.body;
+
+    const practice = await Practice.create({
+      business_name: businessName,
+      website,
+      addresses: [address],
+      is_company: true,
+      members,
+    });
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        practice: practice._id,
+        status: "onboarded",
+      },
+      { new: true }
+    );
 
     return res.status(200).json({
       message: "Practice created successfully",

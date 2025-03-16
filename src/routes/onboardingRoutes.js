@@ -4,6 +4,7 @@ import {
   validateAddress,
   validateUsername,
   onboardingIndividualStep2,
+  onboardingCompanyStep2,
 } from "../controllers/onboardingController.js";
 import express from "express";
 const router = express.Router();
@@ -115,11 +116,49 @@ router.post("/validate-username", checkValidToken, validateUsername);
  *       500:
  *         description: Internal server error
  */
-
 router.post(
   "/onboarding-individual-step-2",
   checkValidToken,
   onboardingIndividualStep2
+);
+
+/**
+ * @swagger
+ * /onboarding/onboarding-company-step-2:
+ *   post:
+ *     summary: Onboarding company step 2
+ *     tags: [Onboarding]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               website:
+ *                 type: string
+ *                 description: The website of the practice
+ *               address:
+ *                 type: string
+ *               businessName:
+ *                 type: string
+ *                 description: The business name of the practice
+ *               members:
+ *                 type: string
+ *                 description: The members of the practice
+ *     responses:
+ *       200:
+ *         description: Success
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post(
+  "/onboarding-company-step-2",
+  checkValidToken,
+  onboardingCompanyStep2
 );
 
 export default router;
