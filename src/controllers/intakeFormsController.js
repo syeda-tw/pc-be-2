@@ -21,7 +21,6 @@ const s3Client = new S3Client({
 });
 
 export const addIntakeForm = async (req, res) => {
-  console.log(req.file, req.body);
   try {
     // Validate request
     if (!req.file || !req.body.formName) {
@@ -42,7 +41,7 @@ export const addIntakeForm = async (req, res) => {
     // **Upload to S3**
     const params = {
       Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: fileName,
+      Key: req.body.formName,
       Body: buffer,
       ContentType: mimetype || "application/pdf",
     };
@@ -50,11 +49,11 @@ export const addIntakeForm = async (req, res) => {
     await s3Client.send(new PutObjectCommand(params));
 
     // Construct file URL
-    const fileUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${fileName}`;
+    const fileUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${req.body.formName}`;
 
     // Update user with new form details
     const formDetails = {
-      _id: fileName,
+      _id: req.body.formName,
       name: req.body.formName,
       created_at: new Date(),
       s3_url: fileUrl,

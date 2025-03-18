@@ -43,8 +43,14 @@ export const isPasswordCorrect = async (password, userPassword) => {
   return await bcrypt.compare(password, userPassword);
 };
 
-//this function is used to remove the password from the user object
+// This function is used to remove the password and internal Mongoose properties from the user object
 export const sanitizeUser = (user) => {
-  const { password, ...userWithoutPassword } = user;
+  // Convert the Mongoose document to a plain JavaScript object, removing Mongoose-specific internal properties
+  const userObject = user.toObject({ versionKey: false });  // `versionKey: false` removes the `__v` field
+  
+  // Destructure to remove the password field
+  const { password, ...userWithoutPassword } = userObject;
+
+  // Return the sanitized user object
   return userWithoutPassword;
 };

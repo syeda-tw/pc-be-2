@@ -9,6 +9,7 @@ import {
   generateToken,
   hashPassword,
   isPasswordCorrect,
+  sanitizeUser,
   validateEmail,
   validatePassword,
   verifyToken,
@@ -142,7 +143,6 @@ export const register = async (req, res) => {
 export const verifyRegistrationOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
-
     // Find OTP verification record
     const otpVerification = await OtpVerification.findOne({ email });
 
@@ -166,20 +166,14 @@ export const verifyRegistrationOtp = async (req, res) => {
     // Create new practice with default values
     const newPractice = await practice.create({});
 
-    // Add practice ID to user data before creation
-    Object.assign(otpVerification, { practice: newPractice._id });
-
     // Create new user
-    const user = await User.create(
-      {
-        email: otpVerification.email,
-        password: otpVerification.password,
-        status: "onboarding-step-1",
-        is_admin: true,
-        practice: newPractice._id,
-      },
-      { new: true }
-    );
+    const user = await User.create({
+      email: otpVerification.email,
+      password: otpVerification.password,
+      status: "onboarding-step-1",
+      is_admin: true,
+      practice: newPractice._id,
+    });
 
     // Delete OTP verification record
     await OtpVerification.deleteOne({ email });
@@ -211,10 +205,9 @@ export const verifyRegistrationOtp = async (req, res) => {
         [www.practicare.co](https://www.practicare.co)`
       )
     );
-
     return res.status(201).json({
       message: messages.success.userRegistered,
-      user: sanitizeUser(user),
+      user,
       token,
     });
   } catch (err) {
@@ -222,7 +215,7 @@ export const verifyRegistrationOtp = async (req, res) => {
     return sendErrorResponse({
       status: 500,
       message: messages.error.serverError,
-      res: err,
+      res,
     });
   }
 };
@@ -410,12 +403,10 @@ export const resetPassword = async (req, res) => {
     );
 
     if (!user) {
-      return res
-        .status(404)
-        .json({
-          message:
-            "The email that you are trying to reset the password for does not exist",
-        });
+      return res.status(404).json({
+        message:
+          "The email that you are trying to reset the password for does not exist",
+      });
     }
 
     // Generate JWT token
@@ -443,7 +434,8 @@ export const changePassword = async (req, res) => {
     if (!user) {
       return sendErrorResponse({
         status: 404,
-        message: "The user that you are trying to change the password for does not exist",
+        message:
+          "The user that you are trying to change the password for does not exist",
         res,
       });
     }
