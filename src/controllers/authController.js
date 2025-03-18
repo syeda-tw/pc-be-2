@@ -149,7 +149,7 @@ export const verifyRegistrationOtp = async (req, res) => {
     if (!otpVerification) {
       return sendErrorResponse({
         status: 404,
-        message: "Email not found. Please register first.",
+        message: messages.notFound.resource,
         res,
       });
     }
@@ -158,7 +158,7 @@ export const verifyRegistrationOtp = async (req, res) => {
     if (otpVerification.otp !== otp) {
       return sendErrorResponse({
         status: 400,
-        message: "Invalid OTP code. Please try again.",
+        message: messages.misc.otpInvalid,
         res,
       });
     }
@@ -170,13 +170,16 @@ export const verifyRegistrationOtp = async (req, res) => {
     Object.assign(otpVerification, { practice: newPractice._id });
 
     // Create new user
-    const user = await User.create({
-      email: otpVerification.email,
-      password: otpVerification.password,
-      status: "onboarding-step-1",
-      is_admin: true,
-      practice: newPractice._id,
-    });
+    const user = await User.create(
+      {
+        email: otpVerification.email,
+        password: otpVerification.password,
+        status: "onboarding-step-1",
+        is_admin: true,
+        practice: newPractice._id,
+      },
+      { new: true }
+    );
 
     // Delete OTP verification record
     await OtpVerification.deleteOne({ email });
@@ -185,9 +188,33 @@ export const verifyRegistrationOtp = async (req, res) => {
     const _id = user._id.toString();
     const token = generateToken({ _id });
 
+    await sendEmail(
+      email,
+      "Welcome to Practicare!",
+      generateEmailHtml(
+        "Welcome to Practicare!",
+        `Hello ${user.first_name} ${user.last_name},  
+    
+        We're excited to welcome you to **Practicare**! Our platform is designed to help you manage your mental health practice efficiently—whether it's scheduling appointments, organizing client records, or streamlining daily tasks.  
+    
+        With Practicare, you can focus more on your clients while we handle the rest.  
+    
+        **Get started today:**  
+        - [Log in to your account](https://www.practicare.co)  
+        - Explore the features built for you  
+        - Reach out to our support team if you need any help  
+    
+        We're here to support you on this journey. Welcome aboard!  
+    
+        **Best regards,**  
+        The Practicare Team  
+        [www.practicare.co](https://www.practicare.co)`
+      )
+    );
+
     return res.status(201).json({
-      message: "Registration successful",
-      user,
+      message: messages.success.userRegistered,
+      user: sanitizeUser(user),
       token,
     });
   } catch (err) {
@@ -244,14 +271,14 @@ export const verifyUserToken = async (req, res, next) => {
 
     if (!user) {
       return res.status(404).json({
-        message: "User not found",
+        message: "Email does not exist",
         user: null,
       });
     }
 
     return res.status(200).json({
       message: "Token is valid",
-      user,
+      user: sanitizeUser(user),
       token,
     });
   } catch (err) {
@@ -304,7 +331,7 @@ export const login = async (req, res) => {
 
     return res.status(200).json({
       message: messages.success.userLoggedIn,
-      user,
+      user: sanitizeUser(user),
       token,
     });
   } catch (err) {
@@ -383,14 +410,19 @@ export const resetPassword = async (req, res) => {
     );
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res
+        .status(404)
+        .json({
+          message:
+            "The email that you are trying to reset the password for does not exist",
+        });
     }
 
     // Generate JWT token
     const loginToken = generateToken({ _id: user._id.toString() });
 
     return res.status(200).json({
-      user,
+      user: sanitizeUser(user),
       message: "Password reset successfully",
       token: loginToken,
     });
@@ -409,7 +441,11 @@ export const changePassword = async (req, res) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return sendErrorResponse({
+        status: 404,
+        message: "The user that you are trying to change the password for does not exist",
+        res,
+      });
     }
 
     const isOldPasswordValid = await isPasswordCorrect(
@@ -418,11 +454,19 @@ export const changePassword = async (req, res) => {
     );
 
     if (!isOldPasswordValid) {
-      return res.status(400).json({ message: "Old password is incorrect" });
+      return sendErrorResponse({
+        status: 400,
+        message: "Old password is incorrect",
+        res,
+      });
     }
 
     if (!validatePassword(newPassword)) {
-      return res.status(400).json({ message: "Invalid password format" });
+      return sendErrorResponse({
+        status: 400,
+        message: "Invalid password format",
+        res,
+      });
     }
 
     const hashedPassword = await hashPassword(newPassword);
@@ -433,6 +477,10 @@ export const changePassword = async (req, res) => {
     return res.status(200).json({ message: "Password changed successfully" });
   } catch (err) {
     console.error("Error changing password:", err);
-    return res.status(500).json({ message: "Internal server error" });
+    return sendErrorResponse({
+      status: 500,
+      message: messages.error.serverError,
+      res: err,
+    });
   }
 };

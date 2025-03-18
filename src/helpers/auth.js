@@ -42,3 +42,9 @@ export const verifyToken = (token) => {
 export const isPasswordCorrect = async (password, userPassword) => {
   return await bcrypt.compare(password, userPassword);
 };
+
+//this function is used to remove the password from the user object
+export const sanitizeUser = (user) => {
+  const { password, ...userWithoutPassword } = user;
+  return userWithoutPassword;
+};
