@@ -1,15 +1,15 @@
 import express from "express";
 import helmet from "helmet";
-import { configureSwagger } from "../docs/swagger.js";
-import { corsMiddleware } from "../middleware/corsMiddleware.js";
-import { errorHandler } from "../middleware/errorHandlingMiddleware.js";
-import { env } from "../config/env.js";
-import authRoutes from "../routes/authRoutes.js";
+import { configureSwagger } from "../../common/config/swagger.js";
+import { corsMiddleware } from "../../common/middlewares/corsMiddleware.js";
+import { errorHandler } from "../../common/middlewares/errorHandlingMiddleware.js";
+import { env } from "./env.js";
+import authRoutes from "../../features/auth/routes.js";
 
 // import onboardingRoutes from "../routes/onboardingRoutes.js";
 // import intakeFormsRoutes from "../routes/intakeFormsRoutes.js";
 
-import "../config/db.js";
+import "./db.js";
 
 const app = express();
 const port = env.PORT || 3000;

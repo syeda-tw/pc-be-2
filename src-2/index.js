@@ -1,4 +1,4 @@
-import app from "./api/server.js"; // Import the Express app setup
+import app from "./common/config/server.js";
 
 const port = process.env.PORT || 3000;
 

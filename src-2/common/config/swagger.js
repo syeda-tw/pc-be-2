@@ -25,7 +25,7 @@ export const configureSwagger = (app) => {
         },
       ],
     },
-    apis: ["./dist/routes/*.js"],
+    apis: ["./src-2/features/auth/swagger.js"],
   };
 
   const swaggerDocs = swaggerJsDoc(swaggerOptions);
