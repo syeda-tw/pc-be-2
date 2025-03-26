@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { env } from "../../common/config/env.js";
+import CustomError from "./customError.js";
 
 export const sendEmail = async (to, subject, htmlContent) => {
   try {
@@ -21,6 +22,6 @@ export const sendEmail = async (to, subject, htmlContent) => {
     await transporter.sendMail(mailOptions);
   } catch (err) {
     console.error("Error sending email:", err);
-    throw new Error("Email sending failed");
+    throw new CustomError(400, 'Email sending failed');
   }
 };

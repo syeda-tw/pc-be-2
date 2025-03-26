@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node src-2/index.js",
     "dev": "nodemon src-2/index.js",
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles",
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles --watch"
   },
   "keywords": [],
   "author": "",

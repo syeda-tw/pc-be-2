@@ -22,8 +22,7 @@ const sendRegistrationEmail = async (email, otp) => {
   try {
     await sendEmail(email, subject, htmlContent);
   } catch (err) {
-    console.error("Error sending registration email:", err);
-    throw new Error("Error sending OTP email.");
+    throw new CustomError(400, "Error sending OTP email.");
   }
 };
 
@@ -65,7 +64,7 @@ const isPasswordCorrect = async (password, userPassword) => {
   return await bcrypt.compare(password, userPassword);
 };
 
-const sendPasswordResetEmail = async (email, resetLink) => {  
+const sendPasswordResetEmail = async (email, resetLink) => {
   await sendEmail(
     email,
     "Password Reset Request",
@@ -83,7 +82,7 @@ const sendPasswordResetEmail = async (email, resetLink) => {
       The Practicare Team`
     )
   );
-};  
+};
 
 export {
   sendRegistrationEmail,

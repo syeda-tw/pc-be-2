@@ -7,15 +7,13 @@ import {
   changePasswordService,
 } from "./services.js";
 import { messages } from "./messages.js";
-import { handleError } from "../../common/utils/customError.js";
 import { sanitizeUser } from "../../../src/helpers/auth.js";
 
 //return object is data: {email} and message: "OTP sent to the email address"
-const register = async (req, res) => {
+const register = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const result = await registerUserService(email, password);
-    console.log("result", result);
     return res.status(200).json({
       data: {
         email,
@@ -23,12 +21,12 @@ const register = async (req, res) => {
       message: messages.register.otpSent,
     });
   } catch (err) {
-    return handleError(err);
+    next(err);
   }
 };
 
 // return object is data: {email} and message: "OTP verified"
-const verifyRegistrationOtp = async (req, res) => {
+const verifyRegistrationOtp = async (req, res, next) => {
   try {
     const { email, otp } = req.body;
     const { user, token } = await verifyRegistrationOtpService(email, otp);
@@ -40,7 +38,7 @@ const verifyRegistrationOtp = async (req, res) => {
       message: messages.register.otpVerified,
     });
   } catch (err) {
-    return handleError(err);
+    next(err);
   }
 };
 

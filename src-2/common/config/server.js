@@ -9,10 +9,7 @@ import authRoutes from "../../features/auth/routes.js";
 // import onboardingRoutes from "../routes/onboardingRoutes.js";
 // import intakeFormsRoutes from "../routes/intakeFormsRoutes.js";
 
-import "./db.js";
-
 const app = express();
-const port = env.PORT || 3000;
 
 // CORS middleware
 app.use(corsMiddleware);
@@ -31,6 +28,8 @@ configureSwagger(app);
 app.use("/auth", authRoutes);
 // app.use("/onboarding", onboardingRoutes);
 // app.use("/intake-forms", intakeFormsRoutes);
+app.use(errorHandler);
+
 
 // Root route
 app.get("/", (req, res) => {

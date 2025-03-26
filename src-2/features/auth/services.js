@@ -1,8 +1,4 @@
-import {
-  hashPassword,
-  generateOtp,
-  isPasswordCorrect,
-} from "./utils.js";
+import { hashPassword, generateOtp, isPasswordCorrect } from "./utils.js";
 import {
   createOtpVerificationDbOp,
   findOtpVerificationByEmailDbOp,
@@ -11,14 +7,14 @@ import {
   deleteOtpVerificationDbOp,
   findUserByIdDbOp,
 } from "./dbOps.js";
-import { throwError } from "../../common/utils/customError.js";
 import { messages } from "./messages.js";
+import CustomError from "../../common/utils/customError.js";
 
 const registerUserService = async (email, password) => {
   // Check if the user already exists
   const existingUser = await findUserByEmailDbOp(email);
   if (existingUser) {
-    throwError(400, messages.error.userAlreadyExists);
+    throw new CustomError(400, messages.error.userAlreadyExists);
   }
 
   const otpVerification = await findOtpVerificationByEmailDbOp(email);
@@ -41,12 +37,12 @@ const verifyRegistrationOtpService = async (email, otp) => {
   const otpVerification = await findOtpVerificationByEmailDbOp(email);
 
   if (!otpVerification) {
-    throwError(404, messages.notFound.resource);
+    throw new CustomError(404, messages.notFound.resource);
   }
 
   // Check if OTP matches
   if (otpVerification.otp !== otp) {
-    throwError(400, messages.misc.otpInvalid);
+    throw new CustomError(400, messages.misc.otpInvalid);
   }
 
   //ALL IS OK
@@ -78,16 +74,13 @@ const verifyRegistrationOtpService = async (email, otp) => {
   };
 };
 
-
-
-
 const loginService = async (email, password) => {
   const user = await findUserByEmailDbOp(email);
-  if (!user) throwError(401, messages.error.invalidEmailFormat);
+  if (!user) throw new CustomError(401, messages.error.invalidEmailFormat);
 
   // Validate password
   const isPasswordValid = await isPasswordCorrect(password, user.password);
-  if (!isPasswordValid) throwError(401, messages.error.invalidCredentials);
+  if (!isPasswordValid) throw new CustomError(401, messages.error.invalidCredentials);
 
   // Generate JWT token
   const _id = user._id.toString();
@@ -102,7 +95,7 @@ const loginService = async (email, password) => {
 const requestResetPasswordService = async (email) => {
   const user = await findUserByEmailDbOp(email);
   if (!user) {
-    throwError(404, messages.error.userNotFound);
+    throw new CustomError(404, messages.error.userNotFound);
   }
   const token = generateToken({ _id: user._id.toString() }, "1h");
   const frontendUrl =
@@ -120,7 +113,7 @@ const resetPasswordService = async (token, password) => {
   const user = await updateUserPasswordDbOp(decoded._id, hashedPassword);
 
   if (!user) {
-    throwError(404, messages.error.userNotFound);
+    throw new CustomError(404, messages.error.userNotFound);
   }
 
   // Generate JWT token
@@ -128,7 +121,7 @@ const resetPasswordService = async (token, password) => {
 
   return {
     user,
-    token: loginToken,  
+    token: loginToken,
   };
 };
 
@@ -136,7 +129,7 @@ const changePasswordService = async (token, password, decodedToken) => {
   const hashedPassword = await hashPassword(password);
   const user = await updateUserPasswordDbOp(decodedToken._id, hashedPassword);
   if (!user) {
-    throwError(404, messages.error.userNotFound);
+    throw new CustomError(404, messages.error.userNotFound);
   }
   return;
 };

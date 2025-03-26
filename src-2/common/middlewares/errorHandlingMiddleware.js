@@ -1,25 +1,19 @@
-class AppError extends Error {
-    constructor(message, statusCode) {
-      super(message);
-      this.statusCode = statusCode || 500;
-      this.isOperational = true; // Mark as an operational error
-      Error.captureStackTrace(this, this.constructor);
-    }
-  }
-  
-  const errorHandler = (err, req, res, next) => {
-    console.error(err.stack);  // Log the error stack for debugging
-  
-    const statusCode = err.statusCode || 500;  // Default to 500 if no status is set
-    const message = err.message || "Internal Server Error";  // Default error message
-  
-    // Send a consistent error response
-    res.status(statusCode).json({
-      status: "error",
-      message,
-      stack: process.env.NODE_ENV === "development" ? err.stack : undefined,  // Only show stack trace in dev mode
+// errorHandler.js
+import CustomError from '../utils/customError.js';
+
+const errorHandler = (err, req, res, next) => {
+  if (err instanceof CustomError) {
+    return res.status(err.status).json({
+      message: err.message,
+      context: err.context || {},
     });
-  };
-  
-  export { AppError, errorHandler };
-  
+  }
+
+  // Default 500 error response for other errors
+  console.error(err); // Log unexpected errors
+  return res.status(500).json({
+    message: 'Internal Server Error',
+  });
+};
+
+export { errorHandler };
