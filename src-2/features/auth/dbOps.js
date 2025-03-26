@@ -1,15 +1,15 @@
 import User from "../../common/models/user.js";
 import OTPVerification from "../../common/models/otpVerification.js";
 
-const findUserByEmail = async (email) => {
+const findUserByEmailDbOp = async (email) => {
   return User.findOne({ email });
 };
 
-const findOtpVerificationByEmail = async (email) => {
+const findOtpVerificationByEmailDbOp = async (email) => {
   return OTPVerification.findOne({ email });
 };
 
-const createOtpVerification = async (email, hashedPassword, otp) => {
+const createOtpVerificationDbOp = async (email, hashedPassword, otp) => {
   const otpVerification = new OTPVerification({
     email,
     password: hashedPassword,
@@ -19,4 +19,28 @@ const createOtpVerification = async (email, hashedPassword, otp) => {
   return otpVerification.save();
 };
 
-export { findUserByEmail, findOtpVerificationByEmail, createOtpVerification };
+const createUserDbOp = async (user) => {
+  const newUser = new User(user);
+  return newUser.save();
+};
+
+const deleteOtpVerificationDbOp = async (email) => {
+  return OTPVerification.deleteOne({ email });
+};
+
+const findUserByIdDbOp = async (id) => {
+  return User.findById(id);
+};
+
+const updateUserPasswordDbOp = async (id, password) => {
+  return User.findByIdAndUpdate(id, { password }, { new: true });
+};
+
+export {
+  findUserByEmailDbOp,
+  findOtpVerificationByEmailDbOp,
+  createOtpVerificationDbOp,
+  createUserDbOp,
+  deleteOtpVerificationDbOp,
+  findUserByIdDbOp,
+};

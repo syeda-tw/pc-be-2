@@ -1,4 +1,6 @@
 import { sendEmail } from "../../common/utils/emailService.js";
+import bcrypt from "bcrypt";
+import { messages } from "./messages.js";
 
 // Send OTP Registration Email
 const sendRegistrationEmail = async (email, otp) => {
@@ -33,5 +35,60 @@ const hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);
 };
 
+const sendWelcomeEmail = async (email) => {
+  await sendEmail(
+    email,
+    "Welcome to Practicare!",
+    generateEmailHtml(
+      "Welcome to Practicare!",
+      `Hello ${user.first_name} ${user.last_name},  
+  
+      We're excited to welcome you to **Practicare**! Our platform is designed to help you manage your mental health practice efficiently—whether it's scheduling appointments, organizing client records, or streamlining daily tasks.  
+  
+      With Practicare, you can focus more on your clients while we handle the rest.  
+  
+      **Get started today:**  
+      - [Log in to your account](https://www.practicare.co)  
+      - Explore the features built for you  
+      - Reach out to our support team if you need any help  
+  
+      We're here to support you on this journey. Welcome aboard!  
+  
+      **Best regards,**  
+      The Practicare Team  
+      [www.practicare.co](https://www.practicare.co)`
+    )
+  );
+};
 
-export { sendRegistrationEmail, generateOtp, hashPassword };
+const isPasswordCorrect = async (password, userPassword) => {
+  return await bcrypt.compare(password, userPassword);
+};
+
+const sendPasswordResetEmail = async (email, resetLink) => {  
+  await sendEmail(
+    email,
+    "Password Reset Request",
+    generateEmailHtml(
+      "Password Reset Request",
+      `Hello,
+
+      We received a request to reset your password. Please use the following link to reset your password:
+
+      <a href="${resetLink}">Reset Password</a>
+
+      This link is valid for the next 1 hour. If you did not request this, please ignore this email.
+
+      Best regards,
+      The Practicare Team`
+    )
+  );
+};  
+
+export {
+  sendRegistrationEmail,
+  generateOtp,
+  hashPassword,
+  sendWelcomeEmail,
+  isPasswordCorrect,
+};
