@@ -1,14 +1,21 @@
-import { hashPassword, generateOtp, isPasswordCorrect } from "./utils.js";
+import {
+  hashPassword,
+  generateOtp,
+  isPasswordCorrect,
+  generateToken,
+  sendWelcomeEmail,
+} from "./utils.js";
 import {
   createOtpVerificationDbOp,
   findOtpVerificationByEmailDbOp,
   findUserByEmailDbOp,
   createUserDbOp,
   deleteOtpVerificationDbOp,
-  findUserByIdDbOp,
 } from "./dbOps.js";
 import { messages } from "./messages.js";
 import CustomError from "../../common/utils/customError.js";
+import Practice from "../../common/models/practice.js";
+
 
 const registerUserService = async (email, password) => {
   // Check if the user already exists
@@ -34,6 +41,7 @@ const registerUserService = async (email, password) => {
 
 const verifyRegistrationOtpService = async (email, otp) => {
   // Find OTP verification record
+  
   const otpVerification = await findOtpVerificationByEmailDbOp(email);
 
   if (!otpVerification) {
@@ -42,12 +50,12 @@ const verifyRegistrationOtpService = async (email, otp) => {
 
   // Check if OTP matches
   if (otpVerification.otp !== otp) {
-    throw new CustomError(400, messages.misc.otpInvalid);
+    throw new CustomError(400, messages.error.invalidOtp);
   }
 
   //ALL IS OK
   // Create new practice with default values
-  const newPractice = await practice.create({});
+  const newPractice = await Practice.create({});
 
   // Create new user
   const user = await createUserDbOp({
@@ -66,7 +74,7 @@ const verifyRegistrationOtpService = async (email, otp) => {
   const token = generateToken({ _id });
 
   // Send welcome email
-  await sendWelcomeEmail(user.email);
+  await sendWelcomeEmail(user);
 
   return {
     user,
@@ -80,7 +88,8 @@ const loginService = async (email, password) => {
 
   // Validate password
   const isPasswordValid = await isPasswordCorrect(password, user.password);
-  if (!isPasswordValid) throw new CustomError(401, messages.error.invalidCredentials);
+  if (!isPasswordValid)
+    throw new CustomError(401, messages.error.invalidCredentials);
 
   // Generate JWT token
   const _id = user._id.toString();

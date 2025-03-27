@@ -1,7 +1,6 @@
 // Import models
 import User from "../models/user.js";
 import OtpVerification from "../models/otpVerification.js";
-import practice from "../models/practice.js";
 
 // Import helpers
 import {
@@ -138,8 +137,6 @@ export const register = async (req, res) => {
     });
   }
 };
-
-
 
 // Verify user token
 export const verifyUserToken = async (req, res, next) => {

@@ -1,65 +1,5 @@
 import { format } from "date-fns";
 import nodemailer from "nodemailer";
-
-export const sendErrorResponse = ({ status, message, res }) => {
-  if (res && typeof res.status === "function") {
-    return res.status(status).json({ message });
-  } else {
-    console.error("Invalid response object passed to sendErrorResponse");
-    throw new Error("Invalid response object");
-  }
-};
-
-export const formatDate = (date) => {
-  return format(date, "yyyy-MM-dd HH:mm:ss");
-};
-//THIS IS CREATED SO THAT TEST ACCOUNTS CAN BE CREATED WITH THE SAME EMAIL ADDRESS
-const getEmailForDevelopment = (email) => {
-  if (process.env.ENV === "development" && email.includes("+")) {
-    // Split by '+' and get the part before '@'
-    const beforeAt = email.split("+")[0];
-    const domain = email.split("@")[1];
-    return `${beforeAt}@${domain}`; // Reconstruct the email without the part between '+' and '@'
-  }
-  return email; // Return the email as is if not in development or no '+' found
-};
-
-/**
- * Send email using Gmail SMTP with Nodemailer
- * @param to - Recipient email address
- * @param subject - Subject of the email
- * @param text - Body of the email
- * @param html - HTML body of the email (optional)
- * @returns Promise indicating the email status
- */
-export const sendEmail = async (to, subject, text, html) => {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.NODEMAILER_EMAIL,
-        pass: process.env.NODEMAILER_PASSWORD,
-      },
-    });
-
-    const mailOptions = {
-      from: process.env.NODEMAILER_EMAIL,
-      to: getEmailForDevelopment(to) || to,
-      subject,
-      text,
-      html: html || text,
-    };
-    console.log("Sending email to:", mailOptions.to); // Log the recipient for debugging
-
-    // Send mail using the defined transporter
-    await transporter.sendMail(mailOptions);
-    console.log(`Email sent to ${to}`);
-  } catch (error) {
-    console.error(`Error sending email to ${to}:`, error);
-    throw new Error("Failed to send email");
-  }
-};
-
 /**
  * Generate an HTML email body with dynamic content
  * @param {string} heading - The dynamic heading for the email
@@ -138,4 +78,16 @@ export const generateEmailHtml = (heading, body) => {
   htmlTemplate = htmlTemplate.replace("{{heading}}", heading);
   htmlTemplate = htmlTemplate.replace("{{body}}", body);
   return htmlTemplate;
+};
+export const sendErrorResponse = ({ status, message, res }) => {
+  if (res && typeof res.status === "function") {
+    return res.status(status).json({ message });
+  } else {
+    console.error("Invalid response object passed to sendErrorResponse");
+    throw new Error("Invalid response object");
+  }
+};
+
+export const formatDate = (date) => {
+  return format(date, "yyyy-MM-dd HH:mm:ss");
 };

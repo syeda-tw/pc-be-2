@@ -19,6 +19,7 @@ export const messages = {
     invalidCredentials: "The password that you entered is incorrect",
     invalidPasswordFormat: "Password must be between 8 and 20 characters.",
     invalidOtpFormat: "Please provide a valid OTP.",
+    invalidOtp: "The OTP that you entered is incorrect",
     tokenNotFound: "Session expired. Please login again",
     invalidTokenFormat: "Session expired. Please login again",
     invalidToken: "Session expired. Please login again",

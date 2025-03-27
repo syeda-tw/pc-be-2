@@ -2,38 +2,73 @@ import User from "../../common/models/user.js";
 import OTPVerification from "../../common/models/otpVerification.js";
 
 const findUserByEmailDbOp = async (email) => {
-  return User.findOne({ email });
+  try {
+    return await User.findOne({ email });
+  } catch (error) {
+    console.error("Error in findUserByEmailDbOp:", error);
+    return null;
+  }
 };
 
 const findOtpVerificationByEmailDbOp = async (email) => {
-  return OTPVerification.findOne({ email });
+  try {
+    return await OTPVerification.findOne({ email });
+  } catch (error) {
+    console.error("Error in findOtpVerificationByEmailDbOp:", error);
+    return null;
+  }
 };
 
 const createOtpVerificationDbOp = async (email, hashedPassword, otp) => {
-  const otpVerification = new OTPVerification({
-    email,
-    password: hashedPassword,
-    otp,
-    expiration: Date.now() + 600000,
-  });
-  return otpVerification.save();
+  try {
+    const otpVerification = new OTPVerification({
+      email,
+      password: hashedPassword,
+      otp,
+      expiration: Date.now() + 600000,
+    });
+    return await otpVerification.save();
+  } catch (error) {
+    console.error("Error in createOtpVerificationDbOp:", error);
+    return null;
+  }
 };
 
 const createUserDbOp = async (user) => {
-  const newUser = new User(user);
-  return newUser.save();
+  try {
+    const newUser = new User(user);
+    return await newUser.save();
+  } catch (error) {
+    console.error("Error in createUserDbOp:", error);
+    return null;
+  }
 };
 
 const deleteOtpVerificationDbOp = async (email) => {
-  return OTPVerification.deleteOne({ email });
+  try {
+    return await OTPVerification.deleteOne({ email });
+  } catch (error) {
+    console.error("Error in deleteOtpVerificationDbOp:", error);
+    return null;
+  }
 };
 
 const findUserByIdDbOp = async (id) => {
-  return User.findById(id);
+  try {
+    return await User.findById(id);
+  } catch (error) {
+    console.error("Error in findUserByIdDbOp:", error);
+    return null;
+  }
 };
 
 const updateUserPasswordDbOp = async (id, password) => {
-  return User.findByIdAndUpdate(id, { password }, { new: true });
+  try {
+    return await User.findByIdAndUpdate(id, { password }, { new: true });
+  } catch (error) {
+    console.error("Error in updateUserPasswordDbOp:", error);
+    return null;
+  }
 };
 
 export {
@@ -43,4 +78,5 @@ export {
   createUserDbOp,
   deleteOtpVerificationDbOp,
   findUserByIdDbOp,
+  updateUserPasswordDbOp,
 };

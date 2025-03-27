@@ -3,6 +3,7 @@ import app from "../../common/config/server.js";
 import User from "../../common/models/user"; // Your Mongoose User model
 import OtpVerification from "../../common/models/otpVerification.js";
 
+//TESTING REGISTER CALL
 describe("Testing register validity of request", () => {
   it("should not register a user with missing email", async () => {
     const res = await request(app).post("/auth/register").send({
@@ -78,7 +79,7 @@ describe("Testing register endpoint functionality", () => {
     await User.deleteMany();
     await OtpVerification.deleteMany();
     // Ensure the user already exists in the Users table
-   const user = await User.create(mockUserComplete);
+    const user = await User.create(mockUserComplete);
     const res = await request(app).post("/auth/register").send({
       email: "test@example.com",
       password: "Test1234!",
@@ -140,3 +141,56 @@ export const mockUserComplete = {
     },
   ],
 };
+
+//TESTING VERIFY REGISTRATION OTP CALL
+describe("Verify Registration OTP - Testing Request Validity", () => {
+  beforeEach(async () => {
+    await OtpVerification.create({
+      email: "test@example.com",
+      otp: "12345",
+      password: "$2b$10$Kqf7X1gABBllZEPxo.R5oO47gayfX8Mw6lxMgHHb6tHskEroDu1/W",
+    });
+  });
+
+  it("should return 400 if OTP is missing", async () => {
+    const res = await request(app).post("/auth/verify-registration-otp").send({
+      email: "test@example.com",
+      otp: "",
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("should return 400 if email is missing", async () => {
+    const res = await request(app).post("/auth/verify-registration-otp").send({
+      otp: "12345",
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("should return 400 if email is invalid", async () => {
+    const res = await request(app).post("/auth/verify-registration-otp").send({
+      email: "invalid-email",
+      otp: "12345",
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it("should return 200 if email and OTP are valid", async () => {
+    const res = await request(app).post("/auth/verify-registration-otp").send({
+      email: "test@example.com",
+      otp: "12345",
+    });
+    expect(res.statusCode).toBe(200);
+  }, 30000); // 30 second timeout
+
+  it("should create a user in the database when valid otp is provided", async () => {
+    await request(app).post("/auth/verify-registration-otp").send({
+      email: "test@example.com",
+      otp: "12345",
+    });
+
+    const user = await User.findOne({ email: "test@example.com" });
+    expect(user.email).toBe("test@example.com");
+    expect(user.status).toBe("onboarding-step-1");
+  }, 30000); // 30 second timeout
+});

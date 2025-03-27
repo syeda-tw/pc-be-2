@@ -1,6 +1,6 @@
-import { sendEmail } from "../../common/utils/emailService.js";
+import { generateEmailHtml, sendEmail } from "../../common/utils/emailService.js";
 import bcrypt from "bcrypt";
-import { messages } from "./messages.js";
+import jwt from "jsonwebtoken";
 
 // Send OTP Registration Email
 const sendRegistrationEmail = async (email, otp) => {
@@ -26,6 +26,8 @@ const sendRegistrationEmail = async (email, otp) => {
   }
 };
 
+
+
 const generateOtp = () => {
   return Math.floor(10000 + Math.random() * 90000).toString();
 };
@@ -34,9 +36,9 @@ const hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);
 };
 
-const sendWelcomeEmail = async (email) => {
+const sendWelcomeEmail = async (user) => {
   await sendEmail(
-    email,
+    user.email,
     "Welcome to Practicare!",
     generateEmailHtml(
       "Welcome to Practicare!",
@@ -84,10 +86,19 @@ const sendPasswordResetEmail = async (email, resetLink) => {
   );
 };
 
+const generateToken = (payload) => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+  return jwt.sign(payload, secret, { expiresIn: "200h" });
+};
+
 export {
   sendRegistrationEmail,
   generateOtp,
   hashPassword,
   sendWelcomeEmail,
   isPasswordCorrect,
+  generateToken,
 };

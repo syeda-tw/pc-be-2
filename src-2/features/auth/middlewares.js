@@ -26,7 +26,8 @@ const verifyRegistrationOtpSchema = Joi.object({
     "string.email": messages.error.invalidEmailFormat,
     "any.required": messages.error.invalidEmailFormat,
   }),
-  otp: Joi.string().required().messages({
+  otp: Joi.string().length(5).required().messages({
+    "string.length": messages.error.invalidOtpFormat,
     "any.required": messages.error.invalidOtpFormat,
   }),
 });
@@ -122,9 +123,6 @@ const validateChangePasswordMiddleware = (req, res, next) => {
   }
   next();
 };
-
-
-
 
 export {
   validateRegisterMiddleware,
