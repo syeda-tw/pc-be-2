@@ -1,4 +1,5 @@
-//this middleware is used to authenticate the user for secure calls
+import jwt from "jsonwebtoken";
+
 const secureRequestMiddleware = (req, res, next) => {
   const token = req.headers.authorization;
   const secret = process.env.JWT_SECRET;
@@ -6,7 +7,7 @@ const secureRequestMiddleware = (req, res, next) => {
     return res.status(500).json({ message: messages.error.serverError });
   }
   try {
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token.split(" ")[1], secret);
     if (!decoded?._id) {
       return res.status(401).json({ message: messages.error.invalidToken });
     }

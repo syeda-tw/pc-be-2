@@ -30,7 +30,9 @@ router.post(
   validateVerifyUserTokenMiddleware,
   secureRequestMiddleware,
   (req, res) => {
-    return;
+    return res.status(200).json({
+      message: "User token verified",
+    });
   }
 );
 router.post("/login", validateLoginMiddleware, login);

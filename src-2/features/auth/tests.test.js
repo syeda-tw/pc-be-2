@@ -2,6 +2,7 @@ import request from "supertest";
 import app from "../../common/config/server.js";
 import User from "../../common/models/user"; // Your Mongoose User model
 import OtpVerification from "../../common/models/otpVerification.js";
+import { generateToken } from "./utils.js";
 
 //TESTING REGISTER CALL
 describe("Testing register validity of request", () => {
@@ -176,7 +177,7 @@ describe("Verify Registration OTP - Testing Request Validity", () => {
   });
 });
 
-describe.only("Verify Registration OTP - Testing Endpoint Functionality", () => {
+describe("Verify Registration OTP - Testing Endpoint Functionality", () => {
   beforeEach(async () => {
     await OtpVerification.create({
       email: "test@example.com",
@@ -227,4 +228,44 @@ describe.only("Verify Registration OTP - Testing Endpoint Functionality", () => 
     expect(res.body.data.token).toBeDefined();
     expect(typeof res.body.data.token).toBe("string");
   }, 30000); // 30 second timeout
+});
+
+describe.only("Verify User Token - Testing Endpoint Functionality", () => {
+  it("should return code greater than 400 if empty authorization", async () => {
+    const res = await request(app)
+      .post("/auth/verify-user-token")
+      .set("Authorization", "") // Empty authorization header
+      .send();
+
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+
+  it("should return code greater than 400 if invalid authorization", async () => {
+    const res = await request(app)
+      .post("/auth/verify-user-token")
+      .set("Authorization", "invalid-token")
+      .send();
+
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+
+  it("should return 200 if user token is valid", async () => {
+    // Step 1: Create a valid user (you can skip this if the user already exists in your test DB)
+    const user = await User.create({
+      email: "test@example.com",
+      password: "Test1234!",
+      // Include other necessary fields for the user model
+    });
+    // Step 2: Generate a token for the user
+    const token = generateToken({ _id: user._id });
+
+    // Step 3: Test the endpoint with the generated token
+    const res = await request(app)
+      .post("/auth/verify-user-token")
+      .set("Authorization", `Bearer ${token}`) // Set the Authorization header with the generated token
+      .send();
+
+    // Step 4: Expect a successful response
+    expect(res.statusCode).toBe(200);
+  });
 });

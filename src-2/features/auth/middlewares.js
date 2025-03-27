@@ -43,18 +43,23 @@ const validateVerifyRegistrationOtpMiddleware = (req, res, next) => {
 };
 
 const verifyValidTokenSchema = Joi.object({
-  authorization: Joi.string().required().messages({
+  token: Joi.string().required().messages({
     "any.required": messages.error.tokenNotFound,
   }),
 });
 
 const validateVerifyUserTokenMiddleware = (req, res, next) => {
-  const { error } = verifyValidTokenSchema.validate(req.headers.authorization);
+  const authorizationHeader = req.headers.authorization;
 
+  if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+    return res.status(400).json({ message: messages.error.tokenNotFound });
+  }
+  const token = authorizationHeader.slice(7);
+
+  const { error } = verifyValidTokenSchema.validate({ token });
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
-
   next();
 };
 
