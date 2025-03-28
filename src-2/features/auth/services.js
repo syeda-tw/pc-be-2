@@ -4,6 +4,8 @@ import {
   isPasswordCorrect,
   generateToken,
   sendWelcomeEmail,
+  sendPasswordResetEmail,
+  comparePassword,
 } from "./utils.js";
 import {
   createOtpVerificationDbOp,
@@ -11,11 +13,13 @@ import {
   findUserByEmailDbOp,
   createUserDbOp,
   deleteOtpVerificationDbOp,
+  updateUserPasswordDbOp,
+  findUserByIdDbOp,
 } from "./dbOps.js";
 import { messages } from "./messages.js";
 import CustomError from "../../common/utils/customError.js";
 import Practice from "../../common/models/practice.js";
-
+import jwt from "jsonwebtoken";
 
 const registerUserService = async (email, password) => {
   // Check if the user already exists
@@ -41,7 +45,7 @@ const registerUserService = async (email, password) => {
 
 const verifyRegistrationOtpService = async (email, otp) => {
   // Find OTP verification record
-  
+
   const otpVerification = await findOtpVerificationByEmailDbOp(email);
 
   if (!otpVerification) {
@@ -117,14 +121,27 @@ const requestResetPasswordService = async (email) => {
 };
 
 const resetPasswordService = async (token, password) => {
+  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  if (!decodedToken) {
+    throw new CustomError(401, messages.error.invalidPasswordChangeUrl);
+  }
+  const userInitial = await findUserByIdDbOp(decodedToken._id);
+  if (!userInitial) {
+    throw new CustomError(404, messages.error.userNotFound);
+  }
+  const isPasswordCorrect = await comparePassword(
+    password,
+    userInitial.password
+  );
+  if (isPasswordCorrect) {
+    throw new CustomError(400, messages.error.cannotUseSamePassword);
+  }
+
   const hashedPassword = await hashPassword(password);
-
-  const user = await updateUserPasswordDbOp(decoded._id, hashedPassword);
-
+  const user = await updateUserPasswordDbOp(decodedToken._id, hashedPassword);
   if (!user) {
     throw new CustomError(404, messages.error.userNotFound);
   }
-
   // Generate JWT token
   const loginToken = generateToken({ _id: user._id.toString() });
 

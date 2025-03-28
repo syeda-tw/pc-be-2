@@ -42,9 +42,10 @@ const verifyRegistrationOtp = async (req, res, next) => {
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
-    const { user, token } = await loginService();
+    const { email, password } = req.body;
+    const { user, token } = await loginService(email, password);
     return res.status(200).json({
       data: {
         user: sanitizeUser(user),
@@ -53,11 +54,11 @@ const login = async (req, res) => {
       message: messages.login.loginSuccessful,
     });
   } catch (err) {
-    return handleError(err);
+    next(err);
   }
 };
 
-const requestResetPassword = async (req, res) => {
+const requestResetPassword = async (req, res, next) => {
   const { email } = req.body;
   try {
     await requestResetPasswordService(email);
@@ -65,7 +66,7 @@ const requestResetPassword = async (req, res) => {
       message: messages.password.passwordResetLinkSent,
     });
   } catch (err) {
-    return handleError(err);
+    next(err);
   }
 };
 
@@ -83,7 +84,7 @@ const resetPassword = async (req, res, next) => {
       },
     });
   } catch (err) {
-    return handleError(err);
+    return next(err);
   }
 };
 
@@ -94,7 +95,7 @@ const changePassword = async (req, res, next) => {
       message: messages.password.passwordChanged,
     });
   } catch (err) {
-    return handleError(err);
+    next(err);
   }
 };
 

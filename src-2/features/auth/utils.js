@@ -1,4 +1,7 @@
-import { generateEmailHtml, sendEmail } from "../../common/utils/emailService.js";
+import {
+  generateEmailHtml,
+  sendEmail,
+} from "../../common/utils/emailService.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -26,14 +29,16 @@ const sendRegistrationEmail = async (email, otp) => {
   }
 };
 
-
-
 const generateOtp = () => {
   return Math.floor(10000 + Math.random() * 90000).toString();
 };
 
 const hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);
+};
+
+const comparePassword = async (password, hashedPassword) => {
+  return await bcrypt.compare(password, hashedPassword);
 };
 
 const sendWelcomeEmail = async (user) => {
@@ -66,7 +71,7 @@ const isPasswordCorrect = async (password, userPassword) => {
   return await bcrypt.compare(password, userPassword);
 };
 
-const sendPasswordResetEmail = async (email, resetLink) => {
+export const sendPasswordResetEmail = async (email, resetLink) => {
   await sendEmail(
     email,
     "Password Reset Request",
@@ -101,4 +106,5 @@ export {
   sendWelcomeEmail,
   isPasswordCorrect,
   generateToken,
+  comparePassword,
 };

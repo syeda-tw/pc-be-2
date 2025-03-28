@@ -2,7 +2,8 @@ import request from "supertest";
 import app from "../../common/config/server.js";
 import User from "../../common/models/user"; // Your Mongoose User model
 import OtpVerification from "../../common/models/otpVerification.js";
-import { generateToken } from "./utils.js";
+import { comparePassword, generateToken, hashPassword } from "./utils.js";
+import bcrypt from "bcrypt";
 
 //TESTING REGISTER CALL
 describe("Testing register validity of request", () => {
@@ -230,7 +231,7 @@ describe("Verify Registration OTP - Testing Endpoint Functionality", () => {
   }, 30000); // 30 second timeout
 });
 
-describe.only("Verify User Token - Testing Endpoint Functionality", () => {
+describe("Verify User Token - Testing Endpoint Functionality", () => {
   it("should return code greater than 400 if empty authorization", async () => {
     const res = await request(app)
       .post("/auth/verify-user-token")
@@ -268,4 +269,188 @@ describe.only("Verify User Token - Testing Endpoint Functionality", () => {
     // Step 4: Expect a successful response
     expect(res.statusCode).toBe(200);
   });
+});
+
+describe.only("Login - Testing Request Validity", () => {
+  it("should return 400 if email is missing", async () => {
+    const res = await request(app).post("/auth/login").send({
+      email: "",
+      password: "Test1234!",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+
+  it("should return 400 if password is missing", async () => {
+    const res = await request(app).post("/auth/login").send({
+      email: "test@example.com",
+      password: "",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+});
+
+describe("Login - Testing Endpoint Functionality", () => {
+  beforeEach(async () => {
+    const hashedPassword = await hashPassword("Test1234!");
+    await User.create({
+      email: "test@example.com",
+      password: hashedPassword,
+      status: "onboarding-step-1",
+      first_name: "John",
+      last_name: "Doe",
+      is_admin: true,
+    });
+  });
+
+  it("should return 200 if email and password are valid", async () => {
+    const res = await request(app).post("/auth/login").send({
+      email: "test@example.com",
+      password: "Test1234!",
+    });
+    expect(res.statusCode).toBe(200);
+    expect(res.body.data.token).toBeDefined();
+    expect(typeof res.body.data.token).toBe("string");
+    expect(res.body.data.user).toBeDefined();
+    expect(res.body.data.user.email).toBe("test@example.com");
+  }, 30000); // 30 second timeout
+
+  it("should return status above 400 if email not found", async () => {
+    const res = await request(app).post("/auth/login").send({
+      email: "nonexistent@example.com",
+      password: "Test1234!",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  }, 30000); // 30 second timeout
+
+  it("should return status greater than 400 if email correct but wrong password", async () => {
+    const res = await request(app).post("/auth/login").send({
+      email: "test@example.com",
+      password: "WrongPassword123!",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  }, 30000); // 30 second timeout
+
+  it("should return 400 if email is invalid", async () => {
+    const res = await request(app).post("/auth/login").send({
+      email: "invalid-email",
+      password: "Test1234!",
+    });
+  }, 30000);
+});
+
+describe("Request Reset Password - Testing Request Validity", () => {
+  it("should return 400 if email is missing", async () => {
+    const res = await request(app).post("/auth/request-reset-password").send({
+      email: "",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+
+  it("should return 400 if email is invalid", async () => {
+    const res = await request(app).post("/auth/request-reset-password").send({
+      email: "invalid-email",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+});
+
+describe("Request Reset Password - Testing Endpoint Functionality", () => {
+  beforeEach(async () => {
+    const hashedPassword = await hashPassword("Test1234!");
+    await User.create({
+      email: "test@example.com",
+      password: hashedPassword,
+      status: "onboarding-step-1",
+      first_name: "John",
+      last_name: "Doe",
+      is_admin: true,
+    });
+  });
+
+  it("should return 200 if email is valid", async () => {
+    const res = await request(app).post("/auth/request-reset-password").send({
+      email: "test@example.com",
+    });
+    expect(res.statusCode).toBe(200);
+  }, 30000); // 30 second timeout
+
+  it("should return greater than or equal to 400 if email not found", async () => {
+    const res = await request(app).post("/auth/request-reset-password").send({
+      email: "nonexistent@example.com",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  }, 30000); // 30 second timeout
+});
+
+describe("Reset Password - Testing Request Validity", () => {
+  it("should return 400 if token is missing", async () => {
+    const res = await request(app).post("/auth/reset-password").send({
+      token: "",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+
+  it("should return 400 if token is invalid", async () => {
+    const res = await request(app).post("/auth/reset-password").send({
+      token: "invalid-token",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+
+  it("should return 400 if password is missing", async () => {
+    const res = await request(app).post("/auth/reset-password").send({
+      token: "valid-token",
+      password: "",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+});
+
+describe.only("Reset Password - Testing Endpoint Functionality", () => {
+  beforeEach(async () => {
+    const hashedPassword = await hashPassword("Test1234!");
+    await User.create({
+      email: "test@example.com",
+      password: hashedPassword,
+      status: "onboarding-step-1",
+      first_name: "John",
+      last_name: "Doe",
+      is_admin: true,
+    });
+  });
+
+  it("should return 200 if token is valid", async () => {
+    const user = await User.findOne({ email: "test@example.com" });
+    const token = generateToken({ _id: user._id.toString() }, "1h");
+    const res = await request(app).post("/auth/reset-password").send({
+      token: token,
+      password: "NewPassword123!",
+    });
+    expect(res.statusCode).toBe(200);
+  }, 30000);
+
+  it("user password should be updated", async () => {
+    const userInitial = await User.findOne({ email: "test@example.com" });
+    const token = generateToken({ _id: userInitial._id.toString() }, "1h");
+    await request(app).post("/auth/reset-password").send({
+      token: token,
+      password: "TestNew1234!",
+    });
+    const user = await User.findOne({ email: "test@example.com" });
+    const isPasswordCorrect = await comparePassword(
+      "TestNew1234!",
+      user.password
+    );
+    expect(isPasswordCorrect).toBe(true);
+  }, 30000);
+
+  it("should return 400 if password is the same as the previous password", async () => {
+    const userInitial = await User.findOne({ email: "test@example.com" });
+    const token = generateToken({ _id: userInitial._id.toString() }, "1h");
+    const res = await request(app).post("/auth/reset-password").send({
+      token: token,
+      password: "Test1234!",
+    });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  }, 30000);
 });

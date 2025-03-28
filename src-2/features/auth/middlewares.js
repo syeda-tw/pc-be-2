@@ -78,6 +78,7 @@ const validateLoginMiddleware = (req, res, next) => {
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
+  next();
 };
 
 const requestResetPasswordSchema = Joi.object({
@@ -99,9 +100,15 @@ const resetPasswordSchema = Joi.object({
   token: Joi.string().required().messages({
     "any.required": messages.error.tokenNotFound,
   }),
-  password: Joi.string().required().messages({
-    "any.required": messages.error.invalidPasswordFormat,
-  }),
+  password: Joi.string()
+    .min(8)
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .required()
+    .messages({
+      "string.min": messages.error.invalidPasswordFormat,
+      "string.pattern.base": messages.error.invalidPasswordFormat,
+      "any.required": messages.error.invalidPasswordFormat,
+    }),
 });
 
 const validateResetPasswordMiddleware = (req, res, next) => {
