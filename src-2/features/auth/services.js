@@ -151,10 +151,24 @@ const resetPasswordService = async (token, password) => {
   };
 };
 
-const changePasswordService = async (token, password, decodedToken) => {
-  const hashedPassword = await hashPassword(password);
-  const user = await updateUserPasswordDbOp(decodedToken._id, hashedPassword);
+const changePasswordService = async (id, oldPassword, newPassword) => {
+  const user = await findUserByIdDbOp(id);
   if (!user) {
+    throw new CustomError(404, messages.error.userNotFound);
+  }
+  const isPasswordCorrect = await comparePassword(
+    oldPassword,
+    user.password
+  );
+  if (!isPasswordCorrect) {
+    throw new CustomError(400, messages.error.invalidOldPassword);
+  }
+  const arePasswordsSame = oldPassword == newPassword
+  if(arePasswordsSame) throw new CustomError(400, messages.error.cannotUseSamePassword)
+
+  const hashedNewPassword = await hashPassword(newPassword);
+  const userUpdated = await updateUserPasswordDbOp(id, hashedNewPassword);
+  if (!userUpdated) {
     throw new CustomError(404, messages.error.userNotFound);
   }
   return;

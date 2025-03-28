@@ -63,12 +63,14 @@ const findUserByIdDbOp = async (id) => {
 };
 
 const updateUserPasswordDbOp = async (id, password) => {
+  let res
   try {
-    return await User.findByIdAndUpdate(id, { password }, { new: true });
+    res = await User.findByIdAndUpdate(id, { password }, { new: true });
   } catch (error) {
     console.error("Error in updateUserPasswordDbOp:", error);
     return null;
   }
+  return res;
 };
 
 export {

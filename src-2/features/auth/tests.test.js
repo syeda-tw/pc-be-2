@@ -271,7 +271,7 @@ describe("Verify User Token - Testing Endpoint Functionality", () => {
   });
 });
 
-describe.only("Login - Testing Request Validity", () => {
+describe("Login - Testing Request Validity", () => {
   it("should return 400 if email is missing", async () => {
     const res = await request(app).post("/auth/login").send({
       email: "",
@@ -406,7 +406,7 @@ describe("Reset Password - Testing Request Validity", () => {
   });
 });
 
-describe.only("Reset Password - Testing Endpoint Functionality", () => {
+describe("Reset Password - Testing Endpoint Functionality", () => {
   beforeEach(async () => {
     const hashedPassword = await hashPassword("Test1234!");
     await User.create({
@@ -451,6 +451,124 @@ describe.only("Reset Password - Testing Endpoint Functionality", () => {
       token: token,
       password: "Test1234!",
     });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  }, 30000);
+});
+
+describe("Testing Change Password - Testing Request Validity", () => {
+  beforeEach(async () => {
+    const hashedPassword = await hashPassword("Test1234!");
+    await User.create({
+      email: "test@example.com",
+      password: hashedPassword,
+      status: "onboarding-step-1",
+      first_name: "John",
+      last_name: "Doe",
+      is_admin: true,
+    });
+  });
+  it("should return 400 if oldPassword is missing", async () => {
+    const user = await User.findOne({ email: "test@example.com" });
+    const token = generateToken({ _id: user._id.toString() }, "1h");
+    const res = await request(app)
+      .post("/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        oldPassword: "",
+        newPassword: "Test1234!",
+      });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+
+  it("should return 400 if newPassword is missing", async () => {
+    const user = await User.findOne({ email: "test@example.com" });
+    const token = generateToken({ _id: user._id.toString() }, "1h");
+    const res = await request(app)
+      .post("/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        oldPassword: "Test1234!",
+        newPassword: "",
+      });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+  it("should return 400 if both oldPassword and newPassword are missing", async () => {
+    const user = await User.findOne({ email: "test@example.com" });
+    const token = generateToken({ _id: user._id.toString() }, "1h");
+    const res = await request(app)
+      .post("/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        oldPassword: "",
+        newPassword: "",
+      });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  });
+});
+
+describe("Testing Change Password - Testing Endpoint Functionality", () => {
+  beforeEach(async () => {
+    const oldPassword = "Test1234!";
+    const hashedPassword = await hashPassword(oldPassword);
+    await User.create({
+      email: "test@example.com",
+      password: hashedPassword,
+      status: "onboarding-step-1",
+      first_name: "John",
+      last_name: "Doe",
+      is_admin: true,
+    });
+  });
+
+  it("should return 200 if oldPassword and newPassword are valid", async () => {
+    const user = await User.findOne({ email: "test@example.com" });
+    const token = generateToken({ _id: user._id.toString() }, "1h");
+    const res = await request(app)
+      .post("/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        oldPassword: "Test1234!",
+        newPassword: "TestNew1234!",
+      });
+    expect(res.statusCode).toBe(200);
+  }, 30000);
+
+  it("should return 400 if oldPassword and newPassword are valid but authorization is wrong", async () => {
+    const user = await User.findOne({ email: "test@example.com" });
+    const token = "invalid_token_that_will_fail_verification";
+    const res = await request(app)
+      .post("/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        oldPassword: "Test1234!",
+        newPassword: "TestNew1234!",
+      });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  }, 30000);
+
+  it("should return 400 if oldPassword is incorrect", async () => {
+    const user = await User.findOne({ email: "test@example.com" });
+    const token = generateToken({ _id: user._id.toString() }, "1h");
+    const res = await request(app)
+      .post("/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        oldPassword: "WrongPassword123!",
+        newPassword: "TestNew1234!",
+      });
+    expect(res.statusCode).toBeGreaterThanOrEqual(400);
+  }, 30000);
+
+  it("should return 400 if newPassword is the same as the oldPassword", async () => {
+    const user = await User.findOne({ email: "test@example.com" });
+    const token = generateToken({ _id: user._id.toString() }, "1h");
+    const res = await request(app)
+      .post("/auth/change-password")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        oldPassword: "Test1234!",
+        newPassword: "Test1234!",
+      });
     expect(res.statusCode).toBeGreaterThanOrEqual(400);
   }, 30000);
 });

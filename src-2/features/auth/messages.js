@@ -18,6 +18,7 @@ export const messages = {
     userDoesNotExist: "User does not exist. Please register first.",
     invalidEmailFormat: "Please provide a valid email address.",
     invalidCredentials: "The password that you entered is incorrect",
+    invalidOldPassword: "The old password that you entered is incorrect",
     invalidPasswordFormat:
       "Password must be between 8 and 20 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
     invalidOtpFormat: "Please provide a valid OTP.",

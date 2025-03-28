@@ -90,7 +90,7 @@ const resetPassword = async (req, res, next) => {
 
 const changePassword = async (req, res, next) => {
   try {
-    await changePasswordService(req.body);
+    await changePasswordService(req.body.decodedToken._id, req.body.oldPassword, req.body.newPassword);
     return res.status(200).json({
       message: messages.password.passwordChanged,
     });
