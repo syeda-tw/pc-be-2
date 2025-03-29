@@ -13,16 +13,13 @@ export const validateOnboardingStep1Middleware = (req, res, next) => {
     middleName: Joi.string().allow("").max(50),
     username: Joi.string().required().min(3).max(30).alphanum(),
   });
-
   const { error } = schema.validate(req.body.user);
-
   if (error) {
     return res.status(400).json({
       message: "Validation error",
       errors: error.details.map((detail) => detail.message),
     });
   }
-
   next();
 };
 
@@ -31,17 +28,27 @@ export const validateAddressMiddleware = (req, res, next) => {
   const schema = Joi.object({
     address: Joi.string().required().min(1).max(255),
   });
-
   const { error } = schema.validate(req.body);
-
   if (error) {
     return res.status(400).json({
       message: "Validation error",
       errors: error.details.map((detail) => detail.message),
     });
   }
-
   next();
 };
 
+export const validateUsernameMiddleware = (req, res, next) => {
+  const schema = Joi.object({
+    username: Joi.string().required().min(3).max(30).alphanum(),
+  });
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({
+      message: "Validation error",
+      errors: error.details.map((detail) => detail.message),
+    });
+  }
+  next();
+};
 

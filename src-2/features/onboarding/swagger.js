@@ -271,3 +271,49 @@
  *                   type: string
  *                   description: Error message
  */
+
+/**
+ * @swagger
+ * /onboarding/validate-username:
+ *   post:
+ *     summary: Validate a user's username
+ *     tags: [Onboarding]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: The username to validate
+ *                 minLength: 3
+ *                 maxLength: 30
+ *     responses:
+ *       200:
+ *         description: Username validation results
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 isValid:
+ *                   type: boolean
+ *                   description: Whether the username is valid
+ *                 message:
+ *                   type: string
+ *                   description: Message indicating the result of the username validation
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
+ */

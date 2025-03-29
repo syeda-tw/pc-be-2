@@ -154,7 +154,6 @@ router.post(
  *       500:
  *         description: Internal server error
  */
-
 router.post(
   "/onboarding-company-step-2",
   checkValidToken,

@@ -17,4 +17,12 @@ const updateUserDbOp = async (id, user) => {
   }
 };
 
-export {findUserByIdDbOp,updateUserDbOp }
+const findUserByUsernameDbOp = async (username) => {
+  try {
+    return await User.findOne({ username });
+  } catch (error) {
+    console.error();
+  }
+};
+
+export {findUserByIdDbOp,updateUserDbOp,findUserByUsernameDbOp }
