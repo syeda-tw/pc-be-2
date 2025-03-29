@@ -27,7 +27,7 @@ export const configureSwagger = (app) => {
         },
       ],
     },
-    apis: ["./src-2/features/**/swagger.js"],
+    apis: ["./src/features/**/swagger.js"],
   };
 
   const swaggerDocs = swaggerJsDoc(swaggerOptions);

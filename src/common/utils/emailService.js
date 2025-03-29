@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import { env } from "../../common/config/env.js";
+import { env } from "../config/env.js";
 import CustomError from "./customError.js";
 
 //THIS IS CREATED SO THAT TEST ACCOUNTS CAN BE CREATED WITH THE SAME EMAIL ADDRESS

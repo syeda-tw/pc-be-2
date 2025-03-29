@@ -1,8 +1,8 @@
 import express from "express";
 import helmet from "helmet";
-import { configureSwagger } from "../../common/config/swagger.js";
-import { corsMiddleware } from "../../common/middlewares/corsMiddleware.js";
-import { errorHandler } from "../../common/middlewares/errorHandlingMiddleware.js";
+import { configureSwagger } from "./swagger.js";
+import { corsMiddleware } from "../middlewares/corsMiddleware.js";
+import { errorHandler } from "../middlewares/errorHandlingMiddleware.js";
 import { env } from "./env.js";
 import authRoutes from "../../features/auth/routes.js";
 import onboardingRoutes from "../../features/onboarding/routes.js";

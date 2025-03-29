@@ -1,4 +1,4 @@
-import User from "../models/user.js";
+import User from "../../src/models/user.js";
 import {
   S3Client,
   PutObjectCommand,
