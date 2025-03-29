@@ -13,7 +13,7 @@ import { sanitizeUser } from "../../../src/helpers/auth.js";
 const register = async (req, res, next) => {
   const { email, password } = req.body;
   try {
-    const result = await registerUserService(email, password);
+    await registerUserService(email, password);
     return res.status(200).json({
       data: {
         email,

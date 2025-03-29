@@ -60,12 +60,9 @@ export const onboardingStep1 = async (req, res, next) => {
     user.status = "onboarding-step-2";
     user.username = username;
 
-    await user.save();
+    await updateUserDbOp(user._id, user);
 
-    return res.status(200).json({
-      message: "User updated successfully",
-      user,
-    });
+    return 
   } catch (err) {
     console.error(err);
     return res.status(500).json({
@@ -77,9 +74,7 @@ export const onboardingStep1 = async (req, res, next) => {
 export const validateAddress = async (req, res, next) => {
   try {
     const { address } = req.body;
-
     const data = await geoapifyValidateAddress(address);
-
     return res.status(200).json(data);
   } catch (err) {
     console.error(err);

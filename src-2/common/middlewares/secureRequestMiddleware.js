@@ -1,13 +1,16 @@
 import jwt from "jsonwebtoken";
-import { messages } from "../../features/auth/messages";
+
+const messages = {
+  error: {
+    serverError: "Server error",
+    invalidToken: "Invalid token",
+    invalidTokenFormat: "Invalid token format",
+  },
+};
 
 const secureRequestMiddleware = (req, res, next) => {
   const token = req.headers.authorization;
-  
   const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    return res.status(500).json({ message: messages.error.serverError });
-  }
   try {
     const decoded = jwt.verify(token.split(" ")[1], secret);
     if (!decoded?._id) {
@@ -16,6 +19,7 @@ const secureRequestMiddleware = (req, res, next) => {
     req.body.decodedToken = decoded;
     next();
   } catch (err) {
+    console.log("err", err);
     return res.status(401).json({ message: messages.error.invalidTokenFormat });
   }
 };

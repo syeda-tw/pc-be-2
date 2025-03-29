@@ -31,6 +31,7 @@ const registerUserService = async (email, password) => {
   const otpVerification = await findOtpVerificationByEmailDbOp(email);
   const otp = generateOtp();
   const hashedPassword = await hashPassword(password);
+  console.log("otp", otp);
 
   if (otpVerification) {
     //If OTP verification already exists, update the password and otp

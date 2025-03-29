@@ -5,6 +5,7 @@ import { corsMiddleware } from "../../common/middlewares/corsMiddleware.js";
 import { errorHandler } from "../../common/middlewares/errorHandlingMiddleware.js";
 import { env } from "./env.js";
 import authRoutes from "../../features/auth/routes.js";
+import onboardingRoutes from "../../features/onboarding/routes.js";
 
 // import onboardingRoutes from "../routes/onboardingRoutes.js";
 // import intakeFormsRoutes from "../routes/intakeFormsRoutes.js";
@@ -26,7 +27,7 @@ configureSwagger(app);
 
 // Routes
 app.use("/auth", authRoutes);
-// app.use("/onboarding", onboardingRoutes);
+app.use("/onboarding", onboardingRoutes);
 // app.use("/intake-forms", intakeFormsRoutes);
 app.use(errorHandler);
 

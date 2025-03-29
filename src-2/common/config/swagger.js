@@ -3,12 +3,14 @@ import swaggerUi from "swagger-ui-express";
 
 export const configureSwagger = (app) => {
   const swaggerOptions = {
+    withCredentials: false, // Prevents Swagger UI from sending cookies
+
     swaggerDefinition: {
       openapi: "3.0.0",
       info: {
-        title: "My Express.js API",
+        title: "Practicare API",
         version: "1.0.0",
-        description: "A sample Express.js API built with JavaScript and Swagger",
+        description: "API for Practicare",
       },
       components: {
         securitySchemes: {
@@ -25,7 +27,7 @@ export const configureSwagger = (app) => {
         },
       ],
     },
-    apis: ["./src-2/features/auth/swagger.js"],
+    apis: ["./src-2/features/**/swagger.js"],
   };
 
   const swaggerDocs = swaggerJsDoc(swaggerOptions);
