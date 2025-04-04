@@ -12,6 +12,7 @@ import onboardingRoutes from "../../features/onboarding/routes.js";
 
 const app = express();
 
+
 // CORS middleware
 app.use(corsMiddleware);
 
