@@ -22,7 +22,7 @@ const onboardingStep1 = async (req, res, next) => {
 const validateAddress = async (req, res, next) => {
   try {
     const data = await geoapifyValidateAddress(req.body.address);
-    return res.status(200).json({ data });
+    return res.status(200).json( data );
   } catch (err) {
     next(err);
   }
@@ -30,8 +30,8 @@ const validateAddress = async (req, res, next) => {
 
 const autocompleteAddress = async (req, res, next) => {
   try {
-    const data = await geoapifyAutocompleteAddress(req.body.address);
-    return res.status(200).json({ data });
+    const data = await geoapifyAutocompleteAddress(req.body.data.address);
+    return res.status(200).json(data );
   } catch (err) {
     next(err);
   }
