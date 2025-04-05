@@ -63,7 +63,7 @@ const onboardingIndividualStep2 = async (req, res, next) => {
 
 const onboardingCompanyStep2 = async (req, res, next) => {
   try {
-    const user = await onboardingCompanyStep2Service(req.body);
+    const user = await onboardingCompanyStep2Service(req.body.data, req.body.decodedToken._id);
     return res.status(200).json({ user });
   } catch (err) {
     next(err);

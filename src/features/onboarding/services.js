@@ -1,5 +1,5 @@
 import CustomError from "../../common/utils/customError.js";
-import { findUserByIdDbOp, findUserByUsernameDbOp, updateUserDbOp } from "./dbOps.js";
+import { findUserByIdDbOp, findUserByUsernameDbOp, updateUserDbOp, findPracticeByIdDbOp, updatePracticeDbOp } from "./dbOps.js";
 import { messages } from "./messages.js";
 
 const onboardingStep1Service = async ({title, pronouns, 
@@ -60,7 +60,7 @@ const onboardingIndividualStep2Service = async (data, id) => {
   }
 };  
 
-const onboardingCompanyStep2Service = async (data) => {
+const onboardingCompanyStep2Service = async (data, id) => {
   const { businessName, website, address, members } = data;
   const user = await findUserByIdDbOp(id);
   if (!user) {
@@ -70,8 +70,13 @@ const onboardingCompanyStep2Service = async (data) => {
   user.website = website;
   user.address = address;
   user.status = "onboarded";
+
+  const practice = findPracticeByIdDbOp(user.practice_id)
+  practice.members = user.members
+
   try {
     const userUpdated = await updateUserDbOp(id, user);
+    await updatePracticeDbOp(practice._id, practice)
     return userUpdated;
   } catch (error) {
     throw new Error(error);

@@ -8,6 +8,7 @@ const PracticeSchema = new Schema({
   is_company: { type: Boolean },
   website: { type: String },
   addresses: { type: [String] },
+  members: { type: [String], default: [] },
 });
 
 export default mongoose.model("Practice", PracticeSchema);

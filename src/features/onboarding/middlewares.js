@@ -74,7 +74,7 @@ export const validateOnboardingCompanyStep2Middleware = (req, res, next) => {
     address: Joi.string().required().max(255),
     members: Joi.array().items(Joi.string().email()).required(),
   });
-  const { error } = schema.validate(req.body);
+  const { error } = schema.validate(req.body.data);
   if (error) {
     return res.status(400).json({
       message: "Validation error",

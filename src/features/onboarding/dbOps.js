@@ -1,3 +1,4 @@
+import Practice from "../../common/models/practice.js";
 import User from "../../common/models/user.js";
 
 const findUserByIdDbOp = async (id) => {
@@ -25,4 +26,28 @@ const findUserByUsernameDbOp = async (username) => {
   }
 };
 
-export {findUserByIdDbOp,updateUserDbOp,findUserByUsernameDbOp }
+const findPracticeByIdDbOp = async (id) => {
+  try {
+    return await Practice.findById(id);
+  } catch (error) {
+    console.error();
+  }
+  return null;
+};
+
+const updatePracticeDbOp = async (id, practice) => {
+  try {
+    return await Practice.findByIdAndUpdate(id, practice, { new: true });
+  } catch (error) {
+    console.error();
+  }
+};
+
+
+export {
+  findUserByIdDbOp,
+  updateUserDbOp,
+  findUserByUsernameDbOp,
+  findPracticeByIdDbOp,
+  updatePracticeDbOp
+};
