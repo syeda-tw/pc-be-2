@@ -68,7 +68,7 @@ const verifyRegistrationOtpService = async (email, otp) => {
     password: otpVerification.password,
     status: "onboarding-step-1",
     is_admin: true,
-    practice: newPractice._id,
+    practice_id: newPractice._id,
   });
 
   // Delete OTP verification record

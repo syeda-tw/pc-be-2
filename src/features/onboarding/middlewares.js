@@ -13,7 +13,7 @@ export const validateOnboardingStep1Middleware = (req, res, next) => {
     middleName: Joi.string().allow("").max(100),
     username: Joi.string().required().max(100).alphanum(),
   });
-  const { error } = schema.validate(req.body.user);
+  const { error } = schema.validate(req.body.data);
   if (error) {
     return res.status(400).json({
       message: "Validation error",

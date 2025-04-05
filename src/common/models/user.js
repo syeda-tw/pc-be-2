@@ -10,7 +10,7 @@ const UserSchema = new Schema({
   hourly_rate: { type: Number },
   gender: { type: String },
   qualifications: { type: [{ type: Schema.Types.Mixed }], default: [] },
-  practice: { type: Schema.Types.ObjectId, ref: "Practice" },
+  practice_id: { type: Schema.Types.ObjectId, ref: "Practice" },
   password: { type: String, required: true },
   status: {
     type: String,
@@ -68,7 +68,7 @@ export const mockUserComplete = {
       year: 2022,
     },
   ],
-  practice: "603d9f3d8d4e4f2f74c2c5f9",
+  practice_id: "603d9f3d8d4e4f2f74c2c5f9",
   password: "hashed_password_here",
   status: "onboarding-step-2",
   email: "user@example.com",

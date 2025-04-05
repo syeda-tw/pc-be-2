@@ -109,7 +109,7 @@ export const mockUserComplete = {
       year: 2022,
     },
   ],
-  practice: "603d9f3d8d4e4f2f74c2c5f9",
+  practice_id: "603d9f3d8d4e4f2f74c2c5f9",
   password: "hashed_password_here",
   status: "onboarding-step-2",
   email: "test@example.com",

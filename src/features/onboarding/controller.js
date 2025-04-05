@@ -5,14 +5,15 @@ import { onboardingStep1Service,
    onboardingCompanyStep2Service
  } from "./services.js";
 import { geoapifyAutocompleteAddress, geoapifyValidateAddress } from "./utils.js";
+import { sanitizeUser } from "../../common/utils/sanitizeUser.js";
 
 const onboardingStep1 = async (req, res, next) => {
   try {
     const user = await onboardingStep1Service(
-      req.body.user,
+      req.body.data,
       req.body.decodedToken._id
     );
-    return res.status(200).json({ user });
+    return res.status(200).json({ user: sanitizeUser(user) });
   } catch (err) {
     next(err);
   }
