@@ -47,7 +47,10 @@ const createIntakeForm = async (req, res, next) => {
 
 const deleteIntakeForm = async (req, res, next) => {
   try {
-    await deleteIntakeFormService();
+    await deleteIntakeFormService(req.params.id, req.body.decodedToken._id);
+    return res.status(200).json({
+      message: messages.intakeForms.deleteIntakeForm,
+    });
   } catch (err) {
     next(err);
   }

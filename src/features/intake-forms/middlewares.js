@@ -36,7 +36,7 @@ const deleteIntakeFormSchema = Joi.object({
 });
 
 const validateDeleteIntakeFormMiddleware = (req, res, next) => {
-  const { error } = deleteIntakeFormSchema.validate(req.headers);
+  const { error } = deleteIntakeFormSchema.validate(req.params);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }

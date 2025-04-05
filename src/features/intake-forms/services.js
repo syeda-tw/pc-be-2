@@ -1,6 +1,6 @@
 import User from "../../common/models/user.js";
-import { findByIdAndUpdate, findUserFormsById } from "./dbOps.js";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { findByIdAndReturnDeletedForm, findByIdAndUpdate, findUserFormsById } from "./dbOps.js";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 
 const s3Client = new S3Client({
@@ -58,8 +58,8 @@ const createIntakeFormService = async (id, file, formName) => {
 
       // Check if the form ID already exists in user's forms
       const formId = formDetails._id;
-      const formExists = user.forms.some(form => form._id === formId);
-      
+      const formExists = user.forms.some((form) => form._id === formId);
+
       if (formExists) {
         // Generate a new ID if there's a collision
         formDetails._id = uuidv4();
@@ -85,9 +85,49 @@ const getSingleIntakeFormService = async (id) => {
   return intakeForm;
 };
 
-const deleteIntakeFormService = async (id) => {
-  const deletedIntakeForm = await IntakeForm.findByIdAndDelete(id);
-  return deletedIntakeForm;
+const deleteIntakeFormService = async (formId, userId) => {
+  try {
+    // Try to find the form
+    let form;
+    try {
+      form = await findByIdAndReturnDeletedForm(userId, formId);
+      if (!form) {
+        throw new Error("Form not found");
+      }
+    } catch (error) {
+      console.error('Error finding form to delete:', error);
+      throw new Error('Failed to find form for deletion');
+    }
+
+    // Try to delete from S3
+    try {
+      const deleteParams = {
+        Bucket: process.env.AWS_S3_BUCKET_NAME || "default-bucket-name",
+        Key: form.s3_url.split("/").pop(),
+      };
+
+      const deleteCommand = new DeleteObjectCommand(deleteParams);
+      await s3Client.send(deleteCommand);
+    } catch (error) {
+      console.error("Error deleting file from S3:", error);
+      throw new Error("Failed to delete file from S3");
+    }
+
+    // Try to update user document
+    try {
+      await findByIdAndUpdate(userId, {
+        $pull: { forms: { _id: formId } }
+      });
+    } catch (error) {
+      console.error("Error removing form from user document:", error);
+      throw new Error("Failed to remove form from user document");
+    }
+
+    return;
+  } catch (error) {
+    console.error("Error in deleteIntakeFormService:", error);
+    throw error;
+  }
 };
 
 export {

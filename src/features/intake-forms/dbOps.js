@@ -30,4 +30,10 @@ const findByIdAndUpdate = async (id, data) => {
   return user;
 };
 
-export { findUserFormsById, findByIdAndUpdate };
+const findByIdAndReturnDeletedForm = async (id, formId) => {
+  const user = await User.findById(id);
+  const form = user.forms.find((form) => form._id === formId);
+  return form;
+};
+
+export { findUserFormsById, findByIdAndUpdate, findByIdAndReturnDeletedForm };
