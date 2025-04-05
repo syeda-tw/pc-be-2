@@ -6,6 +6,7 @@ import {
   sendWelcomeEmail,
   sendPasswordResetEmail,
   comparePassword,
+  sendRegistrationEmail
 } from "./utils.js";
 import {
   createOtpVerificationDbOp,
@@ -37,6 +38,7 @@ const registerUserService = async (email, password) => {
     //If OTP verification already exists, update the password and otp
     Object.assign(otpVerification, { email, password: hashedPassword, otp });
     await otpVerification.save();
+    await sendRegistrationEmail(email, otp)
   } else {
     //If OTP verification does not exist, create a new one
     await createOtpVerificationDbOp(email, hashedPassword, otp);

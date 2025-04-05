@@ -6,9 +6,7 @@ import { errorHandler } from "../middlewares/errorHandlingMiddleware.js";
 import { env } from "./env.js";
 import authRoutes from "../../features/auth/routes.js";
 import onboardingRoutes from "../../features/onboarding/routes.js";
-
-// import onboardingRoutes from "../routes/onboardingRoutes.js";
-// import intakeFormsRoutes from "../routes/intakeFormsRoutes.js";
+import intakeFormsRoutes from "../../features/intake-forms/routes.js";
 
 const app = express();
 
@@ -29,7 +27,7 @@ configureSwagger(app);
 // Routes
 app.use("/auth", authRoutes);
 app.use("/onboarding", onboardingRoutes);
-// app.use("/intake-forms", intakeFormsRoutes);
+app.use("/intake-forms", intakeFormsRoutes);
 app.use(errorHandler);
 
 

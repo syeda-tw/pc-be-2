@@ -42,29 +42,30 @@ const comparePassword = async (password, hashedPassword) => {
 };
 
 const sendWelcomeEmail = async (user) => {
-  await sendEmail(
-    user.email,
-    "Welcome to Practicare!",
-    generateEmailHtml(
-      "Welcome to Practicare!",
-      `Hello ${user.first_name} ${user.last_name},  
-  
-      We're excited to welcome you to **Practicare**! Our platform is designed to help you manage your mental health practice efficiently—whether it's scheduling appointments, organizing client records, or streamlining daily tasks.  
-  
-      With Practicare, you can focus more on your clients while we handle the rest.  
-  
-      **Get started today:**  
-      - [Log in to your account](https://www.practicare.co)  
-      - Explore the features built for you  
-      - Reach out to our support team if you need any help  
-  
-      We're here to support you on this journey. Welcome aboard!  
-  
-      **Best regards,**  
-      The Practicare Team  
-      [www.practicare.co](https://www.practicare.co)`
-    )
-  );
+  const subject = "Welcome to Practicare!";
+  const htmlContent = `
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4; border-radius: 8px;">
+      <h2 style="text-align: center; color: #333;">Welcome to Practicare!</h2>
+      <p style="color: #333;">Hello ${user.first_name} ${user.last_name},</p>
+      <p style="color: #333;">We're excited to welcome you to Practicare! Our platform is designed to help you manage your mental health practice efficiently—whether it's scheduling appointments, organizing client records, or streamlining daily tasks.</p>
+      <p style="color: #333;">With Practicare, you can focus more on your clients while we handle the rest.</p>
+      <p style="color: #333;"><strong>Get started today:</strong></p>
+      <ul style="color: #333;">
+        <li><a href="https://www.practicare.co" style="color: #007bff;">Log in to your account</a></li>
+        <li>Explore the features built for you</li>
+        <li>Reach out to our support team if you need any help</li>
+      </ul>
+      <p style="color: #333;">We're here to support you on this journey. Welcome aboard!</p>
+      <p style="color: #333;">Best regards,<br/>The Practicare Team</p>
+      <p style="color: #333;"><a href="https://www.practicare.co" style="color: #007bff;">www.practicare.co</a></p>
+    </div>
+  `;
+
+  try {
+    await sendEmail(user.email, subject, htmlContent);
+  } catch (err) {
+    throw new CustomError(400, "Error sending welcome email.");
+  }
 };
 
 const isPasswordCorrect = async (password, userPassword) => {
