@@ -6,7 +6,7 @@ import {
   requestResetPassword,
   resetPassword,
   changePassword,
-  verifyUser
+  verifyUserToken
 } from "./controllers.js";
 import {
   validateRegisterMiddleware,
@@ -30,7 +30,7 @@ router.post(
   "/verify-user-token",
   validateVerifyUserTokenMiddleware,
   secureRequestMiddleware,
-  verifyUser
+  verifyUserToken
 );
 router.post("/login", validateLoginMiddleware, login);
 router.post(

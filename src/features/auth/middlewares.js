@@ -14,7 +14,7 @@ const registerSchema = Joi.object({
 });
 
 const validateRegisterMiddleware = (req, res, next) => {
-  const { error } = registerSchema.validate(req.body);
+  const { error } = registerSchema.validate(req.body.data);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
@@ -33,7 +33,7 @@ const verifyRegistrationOtpSchema = Joi.object({
 });
 
 const validateVerifyRegistrationOtpMiddleware = (req, res, next) => {
-  const { error } = verifyRegistrationOtpSchema.validate(req.body);
+  const { error } = verifyRegistrationOtpSchema.validate(req.body.data);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
@@ -74,7 +74,7 @@ const loginSchema = Joi.object({
 });
 
 const validateLoginMiddleware = (req, res, next) => {
-  const { error } = loginSchema.validate(req.body);
+  const { error } = loginSchema.validate(req.body.data);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
@@ -89,7 +89,7 @@ const requestResetPasswordSchema = Joi.object({
 });
 
 const validateRequestResetPasswordMiddleware = (req, res, next) => {
-  const { error } = requestResetPasswordSchema.validate(req.body);
+  const { error } = requestResetPasswordSchema.validate(req.body.data);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }

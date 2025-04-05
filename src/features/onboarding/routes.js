@@ -4,14 +4,16 @@ import {
   validateAddress,
   autocompleteAddress,
   validateUsername,
-  // onboardingIndividualStep2,
-  // onboardingCompanyStep2,
+  onboardingIndividualStep2,
+  onboardingCompanyStep2
 } from "./controller.js";
 import express from "express";
 import {
   validateOnboardingStep1Middleware,
   validateAddressMiddleware,
-  validateUsernameMiddleware
+  validateUsernameMiddleware,
+  validateOnboardingIndividualStep2Middleware,
+  validateOnboardingCompanyStep2Middleware
 } from "./middlewares.js";
 const router = express.Router();
 
@@ -40,16 +42,18 @@ router.post("/validate-username",
   secureRequestMiddleware,
   validateUsername);
 
-// router.post(
-//   "/onboarding-individual-step-2",
-//   checkValidToken,
-//   onboardingIndividualStep2
-// );
+router.post(
+  "/onboarding-individual-step-2",
+  validateOnboardingIndividualStep2Middleware,
+  secureRequestMiddleware,
+  onboardingIndividualStep2
+);
 
-// router.post(
-//   "/onboarding-company-step-2",
-//   checkValidToken,
-//   onboardingCompanyStep2
-// );
+router.post(
+  "/onboarding-company-step-2",
+  validateOnboardingCompanyStep2Middleware,
+  secureRequestMiddleware,
+  onboardingCompanyStep2
+);
 
 export default router;

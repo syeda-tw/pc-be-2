@@ -5,14 +5,14 @@ import {
   requestResetPasswordService,
   resetPasswordService,
   changePasswordService,
-  verifyUserService
+  verifyUserTokenService
 } from "./services.js";
 import { messages } from "./messages.js";
 import { sanitizeUser } from "../../common/utils/sanitizeUser.js";
 
 //return object is data: {email} and message: "OTP sent to the email address"
 const register = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body.data;
   try {
     await registerUserService(email, password);
     return res.status(200).json({
@@ -27,7 +27,7 @@ const register = async (req, res, next) => {
 // return object is data: {email} and message: "OTP verified"
 const verifyRegistrationOtp = async (req, res, next) => {
   try {
-    const { email, otp } = req.body;
+    const { email, otp } = req.body.data;
     const { user, token } = await verifyRegistrationOtpService(email, otp);
     return res.status(200).json({
       user: sanitizeUser(user),
@@ -41,7 +41,7 @@ const verifyRegistrationOtp = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body.data;
     const { user, token } = await loginService(email, password);
     return res.status(200).json({
       user: sanitizeUser(user),
@@ -54,7 +54,7 @@ const login = async (req, res, next) => {
 };
 
 const requestResetPassword = async (req, res, next) => {
-  const { email } = req.body;
+  const { email } = req.body.data;
   try {
     await requestResetPasswordService(email);
     return res.status(200).json({
@@ -96,10 +96,10 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-const verifyUser = async (req, res, next) => {
+const verifyUserToken = async (req, res, next) => {
   try {
     const { decodedToken } = req.body;
-    const { user } = await verifyUserService(decodedToken);
+    const { user } = await verifyUserTokenService(decodedToken);
     return res.status(200).json({
       user: sanitizeUser(user),
       message: messages.user.userVerified,
@@ -116,5 +116,5 @@ export {
   requestResetPassword,
   resetPassword,
   changePassword,
-  verifyUser,
+  verifyUserToken,
 };

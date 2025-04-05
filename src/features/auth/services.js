@@ -175,7 +175,7 @@ const changePasswordService = async (id, oldPassword, newPassword) => {
   return;
 };
 
-const verifyUserService = async (token) => {
+const verifyUserTokenService = async (token) => {
   const user = await findUserByIdDbOp(token._id);
   if (!user) {
     throw new CustomError(404, messages.error.userNotFound);
@@ -190,5 +190,5 @@ export {
   requestResetPasswordService,
   resetPasswordService,
   changePasswordService,
-  verifyUserService,
+  verifyUserTokenService,
 };

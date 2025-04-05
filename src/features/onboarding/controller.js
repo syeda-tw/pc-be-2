@@ -1,5 +1,9 @@
 import { messages } from "./messages.js";
-import { onboardingStep1Service, validateUsernameService } from "./services.js";
+import { onboardingStep1Service,
+   validateUsernameService,
+   onboardingIndividualStep2Service,
+   onboardingCompanyStep2Service
+ } from "./services.js";
 import { geoapifyAutocompleteAddress, geoapifyValidateAddress } from "./utils.js";
 
 const onboardingStep1 = async (req, res, next) => {
@@ -46,4 +50,23 @@ const validateUsername = async (req, res, next) => {
     next(err);
   }
 };
-export { onboardingStep1, validateAddress, autocompleteAddress, validateUsername };
+
+const onboardingIndividualStep2 = async (req, res, next) => {
+  try {
+    const user = await onboardingIndividualStep2Service(req.body);
+    return res.status(200).json({ user });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const onboardingCompanyStep2 = async (req, res, next) => {
+  try {
+    const user = await onboardingCompanyStep2Service(req.body);
+    return res.status(200).json({ user });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export { onboardingStep1, validateAddress, autocompleteAddress, validateUsername, onboardingIndividualStep2, onboardingCompanyStep2 };

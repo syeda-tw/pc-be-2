@@ -41,4 +41,41 @@ const validateUsernameService = async (username, id) => {
   } 
   return
 };
-export { onboardingStep1Service, validateUsernameService };
+
+const onboardingIndividualStep2Service = async (data) => {
+  const { businessName, website, address } = data;
+  const user = await findUserByIdDbOp(id);
+  if (!user) {
+    throw new CustomError(400, messages.userNotFound);
+  }
+  user.business_name = businessName;
+  user.website = website;
+  user.address = address;
+  user.status = "onboarded";
+  try {
+    const userUpdated = await updateUserDbOp(id, user);
+    return userUpdated;
+  } catch (error) {
+    throw new Error(error);
+  }
+};  
+
+const onboardingCompanyStep2Service = async (data) => {
+  const { businessName, website, address, members } = data;
+  const user = await findUserByIdDbOp(id);
+  if (!user) {
+    throw new CustomError(400, messages.userNotFound);
+  }
+  user.business_name = businessName;
+  user.website = website;
+  user.address = address;
+  user.status = "onboarded";
+  try {
+    const userUpdated = await updateUserDbOp(id, user);
+    return userUpdated;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export { onboardingStep1Service, validateUsernameService, onboardingIndividualStep2Service, onboardingCompanyStep2Service };
