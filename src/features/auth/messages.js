@@ -12,6 +12,9 @@ export const messages = {
     passwordResetSuccessful: "Your password has been reset successfully.",
     passwordChanged: "Your password has been changed successfully.",
   },
+  user: {
+    userVerified: "User verified successfully",
+  },
   error: {
     userAlreadyExists: "A user with this email already exists.",
     serverError: "An unexpected error occurred. Please try again later.",

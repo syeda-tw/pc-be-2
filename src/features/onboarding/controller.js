@@ -39,7 +39,7 @@ const autocompleteAddress = async (req, res, next) => {
 const validateUsername = async (req, res, next) => {
   try {
     const user = await validateUsernameService(
-      req.body.username,
+      req.body.data.username,
       req.body.decodedToken._id
     );
     return res.status(200).json({

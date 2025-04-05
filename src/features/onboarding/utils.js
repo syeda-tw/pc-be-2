@@ -87,7 +87,6 @@ export async function geoapifyValidateAddress(address) {
       isComplete: true,
     };
   } catch (error) {
-    console.log("error", error);
     return { isValid: false, isOutsideUS: false };
   }
 }
