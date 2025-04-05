@@ -57,7 +57,7 @@ export const validateOnboardingIndividualStep2Middleware = (req, res, next) => {
     website: Joi.string().allow("").max(255),
     address: Joi.string().required().max(255),
   });
-  const { error } = schema.validate(req.body);
+  const { error } = schema.validate(req.body.data);
   if (error) {
     return res.status(400).json({
       message: "Validation error",

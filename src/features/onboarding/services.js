@@ -42,7 +42,7 @@ const validateUsernameService = async (username, id) => {
   return
 };
 
-const onboardingIndividualStep2Service = async (data) => {
+const onboardingIndividualStep2Service = async (data, id) => {
   const { businessName, website, address } = data;
   const user = await findUserByIdDbOp(id);
   if (!user) {
