@@ -8,7 +8,7 @@ const getSingleIntakeFormSchema = Joi.object({
 });
 
 const validateGetSingleIntakeFormMiddleware = (req, res, next) => {
-  const { error } = getSingleIntakeFormSchema.validate(req.headers);
+  const { error } = getSingleIntakeFormSchema.validate(req.params);
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }

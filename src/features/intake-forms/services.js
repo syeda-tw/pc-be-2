@@ -1,7 +1,17 @@
 import User from "../../common/models/user.js";
-import { findByIdAndReturnDeletedForm, findByIdAndUpdate, findUserFormsById } from "./dbOps.js";
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import {
+  findByIdAndReturnDeletedForm,
+  findByIdAndUpdate,
+  findUserFormsById,
+} from "./dbOps.js";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
+import { Readable } from "stream";
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -80,9 +90,50 @@ const createIntakeFormService = async (id, file, formName) => {
   }
 };
 
-const getSingleIntakeFormService = async (id) => {
-  const intakeForm = await findUserFormsById(id);
-  return intakeForm;
+const getSingleIntakeFormService = async (formId, userId) => {
+  try {
+    // Try to find the user and form
+    let user;
+    let form;
+    try {
+      user = await findUserFormsById(userId);
+      if (!user) {
+        throw new Error("User not found");
+      }
+
+      form = user.forms.find((form) => form._id === formId);
+      if (!form) {
+        throw new Error("Form not found");
+      }
+    } catch (error) {
+      console.error("Error finding user or form:", error);
+      throw new Error("Failed to find user or form");
+    }
+
+    // Try to get file from S3
+    let s3Object;
+    try {
+      const s3Params = {
+        Bucket: process.env.AWS_S3_BUCKET_NAME || "default-bucket-name",
+        Key: formId,
+      };
+
+      s3Object = await s3Client.send(new GetObjectCommand(s3Params));
+
+      if (!s3Object.Body) {
+        throw new Error("Failed to retrieve file from S3");
+      }
+    } catch (error) {
+      console.error("Error retrieving file from S3:", error);
+      throw new Error("Failed to retrieve file from S3");
+    }
+
+    const fileStream = Readable.from(s3Object.Body);
+    return { fileStream, form };
+  } catch (error) {
+    console.error("Error in getSingleIntakeFormService:", error);
+    throw error;
+  }
 };
 
 const deleteIntakeFormService = async (formId, userId) => {
@@ -95,8 +146,8 @@ const deleteIntakeFormService = async (formId, userId) => {
         throw new Error("Form not found");
       }
     } catch (error) {
-      console.error('Error finding form to delete:', error);
-      throw new Error('Failed to find form for deletion');
+      console.error("Error finding form to delete:", error);
+      throw new Error("Failed to find form for deletion");
     }
 
     // Try to delete from S3
@@ -116,7 +167,7 @@ const deleteIntakeFormService = async (formId, userId) => {
     // Try to update user document
     try {
       await findByIdAndUpdate(userId, {
-        $pull: { forms: { _id: formId } }
+        $pull: { forms: { _id: formId } },
       });
     } catch (error) {
       console.error("Error removing form from user document:", error);
