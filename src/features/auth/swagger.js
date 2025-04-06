@@ -19,15 +19,20 @@
  *           schema:
  *             type: object
  *             required:
- *               - email
- *               - password
+ *               - data
  *             properties:
- *               email:
- *                 type: string
- *                 description: The user's email address (must be unique).
- *               password:
- *                 type: string
- *                 description: The user's password (must be between 8 and 20 characters long).
+ *               data:
+ *                 type: object
+ *                 required:
+ *                   - email
+ *                   - password
+ *                 properties:
+ *                   email:
+ *                     type: string
+ *                     description: The user's email address (must be unique).
+ *                   password:
+ *                     type: string
+ *                     description: The user's password (must be between 8 and 20 characters long).
  *     responses:
  *       200:
  *         description: User successfully registered, OTP sent to email.
@@ -36,12 +41,9 @@
  *             schema:
  *               type: object
  *               properties:
- *                 data:
- *                   type: object
- *                   properties:
- *                     email:
- *                       type: string
- *                       description: The email address of the registered user.
+ *                 email:
+ *                   type: string
+ *                   description: The email address of the registered user.
  *                 message:
  *                   type: string
  *                   description: Message indicating that OTP has been sent.
@@ -81,15 +83,20 @@
  *           schema:
  *             type: object
  *             required:
- *               - email
- *               - otp
+ *               - data
  *             properties:
- *               email:
- *                 type: string
- *                 description: The user's email address.
- *               otp:
- *                 type: string
- *                 description: The OTP sent to the user's email.
+ *               data:
+ *                 type: object
+ *                 required:
+ *                   - email
+ *                   - otp
+ *                 properties:
+ *                   email:
+ *                     type: string
+ *                     description: The user's email address.
+ *                   otp:
+ *                     type: string
+ *                     description: The OTP sent to the user's email.
  *     responses:
  *       200:
  *         description: OTP verified successfully.
@@ -98,15 +105,12 @@
  *             schema:
  *               type: object
  *               properties:
- *                 data:
+ *                 user:
  *                   type: object
- *                   properties:
- *                     user:
- *                       type: object
- *                       description: The sanitized user object.
- *                     token:
- *                       type: string
- *                       description: JWT token for the user.
+ *                   description: The sanitized user object.
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for the user.
  *                 message:
  *                   type: string
  *                   description: Message indicating OTP verification success.
@@ -146,15 +150,20 @@
  *           schema:
  *             type: object
  *             required:
- *               - email
- *               - password
+ *               - data
  *             properties:
- *               email:
- *                 type: string
- *                 description: The user's email address.
- *               password:
- *                 type: string
- *                 description: The user's password.
+ *               data:
+ *                 type: object
+ *                 required:
+ *                   - email
+ *                   - password
+ *                 properties:
+ *                   email:
+ *                     type: string
+ *                     description: The user's email address.
+ *                   password:
+ *                     type: string
+ *                     description: The user's password.
  *     responses:
  *       200:
  *         description: User logged in successfully.
@@ -163,15 +172,12 @@
  *             schema:
  *               type: object
  *               properties:
- *                 data:
+ *                 user:
  *                   type: object
- *                   properties:
- *                     user:
- *                       type: object
- *                       description: The sanitized user object.
- *                     token:
- *                       type: string
- *                       description: JWT token for the user.
+ *                   description: The sanitized user object.
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for the user.
  *                 message:
  *                   type: string
  *                   description: Message indicating login success.
@@ -211,11 +217,16 @@
  *           schema:
  *             type: object
  *             required:
- *               - email
+ *               - data
  *             properties:
- *               email:
- *                 type: string
- *                 description: The user's email address.
+ *               data:
+ *                 type: object
+ *                 required:
+ *                   - email
+ *                 properties:
+ *                   email:
+ *                     type: string
+ *                     description: The user's email address.
  *     responses:
  *       200:
  *         description: Password reset link sent successfully.
@@ -254,7 +265,7 @@
  * /auth/reset-password:
  *   post:
  *     summary: Reset password
- *     description: Reset the user's password using a token.
+ *     description: Reset user's password using the token received in the reset password email.
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -268,10 +279,10 @@
  *             properties:
  *               token:
  *                 type: string
- *                 description: The token received in the password reset email.
+ *                 description: The reset password token received via email.
  *               password:
  *                 type: string
- *                 description: The new password for the user.
+ *                 description: The new password.
  *     responses:
  *       200:
  *         description: Password reset successfully.
@@ -280,17 +291,14 @@
  *             schema:
  *               type: object
  *               properties:
- *                 data:
+ *                 user:
  *                   type: object
- *                   properties:
- *                     user:
- *                       type: object
- *                       description: The sanitized user object.
- *                     token:
- *                       type: string
- *                       description: JWT token for the user.
+ *                   description: The sanitized user object.
+ *                 token:
+ *                   type: string
+ *                   description: New JWT token for the user.
  *       400:
- *         description: Invalid token or password format.
+ *         description: Invalid token or password.
  *         content:
  *           application/json:
  *             schema:
@@ -316,8 +324,10 @@
  * /auth/change-password:
  *   post:
  *     summary: Change password
- *     description: Change the user's password by providing the old and new passwords.
+ *     description: Change user's password while logged in.
  *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -330,10 +340,10 @@
  *             properties:
  *               oldPassword:
  *                 type: string
- *                 description: The user's current password.
+ *                 description: The current password.
  *               newPassword:
  *                 type: string
- *                 description: The new password for the user.
+ *                 description: The new password.
  *     responses:
  *       200:
  *         description: Password changed successfully.
@@ -345,8 +355,65 @@
  *                 message:
  *                   type: string
  *                   description: Message indicating password change success.
- *       400:
- *         description: Invalid old password or new password format.
+ *       401:
+ *         description: Invalid current password or unauthorized.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message indicating the issue.
+ *       500:
+ *         description: Internal server error.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Message indicating that an unexpected error occurred.
+ */
+
+/**
+ * @swagger
+ * /auth/verify-user-token:
+ *   post:
+ *     summary: Verify user token
+ *     description: Verify the validity of a user's JWT token.
+ *     tags: [Authentication]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - decodedToken
+ *             properties:
+ *               decodedToken:
+ *                 type: object
+ *                 description: The decoded JWT token.
+ *     responses:
+ *       200:
+ *         description: Token verified successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   type: object
+ *                   description: The sanitized user object.
+ *                 message:
+ *                   type: string
+ *                   description: Message indicating token verification success.
+ *       401:
+ *         description: Invalid or expired token.
  *         content:
  *           application/json:
  *             schema:
