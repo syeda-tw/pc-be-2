@@ -1,28 +1,32 @@
-export async function extractAddressPartsFromGeoapify(address) {
-  const requestOptions = {
-    method: "GET",
-  };
-
-  const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(
+export async function extractAddressPartsFromGoogle(address) {
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
     address
-  )}&format=json&apiKey=${process.env.GEOAPIFY_API_KEY}`;
+  )}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
 
-  const response = await fetch(url, requestOptions);
-  const result = await response.json();
+  const response = await fetch(url);
+  const data = await response.json();
 
-  if (!result.results || result.results.length === 0) {
+  if (!data.results || data.results.length === 0) {
     return null;
   }
 
-  const location = result.results[0]; // Take the best match
+  const result = data.results[0]; // Best match
+  const components = result.address_components;
+
+  const getComponent = (type) => {
+    const comp = components.find(c => c.types.includes(type));
+    return comp ? comp.long_name : '';
+  };
 
   return {
-    street: location.street || "",
-    city: location.city || location.town || location.village || "",
-    state: location.state || "",
-    zip: location.postcode || "",
+    street: `${getComponent("street_number")} ${getComponent("route")}`.trim(),
+    city: getComponent("locality") || getComponent("sublocality") || '',
+    state: getComponent("administrative_area_level_1"),
+    zip: getComponent("postal_code"),
+    country: getComponent("country"),
   };
 }
+
 
 export async function googleAutocompleteAddress(address) {
   const requestOptions = {

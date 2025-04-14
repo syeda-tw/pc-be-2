@@ -1,7 +1,7 @@
 import CustomError from "../../common/utils/customError.js";
 import { findUserByIdDbOp, findUserByUsernameDbOp, updateUserDbOp, findPracticeByIdDbOp, updatePracticeDbOp, createPracticeDbOp } from "./dbOps.js";
 import { messages } from "./messages.js";
-import { extractAddressPartsFromGeoapify } from "./utils.js";
+import { extractAddressPartsFromGoogle } from "./utils.js";
 
 const onboardingStep1Service = async ({title, pronouns, 
   gender, dateOfBirth, firstName, lastName, middleName, username
@@ -50,7 +50,7 @@ const onboardingIndividualStep2Service = async (data, id) => {
   if (!user) {
     throw new CustomError(400, messages.userNotFound);
   }
-  const addressParts = await extractAddressPartsFromGeoapify(address);
+  const addressParts = await extractAddressPartsFromGoogle(address);
 
   let practice;
   try {
