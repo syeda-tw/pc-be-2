@@ -12,6 +12,7 @@ const UserSchema = new Schema({
   qualifications: { type: [{ type: Schema.Types.Mixed }], default: [] },
   practice_id: { type: Schema.Types.ObjectId, ref: "Practice" },
   password: { type: String, required: true },
+  username: { type: String, unique: true },
   status: {
     type: String,
     enum: [
