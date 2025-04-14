@@ -115,3 +115,57 @@ export async function geoapifyAutocompleteAddress(address) {
     })
     .filter((item) => item !== null);
 }
+
+export async function extractAddressPartsFromGeoapify(address) {
+  const requestOptions = {
+    method: "GET",
+  };
+
+  const url = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(
+    address
+  )}&format=json&apiKey=${process.env.GEOAPIFY_API_KEY}`;
+
+  const response = await fetch(url, requestOptions);
+  const result = await response.json();
+
+  if (!result.results || result.results.length === 0) {
+    return null;
+  }
+
+  const location = result.results[0]; // Take the best match
+
+  return {
+    street: location.street || "",
+    city: location.city || location.town || location.village || "",
+    state: location.state || "",
+    zip: location.postcode || "",
+  };
+}
+
+
+
+export async function googleAutocompleteAddress(address) {
+  const requestOptions = {
+    method: "GET",
+  };
+
+  const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+    address
+  )}&types=address&components=country:us&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+
+  try {
+    const response = await fetch(url, requestOptions);
+    console.log(response);
+    const result = await response.json();
+    console.log(result);
+
+    if (!result.predictions || result.predictions.length === 0) {
+      return [];
+    }
+
+    return result.predictions.map((prediction) => prediction.description);
+  } catch (error) {
+    console.error("Error fetching Google autocomplete address:", error);
+    return [];
+  }
+}

@@ -43,11 +43,20 @@ const updatePracticeDbOp = async (id, practice) => {
   }
 };
 
+const createPracticeDbOp = async (practice) => {
+  try {
+    return await Practice.create(practice);
+  } catch (error) {
+    console.error();
+  }
+};
+
 
 export {
   findUserByIdDbOp,
   updateUserDbOp,
   findUserByUsernameDbOp,
   findPracticeByIdDbOp,
-  updatePracticeDbOp
+  updatePracticeDbOp,
+  createPracticeDbOp
 };
