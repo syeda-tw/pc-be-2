@@ -1,121 +1,3 @@
-export async function geoapifyValidateAddress(address) {
-  const requestOptions = {
-    method: "GET",
-  };
-  try {
-    const response = await fetch(
-      `https://api.geoapify.com/v1/geocode/search?text=${address}&apiKey=${process.env.GEOAPIFY_API_KEY}`,
-      requestOptions
-    );
-
-    const result = await response.json();
-
-    // Check if result exists
-    if (!result) {
-      return {
-        isValid: false,
-        isOutsideUS: null,
-        isComplete: null,
-        message: "Address is not valid. Please enter a valid address.",
-      };
-    }
-
-    // Check if features array exists in result
-    if (!result.features || !Array.isArray(result.features)) {
-      return {
-        isValid: false,
-        isOutsideUS: null,
-        isComplete: null,
-        message: "Address is not valid. Please enter a valid address.",
-      };
-    }
-
-    // Find the feature with the highest rank confidence
-    const highestRankedFeature = result.features.reduce((prev, current) => {
-      return Number(current.properties.rank?.confidence) >
-        Number(prev.properties.rank?.confidence)
-        ? current
-        : prev;
-    });
-
-    const isValid = highestRankedFeature.properties.rank?.confidence > 0.8;
-
-    if (!isValid) {
-      return {
-        isValid: false,
-        isOutsideUS: null,
-        isComplete: null,
-        message: "Address is not valid. Please enter a valid address.",
-      };
-    }
-
-    const isOutsideUS =
-      highestRankedFeature.properties?.country !== "United States";
-
-    if (isOutsideUS) {
-      return {
-        isValid: false,
-        isOutsideUS: true,
-        isComplete: null,
-        message:
-          "Address is not valid. Please enter an Address in the United States.",
-      };
-    }
-
-    const requiredFields = [
-      "housenumber",
-      "street",
-      "city",
-      "state",
-      "postcode",
-      "country",
-    ];
-    const isComplete = requiredFields.every(
-      (field) => highestRankedFeature.properties[field]
-    );
-    if (!isComplete) {
-      return {
-        isValid: false,
-        isOutsideUS: false,
-        isComplete: false,
-        message: "Address is not complete. Please enter a complete address.",
-      };
-    }
-    return {
-      isValid: true,
-      isOutsideUS: false,
-      isComplete: true,
-    };
-  } catch (error) {
-    return { isValid: false, isOutsideUS: false };
-  }
-}
-
-export async function geoapifyAutocompleteAddress(address) {
-  const requestOptions = {
-    method: "GET",
-  };
-  const response = await fetch(
-    `https://api.geoapify.com/v1/geocode/autocomplete?text=${address}&apiKey=${process.env.GEOAPIFY_API_KEY}`,
-    requestOptions
-  );
-  const result = await response.json();
-  if (result.length <= 0 && result.features.length <= 0) {
-    return [];
-  }
-  return result.features
-    .map((item) => {
-      if (
-        item.properties.country == "United States of America" ||
-        item.properties.country == "United States"
-      ) {
-        return item.properties.formatted;
-      }
-      return null;
-    })
-    .filter((item) => item !== null);
-}
-
 export async function extractAddressPartsFromGeoapify(address) {
   const requestOptions = {
     method: "GET",
@@ -142,8 +24,6 @@ export async function extractAddressPartsFromGeoapify(address) {
   };
 }
 
-
-
 export async function googleAutocompleteAddress(address) {
   const requestOptions = {
     method: "GET",
@@ -155,9 +35,7 @@ export async function googleAutocompleteAddress(address) {
 
   try {
     const response = await fetch(url, requestOptions);
-    console.log(response);
     const result = await response.json();
-    console.log(result);
 
     if (!result.predictions || result.predictions.length === 0) {
       return [];
@@ -169,3 +47,104 @@ export async function googleAutocompleteAddress(address) {
     return [];
   }
 }
+
+export async function googleValidateAddress(address) {
+  const url = `https://addressvalidation.googleapis.com/v1:validateAddress?key=${process.env.GOOGLE_MAPS_API_KEY}`;
+
+  const payload = {
+    address: {
+      addressLines: [address],
+    },
+    enableUspsCass: true,
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+    const result = data?.result;
+    const { addressComponents } = result?.address;
+
+    // Step 1: Check if it's in the United States
+    const countryComponent = addressComponents.find(
+      (component) => component.componentType === "country"
+    );
+
+    if (countryComponent?.componentName?.text !== "USA") {
+      return {
+        isValid: false,
+        isOutsideUS: true,
+        isComplete: false,
+        message: "Address is not in the United States.",
+      };
+    }
+
+    // Step 2: Check completeness of the address components
+    const missingParts = [];
+
+    // Check for Street address
+    const street = addressComponents.find(
+      (component) => component.componentType === "street_number" && component.confirmationLevel === "CONFIRMED" && component.inferred !== true || component.componentType === "route" && component.confirmationLevel === "CONFIRMED" && component.inferred !== true 
+    );
+    if (!street) missingParts.push("street address");
+
+    // Check for City
+    const city = addressComponents.find(
+      (component) => component.componentType === "locality" && component.confirmationLevel === "CONFIRMED" && component.inferred !== true
+    );
+    if (!city) missingParts.push("city");
+
+    // Check for State
+    const state = addressComponents.find(
+      (component) => component.componentType === "administrative_area_level_1" && component.confirmationLevel === "CONFIRMED" && component.inferred !== true
+    );
+    if (!state) missingParts.push("state");
+
+    // // Check for ZIP code
+    // const zip = addressComponents.find(
+    //   (component) => component.componentType === "postal_code" && component.confirmationLevel === "CONFIRMED" && component.inferred !== true
+    // );
+    // if (!zip) missingParts.push("ZIP code");
+
+    // Check for Country (already validated above, but we still want to ensure it's part of the response)
+    const country = addressComponents.find(
+      (component) => component.componentType === "country" && component.confirmationLevel === "CONFIRMED" && component.inferred !== true
+    );
+    if (!country) missingParts.push("country");
+
+    // If anything is missing, return a message
+    if (missingParts.length > 0) {
+      return {
+        isValid: false,
+        isOutsideUS: false,
+        isComplete: false,
+        message: `Address is incomplete. Missing: ${missingParts.join(", ")}.`,
+      };
+    }
+
+    // If everything is there
+    return {
+      isValid: true,
+      isOutsideUS: false,
+      isComplete: true,
+      message: "Address is valid and complete.",
+    };
+  } catch (error) {
+    return {
+      isValid: false,
+      isOutsideUS: false,
+      isComplete: false,
+      message: "Something went wrong while validating the address.",
+    };
+  }
+}
+
+
+
+

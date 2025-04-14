@@ -4,7 +4,7 @@ import { onboardingStep1Service,
    onboardingIndividualStep2Service,
    onboardingCompanyStep2Service
  } from "./services.js";
-import { geoapifyAutocompleteAddress, geoapifyValidateAddress } from "./utils.js";
+import { googleAutocompleteAddress, googleValidateAddress } from "./utils.js";
 import { sanitizeUser } from "../../common/utils/sanitizeUser.js";
 
 const onboardingStep1 = async (req, res, next) => {
@@ -21,7 +21,7 @@ const onboardingStep1 = async (req, res, next) => {
 
 const validateAddress = async (req, res, next) => {
   try {
-    const data = await geoapifyValidateAddress(req.body.address);
+    const data = await googleValidateAddress(req.body.address);
     return res.status(200).json( data );
   } catch (err) {
     next(err);
@@ -30,7 +30,7 @@ const validateAddress = async (req, res, next) => {
 
 const autocompleteAddress = async (req, res, next) => {
   try {
-    const data = await geoapifyAutocompleteAddress(req.body.data.address);
+    const data = await googleAutocompleteAddress(req.body.data.address);
     return res.status(200).json(data );
   } catch (err) {
     next(err);
