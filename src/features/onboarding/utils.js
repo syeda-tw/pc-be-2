@@ -1,26 +1,39 @@
 export async function extractAddressPartsFromGoogle(address) {
-  const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-    address
-  )}&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+  const url = `https://addressvalidation.googleapis.com/v1:validateAddress?key=${process.env.GOOGLE_MAPS_API_KEY}`;
 
-  const response = await fetch(url);
+  const payload = {
+    address: {
+      addressLines: [address],
+    },
+    enableUspsCass: true,
+  };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
   const data = await response.json();
+  const components = data?.result?.address?.addressComponents;
 
-  if (!data.results || data.results.length === 0) {
+  if (!components || components.length === 0) {
     return null;
   }
 
-  const result = data.results[0]; // Best match
-  const components = result.address_components;
-
   const getComponent = (type) => {
-    const comp = components.find(c => c.types.includes(type));
-    return comp ? comp.long_name : '';
+    const comp = components.find((c) => c.componentType === type);
+    return comp?.componentName?.text || "";
   };
 
   return {
     street: `${getComponent("street_number")} ${getComponent("route")}`.trim(),
-    city: getComponent("locality") || getComponent("sublocality") || '',
+    city:
+      getComponent("locality") ||
+      getComponent("sublocality") ||
+      getComponent("administrative_area_level_2") || "",
     state: getComponent("administrative_area_level_1"),
     zip: getComponent("postal_code"),
     country: getComponent("country"),

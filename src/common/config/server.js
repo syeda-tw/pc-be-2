@@ -7,7 +7,7 @@ import { env } from "./env.js";
 import authRoutes from "../../features/auth/routes.js";
 import onboardingRoutes from "../../features/onboarding/routes.js";
 import intakeFormsRoutes from "../../features/intake-forms/routes.js";
-
+import profileSettingsRoutes from "../../features/profile-settings/routes.js";
 const app = express();
 
 
@@ -28,6 +28,7 @@ configureSwagger(app);
 app.use("/auth", authRoutes);
 app.use("/onboarding", onboardingRoutes);
 app.use("/intake-forms", intakeFormsRoutes);
+app.use("/profile-settings", profileSettingsRoutes);
 app.use(errorHandler);
 
 

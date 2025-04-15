@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { timezones } from "../../features/profile-settings/constants.js";
 
 const { Schema } = mongoose;
 
@@ -13,6 +14,8 @@ const UserSchema = new Schema({
   practice_id: { type: Schema.Types.ObjectId, ref: "Practice" },
   password: { type: String, required: true },
   username: { type: String, unique: true },
+  holiday: { type: [{ name: String, start_date: Date, end_date: Date }], 
+  default: [] },
   status: {
     type: String,
     enum: [
@@ -29,19 +32,37 @@ const UserSchema = new Schema({
   last_name: { type: String },
   middle_name: { type: String },
   date_of_birth: { type: Date },
+  timezone: { type: String, default: timezones[0] },
   availability: {
-    type: [{ type: Schema.Types.Mixed }],
-    default: [
-      {
-        Monday: [],
-        Tuesday: [],
-        Wednesday: [],
-        Thursday: [],
-        Friday: [],
-        Saturday: [],
-        Sunday: [],
-      },
-    ],
+    type: {
+      fixedLunch: { type: Boolean, default: false },
+      fixedLunchStarttime: { type: String },
+      fixedLunchEndtime: { type: String },
+      week: [
+        {
+          day: { type: String, required: true },
+          starttime: { type: String },
+          endtime: { type: String },
+          lunchstarttime: { type: String },
+          lunchendtime: { type: String },
+          isOpen: { type: Boolean, default: false },
+        },
+      ],
+    },
+    default: {
+      fixedLunch: false,
+      fixedLunchStarttime: "",
+      fixedLunchEndtime: "",
+      week: [
+        { day: "Monday", starttime: "09:00", endtime: "17:00", lunchstarttime: "", lunchendtime: "", isOpen: true },
+        { day: "Tuesday", starttime: "09:00", endtime: "17:00", lunchstarttime: "", lunchendtime: "", isOpen: true },
+        { day: "Wednesday", starttime: "09:00", endtime: "17:00", lunchstarttime: "", lunchendtime: "", isOpen: true },
+        { day: "Thursday", starttime: "09:00", endtime: "17:00", lunchstarttime: "", lunchendtime: "", isOpen: true },
+        { day: "Friday", starttime: "09:00", endtime: "17:00", lunchstarttime: "", lunchendtime: "", isOpen: true },
+        { day: "Saturday", starttime: "", endtime: "", lunchstarttime: "", lunchendtime: "", isOpen: false },
+        { day: "Sunday", starttime: "", endtime: "", lunchstarttime: "", lunchendtime: "", isOpen: false },
+      ],
+    },
   },
   forms: {
     type: [{ _id: String, name: String, created_at: Date, s3_url: String }],

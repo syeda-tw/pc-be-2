@@ -87,10 +87,12 @@ const onboardingCompanyStep2Service = async (data, id) => {
   if (!user) {
     throw new CustomError(400, messages.userNotFound);
   }
-  const addressParts = await extractAddressPartsFromGeoapify(address);
+  const addressParts = await extractAddressPartsFromGoogle(address);
+
+  let practice;
 
   try {
-    const practice = await createPracticeDbOp({
+    practice = await createPracticeDbOp({
       members: members,
       business_name: businessName,
       website: website,
