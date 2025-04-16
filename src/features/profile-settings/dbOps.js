@@ -40,3 +40,8 @@ export const updateUserDbOp = async (userId, data) => {
   const user = await User.findByIdAndUpdate(userId, data, { new: true });
   return user;
 };
+
+export const getHolidaysByUserIdDbOp = async (userId) => {
+  const user = await User.findById(userId);
+  return user && user.holidays && user.holidays.length > 0 ? user.holidays : [];
+};

@@ -1,10 +1,11 @@
 import express from "express";
-import { updatePersonalInformation, getTimezone, updateTimezone } from "./controllers.js";
-import { validateUpdatePersonalInformationMiddleware,
+import { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday} from "./controllers.js";
+import {
+  validateUpdatePersonalInformationMiddleware,
   validateUpdateTimezoneMiddleware,
   validateUpdateAvailabilityMiddleware,
-  validateUpdateHolidayMiddleware,
- } from "./middlewares.js";
+  validateAddHolidayMiddleware,
+} from "./middlewares.js";
 import { secureRequestMiddleware } from "../../common/middlewares/secureRequestMiddleware.js";
 
 const router = express.Router();
@@ -30,7 +31,7 @@ router.patch(
 );
 
 router.put(
-  'availability',
+  '/availability',
   validateUpdateAvailabilityMiddleware,
   secureRequestMiddleware,
   (req, res) => {
@@ -38,13 +39,23 @@ router.put(
   }
 )
 
-router.put(
-  'holiday',
-  validateUpdateHolidayMiddleware,
+router.get(
+  '/holidays',
   secureRequestMiddleware,
-  (req, res) => {
-    res.status(200).json({ message: "Holiday updated successfully" });
-  }
+  getHolidays
+)
+
+router.post(
+  '/holidays',
+  validateAddHolidayMiddleware,
+  secureRequestMiddleware,
+  addHoliday
+)
+
+router.delete(
+  '/holidays/:holidayId',
+  secureRequestMiddleware,
+  deleteHoliday
 )
 
 export default router; 

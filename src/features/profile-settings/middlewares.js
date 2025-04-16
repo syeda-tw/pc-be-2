@@ -2,8 +2,6 @@ import Joi from 'joi';
 import { timezones } from './constants.js';
 
 const validateUpdatePersonalInformationMiddleware = (req, res, next) => {
-  console.log(req.body);
-
   const schema = Joi.object({
     first_name: Joi.string().trim().max(50).required().messages({
       'string.empty': 'First name is required',
@@ -112,7 +110,7 @@ const validateUpdateAvailabilityMiddleware = (req, res, next) => {
   next();
 };
 
-const validateUpdateHolidayMiddleware = (req, res, next) => {
+const validateAddHolidayMiddleware = (req, res, next) => {
   const schema = Joi.object({
     holiday: Joi.array().items(Joi.object({
       name: Joi.string().trim().max(50).required(),
@@ -139,4 +137,4 @@ const validateUpdateHolidayMiddleware = (req, res, next) => {
   next();
 };
 
-export { validateUpdatePersonalInformationMiddleware, validateUpdateTimezoneMiddleware, validateUpdateAvailabilityMiddleware, validateUpdateHolidayMiddleware };
+export { validateUpdatePersonalInformationMiddleware, validateUpdateTimezoneMiddleware, validateUpdateAvailabilityMiddleware, validateAddHolidayMiddleware };   
