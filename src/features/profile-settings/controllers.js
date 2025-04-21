@@ -122,8 +122,7 @@ const getWeeklySchedule = async (req, res, next) => {
 const updateWeeklySchedule = async (req, res, next) => {
   try {
     const userId = req.body.decodedToken._id;
-    const weeklyScheduleData = req.body;
-    
+    const weeklyScheduleData = req.body.data;
     const updatedWeeklySchedule = await updateWeeklyScheduleService(userId, weeklyScheduleData);
     
     return res.status(200).json({

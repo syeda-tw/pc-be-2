@@ -130,9 +130,7 @@ const validateUpdateDailyLunchMiddleware = (req, res, next) => {
 
 const validateWeeklyScheduleMiddleware = (req, res, next) => {
   const schema = Joi.object({
-    dailyLunchStarttime: Joi.string().pattern(/^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/),
-    dailyLunchEndtime: Joi.string().pattern(/^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/),
-    week: Joi.array().items(
+    data: Joi.array().items(
       Joi.object({
         day: Joi.string().valid(
           "Monday",
@@ -143,10 +141,11 @@ const validateWeeklyScheduleMiddleware = (req, res, next) => {
           "Saturday",
           "Sunday"
         ).required(),
-        starttime: Joi.string().pattern(/^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/),
-        endtime: Joi.string().pattern(/^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/)
+        start_time: Joi.string().pattern(/^([01]\d|2[0-3]):[0-5]\d$/).required(),
+        end_time: Joi.string().pattern(/^([01]\d|2[0-3]):[0-5]\d$/).required(),
+        is_open: Joi.boolean().required()
       })
-    )
+    ).required()
   });
 
   const { error } = schema.validate(req.body);

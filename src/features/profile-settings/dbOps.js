@@ -48,7 +48,7 @@ export const getHolidaysByUserIdDbOp = async (userId) => {
 
 export const getUserDailyLunch = async (userId) => {
   const user = await User.findById(userId)
-    .select('availability.dailyLunchStarttime availability.dailyLunchEndtime')
+    .select('availability.daily_lunch_start_time availability.daily_lunch_end_time')
     .lean();
 
   if (!user) {
@@ -56,8 +56,8 @@ export const getUserDailyLunch = async (userId) => {
   }
 
   return {
-    dailyLunchStarttime: user.availability.dailyLunchStarttime,
-    dailyLunchEndtime: user.availability.dailyLunchEndtime
+    daily_lunch_start_time: user.availability.daily_lunch_start_time,
+    daily_lunch_end_time: user.availability.daily_lunch_end_time
   };
 };
 
@@ -65,12 +65,12 @@ export const updateUserDailyLunch = async (userId, startTime, endTime) => {
   const user = await User.findByIdAndUpdate(
     userId,
     {
-      'availability.dailyLunchStarttime': startTime,
-      'availability.dailyLunchEndtime': endTime
+      'availability.daily_lunch_start_time': startTime,
+      'availability.daily_lunch_end_time': endTime
     },
     {
       new: true,
-      select: 'availability.dailyLunchStarttime availability.dailyLunchEndtime'
+      select: 'availability.daily_lunch_start_time availability.daily_lunch_end_time'
     }
   ).lean();
 
@@ -79,26 +79,31 @@ export const updateUserDailyLunch = async (userId, startTime, endTime) => {
   }
 
   return {
-    dailyLunchStarttime: user.availability.dailyLunchStarttime,
-    dailyLunchEndtime: user.availability.dailyLunchEndtime
+    daily_lunch_start_time: user.availability.daily_lunch_start_time,
+    daily_lunch_end_time: user.availability.daily_lunch_end_time
   };
 };
 
 export const getWeeklyScheduleFromDB = async (userId) => {
-  const user = await User.findById(userId).select('availability.weeklySchedule');
+  const user = await User.findById(userId).select('availability.weekly_schedule');
   if (!user) throw new Error('User not found');
   
-  return user.availability?.weeklySchedule || null;
+  return user.availability?.weekly_schedule || null;
 };
 
 
-export const updateWeeklyScheduleInDB = async ({ userId, weeklySchedule }) => {
-  const user = await User.findById(userId);
+export const updateWeeklyScheduleInDB = async (userId, weeklySchedule) => {
+  try {
+    const user = await User.findById(userId);
 
   if (!user) throw new Error('User not found');
 
-  user.availability.weeklySchedule = weeklySchedule;
+  user.availability.weekly_schedule = weeklySchedule;
   await user.save();
 
   return user;
+  } catch (error) {
+    console.error("Error in updateWeeklyScheduleInDB:", error);
+    throw new Error('Failed to update weekly schedule');
+  }
 };

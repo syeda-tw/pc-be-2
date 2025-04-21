@@ -20,7 +20,7 @@ const UserSchema = new Schema({
     enum: [
       "onboarding-step-1",
       "onboarding-step-2",
-      "onboarding-step-3",
+      "onboarded",
       "verified",
       "disabled",
     ],
@@ -34,28 +34,28 @@ const UserSchema = new Schema({
   timezone: { type: String, default: timezones[0] },
   availability: {
     type: {
-      dailyLunchStarttime: { type: String },
-      dailyLunchEndtime: { type: String },
-      weeklySchedule: [
-        {
+      daily_lunch_start_time: { type: String },
+      daily_lunch_end_time: { type: String },
+      weekly_schedule: [
+        new Schema({
           day: { type: String, required: true },
-          starttime: { type: String },
-          endtime: { type: String },
+          start_time: { type: String },
+          end_time: { type: String },
           is_open: { type: Boolean, default: true },
-        },
+        }, { _id: false })
       ],
     },
     default: {
-      dailyLunchStarttime: "12:00 PM",
-      dailyLunchEndtime: "1:00 PM",
-      weeklySchedule: [
-        { day: "Monday", starttime: "9:00 AM", endtime: "5:00 PM", is_open: true },
-        { day: "Tuesday", starttime: "9:00 AM", endtime: "5:00 PM", is_open: true },
-        { day: "Wednesday", starttime: "9:00 AM", endtime: "5:00 PM", is_open: true },
-        { day: "Thursday", starttime: "9:00 AM", endtime: "5:00 PM" , is_open: true},
-        { day: "Friday", starttime: "9:00 AM", endtime: "5:00 PM" , is_open: true},
-        { day: "Saturday", starttime: "9:00 AM", endtime: "5:00 PM" , is_open: false},
-        { day: "Sunday", starttime: "9:00 AM", endtime: "5:00 PM" , is_open: false},
+      daily_lunch_start_time: "12:00",
+      daily_lunch_end_time: "13:00",
+      weekly_schedule: [
+        { day: "Monday", start_time: "09:00", end_time: "17:00", is_open: true },
+        { day: "Tuesday", start_time: "09:00", end_time: "17:00", is_open: true },
+        { day: "Wednesday", start_time: "09:00", end_time: "17:00", is_open: true },
+        { day: "Thursday", start_time: "09:00", end_time: "17:00", is_open: true },
+        { day: "Friday", start_time: "09:00", end_time: "17:00", is_open: true },
+        { day: "Saturday", start_time: "09:00", end_time: "17:00", is_open: false },
+        { day: "Sunday", start_time: "09:00", end_time: "17:00", is_open: false },
       ],
     },
   },
