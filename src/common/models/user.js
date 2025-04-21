@@ -34,38 +34,36 @@ const UserSchema = new Schema({
   timezone: { type: String, default: timezones[0] },
   availability: {
     type: {
-      fixedLunch: { type: Boolean, default: false },
-      fixedLunchStarttime: { type: String },
-      fixedLunchEndtime: { type: String },
+      dailyLunchStarttime: { type: String },
+      dailyLunchEndtime: { type: String },
       week: [
         {
           day: { type: String, required: true },
           starttime: { type: String },
           endtime: { type: String },
-          lunchstarttime: { type: String },
-          lunchendtime: { type: String },
-          isOpen: { type: Boolean, default: false },
-          hasIndividualLunch: { type: Boolean, default: false },
         },
       ],
     },
     default: {
-      fixedLunch: false,
-      fixedLunchStarttime: "",
-      fixedLunchEndtime: "",
+      dailyLunchStarttime: "12:00 PM",
+      dailyLunchEndtime: "1:00 PM",
       week: [
-        { day: "Monday", starttime: "09:00", endtime: "17:00", lunchstarttime: "", lunchendtime: "", isOpen: true, hasIndividualLunch: false },
-        { day: "Tuesday", starttime: "09:00", endtime: "17:00", lunchstarttime: "", lunchendtime: "", isOpen: true, hasIndividualLunch: false },
-        { day: "Wednesday", starttime: "09:00", endtime: "17:00", lunchstarttime: "", lunchendtime: "", isOpen: true, hasIndividualLunch: false },
-        { day: "Thursday", starttime: "09:00", endtime: "17:00", lunchstarttime: "", lunchendtime: "", isOpen: true, hasIndividualLunch: false },
-        { day: "Friday", starttime: "09:00", endtime: "17:00", lunchstarttime: "", lunchendtime: "", isOpen: true, hasIndividualLunch: false },
-        { day: "Saturday", starttime: "", endtime: "", lunchstarttime: "", lunchendtime: "", isOpen: false, hasIndividualLunch: false },
-        { day: "Sunday", starttime: "", endtime: "", lunchstarttime: "", lunchendtime: "", isOpen: false },
+        { day: "Monday", starttime: "9:00 AM", endtime: "5:00 PM" },
+        { day: "Tuesday", starttime: "9:00 AM", endtime: "5:00 PM" },
+        { day: "Wednesday", starttime: "9:00 AM", endtime: "5:00 PM" },
+        { day: "Thursday", starttime: "9:00 AM", endtime: "5:00 PM" },
+        { day: "Friday", starttime: "9:00 AM", endtime: "5:00 PM" },
+        { day: "Saturday", starttime: "9:00 AM", endtime: "5:00 PM" },
+        { day: "Sunday", starttime: "9:00 AM", endtime: "5:00 PM" },
       ],
     },
   },
   forms: {
     type: [{ _id: String, name: String, created_at: Date, s3_url: String }],
+    default: [],
+  },
+  clients: {
+    type: [{ _id: String, name: String, email: String, phone: String }],
     default: [],
   },
 });

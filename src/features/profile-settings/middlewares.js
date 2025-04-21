@@ -68,47 +68,6 @@ const validateUpdateTimezoneMiddleware = (req, res, next) => {
   next();
 };
 
-const validateUpdateAvailabilityMiddleware = (req, res, next) => {
-  const schema = Joi.object({
-    availability: Joi.object({
-      fixedLunch: Joi.boolean().default(false),
-      fixedLunchStarttime: Joi.string().allow(''),
-      fixedLunchEndtime: Joi.string().allow(''),
-      week: Joi.array().items(
-        Joi.object({
-          day: Joi.string().required(),
-          starttime: Joi.string().allow(''),
-          endtime: Joi.string().allow(''),
-          lunchstarttime: Joi.string().allow(''),
-          lunchendtime: Joi.string().allow(''),
-          isOpen: Joi.boolean().default(false)
-        }).custom((value, helpers) => {
-          if (!value.isOpen && (value.starttime || value.endtime)) {
-            return helpers.message('Start and end times must be empty if the day is not open');
-          }
-          if (value.starttime && value.endtime && value.starttime >= value.endtime) {
-            return helpers.message('Start time cannot be greater than or equal to end time');
-          }
-          return value;
-        })
-      ).required()
-    }).required()
-  });
-
-  const { error } = schema.validate(req.body.data);
-
-  if (error) {
-    console.log(error);
-    return res.status(400).json({
-      errors: error.details.map(detail => ({
-        message: detail.message,
-        path: detail.path
-      }))
-    });
-  }
-
-  next();
-};
 
 const validateAddHolidayMiddleware = (req, res, next) => {
   const schema = Joi.object({
@@ -137,4 +96,36 @@ const validateAddHolidayMiddleware = (req, res, next) => {
   next();
 };
 
-export { validateUpdatePersonalInformationMiddleware, validateUpdateTimezoneMiddleware, validateUpdateAvailabilityMiddleware, validateAddHolidayMiddleware };   
+const validateUpdateDailyLunchMiddleware = (req, res, next) => {
+
+  const schema = Joi.object({
+    startTime: Joi.string().trim().required(),
+    endTime: Joi.string().trim().required()
+  }).custom((value, helpers) => {
+    const { startTime, endTime } = value;
+    const startTimeDate = new Date(`1970-01-01T${startTime}`);
+    const endTimeDate = new Date(`1970-01-01T${endTime}`);
+    if (startTimeDate >= endTimeDate) {
+      return helpers.message('Start time must be less than end time');
+    }
+    return value;
+  }).required().messages({
+    'object.empty': 'Daily lunch times are required'
+  });
+
+  const { error } = schema.validate(req.body.data);
+
+  if (error) {
+    console.log(error);
+    return res.status(400).json({
+      errors: error.details.map(detail => ({
+        message: detail.message,
+        path: detail.path
+      }))
+    });
+  }
+
+  next();
+}
+
+export { validateUpdatePersonalInformationMiddleware, validateUpdateTimezoneMiddleware, validateAddHolidayMiddleware, validateUpdateDailyLunchMiddleware };   

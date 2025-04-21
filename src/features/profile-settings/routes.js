@@ -1,10 +1,10 @@
 import express from "express";
-import { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday} from "./controllers.js";
+import { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch } from "./controllers.js";
 import {
   validateUpdatePersonalInformationMiddleware,
   validateUpdateTimezoneMiddleware,
-  validateUpdateAvailabilityMiddleware,
   validateAddHolidayMiddleware,
+  validateUpdateDailyLunchMiddleware,
 } from "./middlewares.js";
 import { secureRequestMiddleware } from "../../common/middlewares/secureRequestMiddleware.js";
 
@@ -30,15 +30,6 @@ router.patch(
   updateTimezone
 );
 
-router.put(
-  '/availability',
-  validateUpdateAvailabilityMiddleware,
-  secureRequestMiddleware,
-  (req, res) => {
-    res.status(200).json({ message: "Availability updated successfully" });
-  }
-)
-
 router.get(
   '/holidays',
   secureRequestMiddleware,
@@ -57,5 +48,14 @@ router.delete(
   secureRequestMiddleware,
   deleteHoliday
 )
+
+router.get('/daily-lunch', secureRequestMiddleware, getDailyLunch);
+
+router.patch(
+  "/daily-lunch",
+  validateUpdateDailyLunchMiddleware,
+  secureRequestMiddleware,
+  updateDailyLunch
+);
 
 export default router; 

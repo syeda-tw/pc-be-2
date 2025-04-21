@@ -1,4 +1,4 @@
-import { updateUserPersonalInformation, findUserByIdDbOp, getTimezoneByUserIdDbOp, updateUserDbOp, getHolidaysByUserIdDbOp } from "./dbOps.js";
+import { updateUserPersonalInformation, findUserByIdDbOp, getTimezoneByUserIdDbOp, updateUserDbOp, getHolidaysByUserIdDbOp, getUserDailyLunch, updateUserDailyLunch } from "./dbOps.js";
 import CustomError from "../../common/utils/customError.js";
 import { messages } from "./messages.js";
 import { timezones } from "./constants.js";
@@ -57,4 +57,30 @@ export const deleteHolidayService = async (holidayId, userId) => {
   user.holidays = user.holidays.filter(holiday => holiday._id.toString() != holidayId);
   const res = await updateUserDbOp(userId, user);
   return res;
+};
+
+export const getDailyLunchService = async (userId) => {
+  const lunchTimes = await getUserDailyLunch(userId);
+  
+  if (!lunchTimes.dailyLunchStarttime || !lunchTimes.dailyLunchEndtime) {
+    throw new CustomError(messages.error.lunchNotFound);
+  }
+
+  return {
+    startTime: lunchTimes.dailyLunchStarttime,
+    endTime: lunchTimes.dailyLunchEndtime
+  };
+};
+
+export const updateDailyLunchService = async (userId, startTime, endTime) => {
+  const updatedLunchTimes = await updateUserDailyLunch(userId, startTime, endTime);
+  
+  if (!updatedLunchTimes) {
+    throw new CommonCustomError(messages.error.userNotFound, 404);
+  }
+
+  return {
+    startTime: updatedLunchTimes.dailyLunchStarttime,
+    endTime: updatedLunchTimes.dailyLunchEndtime
+  };
 };

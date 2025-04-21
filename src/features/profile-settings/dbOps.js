@@ -45,3 +45,41 @@ export const getHolidaysByUserIdDbOp = async (userId) => {
   const user = await User.findById(userId);
   return user && user.holidays && user.holidays.length > 0 ? user.holidays : [];
 };
+
+export const getUserDailyLunch = async (userId) => {
+  const user = await User.findById(userId)
+    .select('availability.dailyLunchStarttime availability.dailyLunchEndtime')
+    .lean();
+
+  if (!user) {
+    return null;
+  }
+
+  return {
+    dailyLunchStarttime: user.availability.dailyLunchStarttime,
+    dailyLunchEndtime: user.availability.dailyLunchEndtime
+  };
+};
+
+export const updateUserDailyLunch = async (userId, startTime, endTime) => {
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      'availability.dailyLunchStarttime': startTime,
+      'availability.dailyLunchEndtime': endTime
+    },
+    {
+      new: true,
+      select: 'availability.dailyLunchStarttime availability.dailyLunchEndtime'
+    }
+  ).lean();
+
+  if (!user) {
+    return null;
+  }
+
+  return {
+    dailyLunchStarttime: user.availability.dailyLunchStarttime,
+    dailyLunchEndtime: user.availability.dailyLunchEndtime
+  };
+};

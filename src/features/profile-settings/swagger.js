@@ -71,4 +71,105 @@
  *         description: User not found.
  *       500:
  *         description: Internal server error.
+ */
+
+/**
+ * @swagger
+ * /profile-settings/daily-lunch:
+ *   get:
+ *     summary: Get daily lunch times
+ *     description: Retrieve the user's daily lunch start and end times from their availability settings.
+ *     tags: [Profile Settings]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved lunch times.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     startTime:
+ *                       type: string
+ *                       description: Daily lunch start time
+ *                       example: "12:00 PM"
+ *                     endTime:
+ *                       type: string
+ *                       description: Daily lunch end time
+ *                       example: "1:00 PM"
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication token
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+
+/**
+ * @swagger
+ * /profile-settings/daily-lunch:
+ *   patch:
+ *     summary: Update daily lunch times
+ *     description: Update the user's daily lunch start and end times.
+ *     tags: [Profile Settings]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - data
+ *             properties:
+ *               data:
+ *                 type: object
+ *                 required:
+ *                   - startTime
+ *                   - endTime
+ *                 properties:
+ *                   startTime:
+ *                     type: string
+ *                     description: Daily lunch start time in 12-hour format
+ *                     example: "12:00 PM"
+ *                   endTime:
+ *                     type: string
+ *                     description: Daily lunch end time in 12-hour format
+ *                     example: "1:00 PM"
+ *     responses:
+ *       200:
+ *         description: Successfully updated lunch times.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     startTime:
+ *                       type: string
+ *                       description: Updated lunch start time
+ *                     endTime:
+ *                       type: string
+ *                       description: Updated lunch end time
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *       400:
+ *         description: Validation error - Invalid time format or start time after end time
+ *       401:
+ *         description: Unauthorized - Invalid or missing authentication token
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
  */ 

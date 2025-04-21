@@ -1,5 +1,5 @@
 import { messages } from "./messages.js";
-import { updatePersonalInformationService, getTimezoneService, updateTimezoneService, getHolidaysService, addHolidayService, deleteHolidayService } from "./services.js";
+import { updatePersonalInformationService, getTimezoneService, updateTimezoneService, getHolidaysService, addHolidayService, deleteHolidayService, getDailyLunchService, updateDailyLunchService } from "./services.js";
 import { sanitizeUser } from "../../common/utils/sanitizeUser.js";
 
 const updatePersonalInformation = async (req, res, next) => {
@@ -75,4 +75,34 @@ const deleteHoliday = async (req, res, next) => {
   }
 }
 
-export { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday }; 
+const getDailyLunch = async (req, res, next) => {
+  try {
+    const lunchTimes = await getDailyLunchService(req.body.decodedToken._id);
+    return res.status(200).json({
+      data: lunchTimes,
+      message: messages.lunch.retrieved
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateDailyLunch = async (req, res, next) => {
+  try {
+    const { startTime, endTime } = req.body.data;
+    const updatedLunchTimes = await updateDailyLunchService(
+      req.body.decodedToken._id,
+      startTime,
+      endTime
+    );
+    
+    return res.status(200).json({
+      data: updatedLunchTimes,
+      message: messages.lunch.updated
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch }; 
