@@ -83,3 +83,22 @@ export const updateUserDailyLunch = async (userId, startTime, endTime) => {
     dailyLunchEndtime: user.availability.dailyLunchEndtime
   };
 };
+
+export const getWeeklyScheduleFromDB = async (userId) => {
+  const user = await User.findById(userId).select('availability.weeklySchedule');
+  if (!user) throw new Error('User not found');
+  
+  return user.availability?.weeklySchedule || null;
+};
+
+
+export const updateWeeklyScheduleInDB = async ({ userId, weeklySchedule }) => {
+  const user = await User.findById(userId);
+
+  if (!user) throw new Error('User not found');
+
+  user.availability.weeklySchedule = weeklySchedule;
+  await user.save();
+
+  return user;
+};

@@ -1,10 +1,11 @@
 import express from "express";
-import { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch } from "./controllers.js";
+import { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch, getWeeklySchedule, updateWeeklySchedule } from "./controllers.js";
 import {
   validateUpdatePersonalInformationMiddleware,
   validateUpdateTimezoneMiddleware,
   validateAddHolidayMiddleware,
   validateUpdateDailyLunchMiddleware,
+  validateWeeklyScheduleMiddleware,
 } from "./middlewares.js";
 import { secureRequestMiddleware } from "../../common/middlewares/secureRequestMiddleware.js";
 
@@ -56,6 +57,19 @@ router.patch(
   validateUpdateDailyLunchMiddleware,
   secureRequestMiddleware,
   updateDailyLunch
+);
+
+router.get(
+  "/weekly-schedule",
+  secureRequestMiddleware,
+  getWeeklySchedule
+);
+
+router.patch(
+  "/weekly-schedule",  
+  validateWeeklyScheduleMiddleware,
+  secureRequestMiddleware,
+  updateWeeklySchedule
 );
 
 export default router; 

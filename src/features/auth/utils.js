@@ -4,6 +4,7 @@ import {
 } from "../../common/utils/emailService.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import CustomError from "../../common/utils/customError.js";
 
 // Send OTP Registration Email
 const sendRegistrationEmail = async (email, otp) => {

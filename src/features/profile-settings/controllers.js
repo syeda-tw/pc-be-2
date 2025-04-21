@@ -1,5 +1,5 @@
 import { messages } from "./messages.js";
-import { updatePersonalInformationService, getTimezoneService, updateTimezoneService, getHolidaysService, addHolidayService, deleteHolidayService, getDailyLunchService, updateDailyLunchService } from "./services.js";
+import { updatePersonalInformationService, getTimezoneService, updateTimezoneService, getHolidaysService, addHolidayService, deleteHolidayService, getDailyLunchService, updateDailyLunchService, getWeeklyScheduleService, updateWeeklyScheduleService } from "./services.js";
 import { sanitizeUser } from "../../common/utils/sanitizeUser.js";
 
 const updatePersonalInformation = async (req, res, next) => {
@@ -105,4 +105,34 @@ const updateDailyLunch = async (req, res, next) => {
   }
 };
 
-export { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch }; 
+const getWeeklySchedule = async (req, res, next) => {
+  try {
+    const userId = req.body.decodedToken._id;
+    const weeklySchedule = await getWeeklyScheduleService(userId);
+    
+    return res.status(200).json({
+      data: weeklySchedule,
+      message: messages.weeklySchedule.retrieved
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateWeeklySchedule = async (req, res, next) => {
+  try {
+    const userId = req.body.decodedToken._id;
+    const weeklyScheduleData = req.body;
+    
+    const updatedWeeklySchedule = await updateWeeklyScheduleService(userId, weeklyScheduleData);
+    
+    return res.status(200).json({
+      data: updatedWeeklySchedule,
+      message: messages.weeklySchedule.updated
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch, getWeeklySchedule, updateWeeklySchedule }; 

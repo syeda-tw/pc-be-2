@@ -128,4 +128,35 @@ const validateUpdateDailyLunchMiddleware = (req, res, next) => {
   next();
 }
 
-export { validateUpdatePersonalInformationMiddleware, validateUpdateTimezoneMiddleware, validateAddHolidayMiddleware, validateUpdateDailyLunchMiddleware };   
+const validateWeeklyScheduleMiddleware = (req, res, next) => {
+  const schema = Joi.object({
+    dailyLunchStarttime: Joi.string().pattern(/^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/),
+    dailyLunchEndtime: Joi.string().pattern(/^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/),
+    week: Joi.array().items(
+      Joi.object({
+        day: Joi.string().valid(
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ).required(),
+        starttime: Joi.string().pattern(/^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/),
+        endtime: Joi.string().pattern(/^(0?[1-9]|1[0-2]):[0-5][0-9] (AM|PM)$/)
+      })
+    )
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    return res.status(400).json({
+      status: "error",
+      message: error.details[0].message
+    });
+  }
+  next();
+};
+
+export { validateUpdatePersonalInformationMiddleware, validateUpdateTimezoneMiddleware, validateAddHolidayMiddleware, validateUpdateDailyLunchMiddleware, validateWeeklyScheduleMiddleware };   

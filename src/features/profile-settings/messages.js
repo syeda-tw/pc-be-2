@@ -17,8 +17,15 @@ const messages = {
   },
   error: {
     lunchNotFound: "Lunch times not found",
-    userNotFound: "User not found"
+    userNotFound: "User not found",
+    weeklyScheduleNotFound: "Weekly schedule not found",
+    failedToUpdateWeeklySchedule: "Failed to update weekly schedule"
+  },
+  weeklySchedule: {
+    retrieved: "Weekly schedule retrieved successfully",
+    updated: "Weekly schedule updated successfully",
   }
 };
+
 
 export { messages };

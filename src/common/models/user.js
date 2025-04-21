@@ -36,25 +36,26 @@ const UserSchema = new Schema({
     type: {
       dailyLunchStarttime: { type: String },
       dailyLunchEndtime: { type: String },
-      week: [
+      weeklySchedule: [
         {
           day: { type: String, required: true },
           starttime: { type: String },
           endtime: { type: String },
+          is_open: { type: Boolean, default: true },
         },
       ],
     },
     default: {
       dailyLunchStarttime: "12:00 PM",
       dailyLunchEndtime: "1:00 PM",
-      week: [
-        { day: "Monday", starttime: "9:00 AM", endtime: "5:00 PM" },
-        { day: "Tuesday", starttime: "9:00 AM", endtime: "5:00 PM" },
-        { day: "Wednesday", starttime: "9:00 AM", endtime: "5:00 PM" },
-        { day: "Thursday", starttime: "9:00 AM", endtime: "5:00 PM" },
-        { day: "Friday", starttime: "9:00 AM", endtime: "5:00 PM" },
-        { day: "Saturday", starttime: "9:00 AM", endtime: "5:00 PM" },
-        { day: "Sunday", starttime: "9:00 AM", endtime: "5:00 PM" },
+      weeklySchedule: [
+        { day: "Monday", starttime: "9:00 AM", endtime: "5:00 PM", is_open: true },
+        { day: "Tuesday", starttime: "9:00 AM", endtime: "5:00 PM", is_open: true },
+        { day: "Wednesday", starttime: "9:00 AM", endtime: "5:00 PM", is_open: true },
+        { day: "Thursday", starttime: "9:00 AM", endtime: "5:00 PM" , is_open: true},
+        { day: "Friday", starttime: "9:00 AM", endtime: "5:00 PM" , is_open: true},
+        { day: "Saturday", starttime: "9:00 AM", endtime: "5:00 PM" , is_open: false},
+        { day: "Sunday", starttime: "9:00 AM", endtime: "5:00 PM" , is_open: false},
       ],
     },
   },

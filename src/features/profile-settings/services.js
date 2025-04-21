@@ -1,4 +1,4 @@
-import { updateUserPersonalInformation, findUserByIdDbOp, getTimezoneByUserIdDbOp, updateUserDbOp, getHolidaysByUserIdDbOp, getUserDailyLunch, updateUserDailyLunch } from "./dbOps.js";
+import { updateUserPersonalInformation, findUserByIdDbOp, getTimezoneByUserIdDbOp, updateUserDbOp, getHolidaysByUserIdDbOp, getUserDailyLunch, updateUserDailyLunch, getWeeklyScheduleFromDB, updateWeeklyScheduleInDB } from "./dbOps.js";
 import CustomError from "../../common/utils/customError.js";
 import { messages } from "./messages.js";
 import { timezones } from "./constants.js";
@@ -83,4 +83,28 @@ export const updateDailyLunchService = async (userId, startTime, endTime) => {
     startTime: updatedLunchTimes.dailyLunchStarttime,
     endTime: updatedLunchTimes.dailyLunchEndtime
   };
+};
+
+export const getWeeklyScheduleService = async (userId) => {
+  try {
+    const weeklySchedule = await getWeeklyScheduleFromDB(userId);
+    if (!weeklySchedule) {
+      throw new CustomError(messages.error.weeklyScheduleNotFound, 404);
+    }
+    return weeklySchedule;
+  } catch (error) {
+    throw new CustomError(messages.error.weeklyScheduleNotFound, 404);
+  }
+};
+
+export const updateWeeklyScheduleService = async (userId, weeklyScheduleData) => {
+  try {
+    const updatedWeeklySchedule = await updateWeeklyScheduleInDB(userId, weeklyScheduleData);
+    if (!updatedWeeklySchedule) {
+      throw new CustomError(messages.error.failedToUpdateWeeklySchedule, 400);
+    }
+    return updatedWeeklySchedule;
+  } catch (error) {
+    throw new CustomError(messages.error.failedToUpdateWeeklySchedule, 400);
+  }
 };
