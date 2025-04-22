@@ -24,6 +24,9 @@ const messages = {
   weeklySchedule: {
     retrieved: "Weekly schedule retrieved successfully",
     updated: "Weekly schedule updated successfully",
+  },
+  profile: {
+    retrieved: "Profile retrieved successfully",
   }
 };
 

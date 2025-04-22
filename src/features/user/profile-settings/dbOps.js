@@ -107,3 +107,13 @@ export const updateWeeklyScheduleInDB = async (userId, weeklySchedule) => {
     throw new Error('Failed to update weekly schedule');
   }
 };
+
+
+export const findUserByUsernameDbOp = async (username) => {
+  try {
+    return await User.findOne({ username });
+  } catch (error) {
+    console.error("Error in findUserByUsernameDbOp:", error);
+    return null;
+  }
+};

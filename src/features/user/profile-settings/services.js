@@ -1,4 +1,4 @@
-import { updateUserPersonalInformation, findUserByIdDbOp, getTimezoneByUserIdDbOp, updateUserDbOp, getHolidaysByUserIdDbOp, getUserDailyLunch, updateUserDailyLunch, getWeeklyScheduleFromDB, updateWeeklyScheduleInDB } from "./dbOps.js";
+import { updateUserPersonalInformation, findUserByIdDbOp, getTimezoneByUserIdDbOp, updateUserDbOp, getHolidaysByUserIdDbOp, getUserDailyLunch, updateUserDailyLunch, getWeeklyScheduleFromDB, updateWeeklyScheduleInDB, findUserByUsernameDbOp } from "./dbOps.js";
 import CustomError from "../../../common/utils/customError.js";
 import { messages } from "./messages.js";
 import { timezones } from "./constants.js";
@@ -107,4 +107,25 @@ export const updateWeeklyScheduleService = async (userId, weeklyScheduleData) =>
   } catch (error) {
     throw new CustomError(messages.error.failedToUpdateWeeklySchedule, 400);
   }
+};
+
+export const getProfileService = async (username) => {
+  const user = await findUserByUsernameDbOp(username);
+  if (!user) {
+    throw new CustomError(messages.error.userNotFound, 404);
+  }
+  const profile = {
+    first_name: user.first_name,
+    last_name: user.last_name,
+    email: user.email,
+    phone: user.phone,
+    gender: user.gender,
+    timezone: user.timezone,
+    pronouns: user.pronouns,
+    address: user.address,
+    weekly_schedule: user.availability.weekly_schedule,
+    holidays: user.holidays,
+    daily_lunch: user.availability.daily_lunch,
+  }
+  return profile;
 };

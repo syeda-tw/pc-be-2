@@ -1,5 +1,5 @@
 import express from "express";
-import { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch, getWeeklySchedule, updateWeeklySchedule } from "./controllers.js";
+import { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch, getWeeklySchedule, updateWeeklySchedule, getProfile } from "./controllers.js";
 import {
   validateUpdatePersonalInformationMiddleware,
   validateUpdateTimezoneMiddleware,
@@ -71,5 +71,7 @@ router.patch(
   secureRequestMiddleware,
   updateWeeklySchedule
 );
+
+router.get('/profile/:username', getProfile);
 
 export default router; 

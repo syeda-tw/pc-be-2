@@ -1,5 +1,5 @@
 import { messages } from "./messages.js";
-import { updatePersonalInformationService, getTimezoneService, updateTimezoneService, getHolidaysService, addHolidayService, deleteHolidayService, getDailyLunchService, updateDailyLunchService, getWeeklyScheduleService, updateWeeklyScheduleService } from "./services.js";
+import { updatePersonalInformationService, getTimezoneService, updateTimezoneService, getHolidaysService, addHolidayService, deleteHolidayService, getDailyLunchService, updateDailyLunchService, getWeeklyScheduleService, updateWeeklyScheduleService, getProfileService } from "./services.js";
 import { sanitizeUser } from "../../../common/utils/sanitizeUser.js";
 
 const updatePersonalInformation = async (req, res, next) => {
@@ -134,4 +134,17 @@ const updateWeeklySchedule = async (req, res, next) => {
   }
 };
 
-export { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch, getWeeklySchedule, updateWeeklySchedule }; 
+const getProfile = async (req, res, next) => {
+  try {
+    const profile = await getProfileService(req.params.username);
+    return res.status(200).json({ 
+      profile: profile,
+      message: messages.profile.retrieved
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch, getWeeklySchedule, updateWeeklySchedule, getProfile }; 
