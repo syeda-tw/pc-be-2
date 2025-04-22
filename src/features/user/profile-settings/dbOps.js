@@ -111,7 +111,10 @@ export const updateWeeklyScheduleInDB = async (userId, weeklySchedule) => {
 
 export const findUserByUsernameDbOp = async (username) => {
   try {
-    return await User.findOne({ username });
+    return await User.findOne({ username }).populate({
+      path: 'practice',
+      select: '_id business_name is_company website addresses'
+    });
   } catch (error) {
     console.error("Error in findUserByUsernameDbOp:", error);
     return null;

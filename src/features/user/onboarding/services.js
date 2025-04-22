@@ -70,7 +70,7 @@ const onboardingIndividualStep2Service = async (data, id) => {
     throw new Error(error);
   }
 
-  user.practice_id = practice._id;
+  user.practice = practice._id;
   user.status = "onboarded";
 
   try {
@@ -108,7 +108,7 @@ const onboardingCompanyStep2Service = async (data, id) => {
     throw new Error(error);
   }
 
-  user.practice_id = practice._id;
+  user.practice = practice._id;
   user.status = "onboarded";
 
   try {

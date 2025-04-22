@@ -117,15 +117,15 @@ export const getProfileService = async (username) => {
   const profile = {
     first_name: user.first_name,
     last_name: user.last_name,
-    email: user.email,
     phone: user.phone,
     gender: user.gender,
+    title: user.title,
     timezone: user.timezone,
     pronouns: user.pronouns,
-    address: user.address,
     weekly_schedule: user.availability.weekly_schedule,
     holidays: user.holidays,
     daily_lunch: user.availability.daily_lunch,
+    practice: user.practice,
   }
   return profile;
 };

@@ -11,7 +11,7 @@ const UserSchema = new Schema({
   hourly_rate: { type: Number },
   gender: { type: String },
   qualifications: { type: [{ type: Schema.Types.Mixed }], default: [] },
-  practice_id: { type: Schema.Types.ObjectId, ref: "Practice" },
+  practice: { type: Schema.Types.ObjectId, ref: "Practice" },
   password: { type: String, required: true },
   username: { type: String, unique: true },
   holidays: { type: [{ name: String, start_date: Date, end_date: Date }], default: [] },
