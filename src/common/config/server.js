@@ -4,10 +4,10 @@ import { configureSwagger } from "./swagger.js";
 import { corsMiddleware } from "../middlewares/corsMiddleware.js";
 import { errorHandler } from "../middlewares/errorHandlingMiddleware.js";
 import { env } from "./env.js";
-import authRoutes from "../../features/auth/routes.js";
-import onboardingRoutes from "../../features/onboarding/routes.js";
-import intakeFormsRoutes from "../../features/intake-forms/routes.js";
-import profileSettingsRoutes from "../../features/profile-settings/routes.js";
+import authRoutes from "../../features/user/auth/routes.js";
+import onboardingRoutes from "../../features/user/onboarding/routes.js";
+import intakeFormsRoutes from "../../features/user/intake-forms/routes.js";
+import profileSettingsRoutes from "../../features/user/profile-settings/routes.js";
 const app = express();
 
 

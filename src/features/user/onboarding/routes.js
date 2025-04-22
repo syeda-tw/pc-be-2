@@ -1,4 +1,4 @@
-import { secureRequestMiddleware } from "../../common/middlewares/secureRequestMiddleware.js";
+import { secureRequestMiddleware } from "../../../common/middlewares/secureRequestMiddleware.js";
 import {
   onboardingStep1,
   validateAddress,

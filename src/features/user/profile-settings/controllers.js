@@ -1,6 +1,6 @@
 import { messages } from "./messages.js";
 import { updatePersonalInformationService, getTimezoneService, updateTimezoneService, getHolidaysService, addHolidayService, deleteHolidayService, getDailyLunchService, updateDailyLunchService, getWeeklyScheduleService, updateWeeklyScheduleService } from "./services.js";
-import { sanitizeUser } from "../../common/utils/sanitizeUser.js";
+import { sanitizeUser } from "../../../common/utils/sanitizeUser.js";
 
 const updatePersonalInformation = async (req, res, next) => {
   try {

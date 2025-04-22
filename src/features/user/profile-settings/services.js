@@ -1,5 +1,5 @@
 import { updateUserPersonalInformation, findUserByIdDbOp, getTimezoneByUserIdDbOp, updateUserDbOp, getHolidaysByUserIdDbOp, getUserDailyLunch, updateUserDailyLunch, getWeeklyScheduleFromDB, updateWeeklyScheduleInDB } from "./dbOps.js";
-import CustomError from "../../common/utils/customError.js";
+import CustomError from "../../../common/utils/customError.js";
 import { messages } from "./messages.js";
 import { timezones } from "./constants.js";
 

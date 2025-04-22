@@ -7,7 +7,7 @@ import {
   validateUpdateDailyLunchMiddleware,
   validateWeeklyScheduleMiddleware,
 } from "./middlewares.js";
-import { secureRequestMiddleware } from "../../common/middlewares/secureRequestMiddleware.js";
+import { secureRequestMiddleware } from "../../../common/middlewares/secureRequestMiddleware.js";
 
 const router = express.Router();
 

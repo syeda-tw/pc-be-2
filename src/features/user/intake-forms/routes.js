@@ -1,4 +1,4 @@
-import { secureRequestMiddleware } from "../../common/middlewares/secureRequestMiddleware.js";
+import { secureRequestMiddleware } from "../../../common/middlewares/secureRequestMiddleware.js";
 import express from "express";
 import {
   getAllIntakeForms,

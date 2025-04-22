@@ -18,8 +18,8 @@ import {
   findUserByIdDbOp,
 } from "./dbOps.js";
 import { messages } from "./messages.js";
-import CustomError from "../../common/utils/customError.js";
-import Practice from "../../common/models/practice.js";
+import CustomError from "../../../common/utils/customError.js";
+import Practice from "../../../common/models/practice.js";
 import jwt from "jsonwebtoken";
 
 const registerUserService = async (email, password) => {

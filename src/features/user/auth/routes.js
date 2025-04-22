@@ -17,7 +17,7 @@ import {
   validateResetPasswordMiddleware,
   validateChangePasswordMiddleware,
 } from "./middlewares.js";
-import { secureRequestMiddleware } from "../../common/middlewares/secureRequestMiddleware.js";
+import { secureRequestMiddleware } from "../../../common/middlewares/secureRequestMiddleware.js";
 
 const router = express.Router();
 router.post("/register", validateRegisterMiddleware, register);

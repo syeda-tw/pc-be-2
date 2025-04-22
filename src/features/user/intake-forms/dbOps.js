@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import User from "../../common/models/user.js"; // Adjust the path as needed
+import User from "../../../common/models/user.js"; // Adjust the path as needed
 
 /**
  * Find a user by their ID in MongoDB

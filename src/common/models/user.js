@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { timezones } from "../../features/profile-settings/constants.js";
+import { timezones } from "../../features/user/profile-settings/constants.js";
 
 const { Schema } = mongoose;
 
@@ -14,13 +14,13 @@ const UserSchema = new Schema({
   practice_id: { type: Schema.Types.ObjectId, ref: "Practice" },
   password: { type: String, required: true },
   username: { type: String, unique: true },
-  holidays: { type: [{ _id: { type: Schema.Types.ObjectId, auto: true, unique: true }, name: String, start_date: Date, end_date: Date }], default: [] },
+  holidays: { type: [{ name: String, start_date: Date, end_date: Date }], default: [] },
   status: {
     type: String,
     enum: [
       "onboarding-step-1",
       "onboarding-step-2",
-      "onboarded",
+      "onboared",
       "verified",
       "disabled",
     ],

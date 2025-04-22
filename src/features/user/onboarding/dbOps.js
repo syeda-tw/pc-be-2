@@ -1,5 +1,5 @@
-import Practice from "../../common/models/practice.js";
-import User from "../../common/models/user.js";
+import Practice from "../../../common/models/practice.js";
+import User from "../../../common/models/user.js";
 
 const findUserByIdDbOp = async (id) => {
   try {

@@ -1,4 +1,4 @@
-import User from "../../common/models/user.js";
+import User from "../../../common/models/user.js";
 import {
   findByIdAndReturnDeletedForm,
   findByIdAndUpdate,
