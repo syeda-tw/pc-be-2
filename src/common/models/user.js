@@ -64,8 +64,9 @@ const UserSchema = new Schema({
     default: [],
   },
   clients: {
-    type: [{ _id: String, name: String, email: String, phone: String }],
+    type: [{ type: Schema.Types.ObjectId, ref: 'Client' }],
     default: [],
+
   },
 });
 
