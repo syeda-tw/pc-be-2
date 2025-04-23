@@ -73,6 +73,7 @@ const updateUserPasswordDbOp = async (id, password) => {
   return res;
 };
 
+
 export {
   findUserByEmailDbOp,
   findOtpVerificationByEmailDbOp,

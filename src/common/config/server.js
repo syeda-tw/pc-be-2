@@ -3,11 +3,11 @@ import helmet from "helmet";
 import { configureSwagger } from "./swagger.js";
 import { corsMiddleware } from "../middlewares/corsMiddleware.js";
 import { errorHandler } from "../middlewares/errorHandlingMiddleware.js";
-import { env } from "./env.js";
 import authRoutes from "../../features/user/auth/routes.js";
 import onboardingRoutes from "../../features/user/onboarding/routes.js";
 import intakeFormsRoutes from "../../features/user/intake-forms/routes.js";
 import profileSettingsRoutes from "../../features/user/profile-settings/routes.js";
+import clientsRoutes from "../../features/user/clients/routes.js";
 const app = express();
 
 
@@ -29,6 +29,7 @@ app.use("/auth", authRoutes);
 app.use("/onboarding", onboardingRoutes);
 app.use("/intake-forms", intakeFormsRoutes);
 app.use("/profile-settings", profileSettingsRoutes);
+app.use("/clients", clientsRoutes);
 app.use(errorHandler);
 
 

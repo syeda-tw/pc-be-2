@@ -66,7 +66,6 @@ const UserSchema = new Schema({
   clients: {
     type: [{ type: Schema.Types.ObjectId, ref: 'Client' }],
     default: [],
-
   },
 });
 
