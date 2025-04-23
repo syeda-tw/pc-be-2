@@ -16,6 +16,6 @@ const PracticeSchema = new Schema({
   website: { type: String },
   addresses: { type: [AddressSchema], default: [] },
   members: { type: [String], default: [] },
-});
+}, { timestamps: true });
 
 export default mongoose.model("Practice", PracticeSchema);

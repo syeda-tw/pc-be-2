@@ -11,7 +11,12 @@ export const messages = {
     unauthorized: "You are not authorized to access this client",
     invalidPhoneNumber: "Invalid phone number format",
     invalidEmailFormat: "Invalid email format",
-    clientAlreadyExists: "Client already exists"
+    clientAlreadyInvited: "The client is already invited",
+    clientAlreadyOnPlatform: "The client is already on the platform",
+    clientAlreadyPending: "The client is already pending",
+    clientAlreadyAccepted: "The client is already accepted",
+    clientAlreadyRejected: "The client is already rejected",
+    clientAlreadyOnPlatformAndInvited: "The client is already on the platform and invited",
   },
   validation: {
     phone: "Phone number must be a valid US number",

@@ -20,7 +20,7 @@ const UserSchema = new Schema({
     enum: [
       "onboarding-step-1",
       "onboarding-step-2",
-      "onboared",
+      "onboarded",
       "verified",
       "disabled",
     ],
@@ -64,10 +64,14 @@ const UserSchema = new Schema({
     default: [],
   },
   clients: {
-    type: [{ type: Schema.Types.ObjectId, ref: 'Client' }],
+    type: [{ type: Schema.Types.ObjectId, ref: 'Client' }, { status: { type: String, enum: ['accepted', 'rejected', 'pending'], default: 'pending' } }],
     default: [],
   },
-});
+  invited_clients: {
+    type: [{ type: Schema.Types.ObjectId, ref: 'InvitedClients' }],
+    default: [],
+  },
+}, { timestamps: true });
 
 export default mongoose.model("User", UserSchema);
 

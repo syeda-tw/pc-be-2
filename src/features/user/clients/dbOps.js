@@ -1,63 +1,120 @@
 import Client from "../../../common/models/client.js";
 import User from "../../../common/models/user.js";
+import InvitedClient from "../../../common/models/invitedClient.js";
 
-const getAllClientsByUserId = async (userId) => {
-  const clients = await Client.find({ userId })
-    .sort({ createdAt: -1 }); // Sort by newest first
-  
-  return clients;
-}; 
-
-const getUserByIdDbOp = async (userId) => {
+const getUsersClientsByIdDbOp = async (userId) => {
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).populate({
+      path: 'clients',
+      select: '_id first_name last_name middle_name is_active phone email'
+    });
+    return user.clients;
+  } catch (error) {
+    console.error("Error in getUsersClientsByIdDbOp:", error);
+    return null;
+  }
+};
+
+const getUserWithClientsByIdDbOp = async (userId) => {
+  try {
+    const user = await User.findById(userId).populate({
+      path: 'clients, invited_clients',
+    });
     return user;
   } catch (error) {
-    console.error("Error in getUserByIdDbOp:", error);
+    console.error("Error in getUserWithClientsByIdDbOp:", error);
     return null;
   }
 };
 
-const findClientByPhoneNumberDbOp = async (phoneNumber) => {
+const getClientByPhoneNumberDbOp = async (phoneNumber) => {
   try {
-    return await Client.findOne({ phone: phoneNumber });
+    const client = await Client.findOne({ phone: phoneNumber });
+    if (!client) {
+      return null;
+    }
+    return client;
   } catch (error) {
-    console.error("Error in findClientByPhoneNumberDbOp:", error);
-    return null;
+    console.error("Error in getClientByPhoneNumberDbOp:", error);
+    throw error;
   }
 };
 
-const updateClientDbOp = async (clientId, clientData) => {
+const getInvitedClientByPhoneNumberDbOp = async (phoneNumber) => {
   try {
-    return await Client.findByIdAndUpdate(clientId, clientData, { new: true });
+    const client = await InvitedClient.findOne({ phone: phoneNumber });
+    if (!client) {
+      return null;
+    }
+    return client;
   } catch (error) {
-    console.error("Error in updateClientDbOp:", error);
-    return null;
+    console.error("Error in getInvitedClientByPhoneNumberDbOp:", error);
+    throw error;
   }
 };
 
-const createClientDbOp = async (clientData) => {
-  console.log("Creating client with data:", clientData);
+const createInvitedClientDbOp = async (clientData) => {
   try {
-    return await Client.create(clientData);
+    const client = await InvitedClient.create(clientData);
+    return client;
   } catch (error) {
-    console.error("Error in createClientDbOp:", error);
-    return null;
+    console.error("Error in createInvitedClientDbOp:", error);
+    throw error;
   }
 };
-const updateUserDbOp = async (userId, userData) => {
+
+const updateUserWithInvitedClientDbOp = async (userId, invitedClientId) => {
   try {
-    return await User.findByIdAndUpdate(userId, userData, { new: true });
+    const user = await User.findById(userId);
+    user.invited_clients = [...user.invited_clients, { _id: invitedClientId, status: 'pending' }];
+    await user.save();
   } catch (error) {
-    console.error("Error in updateUserDbOp:", error);
-    return null;
+    console.error("Error in updateUserWithInvitedClientDbOp:", error);
+    throw error;
+  }
+};
+
+const updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp = async (invitedClientId, newRegistrationCode, userId) => {
+  try {
+    const invitedClient = await InvitedClient.findById(invitedClientId);
+    invitedClient.registration_code = newRegistrationCode;
+    invitedClient.users_who_have_invited = [...invitedClient.users_who_have_invited, userId];
+    await invitedClient.save();
+  } catch (error) {
+    console.error("Error in updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp:", error);
+    throw error;
+  }
+};
+
+const updateUserWithClientDbOp = async (userId, clientId) => {
+  try {
+    const user = await User.findById(userId);
+    user.clients = [...user.clients, { _id: clientId, status: 'pending' }];
+    await user.save();
+  } catch (error) {
+    console.error("Error in updateUserWithClientDbOp:", error);
+    throw error;
+  }
+};
+
+const updateClientWithUserDbOp = async (clientId, userId) => {
+  try {
+    const client = await Client.findById(clientId);
+    client.users = [...client.users, { _id: userId, status: 'pending' }];
+    await client.save();
+  } catch (error) {
+    console.error("Error in updateClientWithUserDbOp:", error);
+    throw error;
   }
 };
 export {
-  getAllClientsByUserId,
-  findClientByPhoneNumberDbOp,
-  updateClientDbOp,
-  updateUserDbOp,
-  createClientDbOp,
-  getUserByIdDbOp
+  getUsersClientsByIdDbOp,
+  getUserWithClientsByIdDbOp,
+  getClientByPhoneNumberDbOp,
+  getInvitedClientByPhoneNumberDbOp,
+  createInvitedClientDbOp,
+  updateUserWithInvitedClientDbOp,
+  updateUserWithClientDbOp,
+  updateClientWithUserDbOp,
+  updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp,
 };
