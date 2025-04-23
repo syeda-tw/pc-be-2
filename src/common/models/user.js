@@ -68,7 +68,7 @@ const UserSchema = new Schema({
     default: [],
   },
   invited_clients: {
-    type: [{ type: Schema.Types.ObjectId, ref: 'InvitedClients' }],
+    type: [{ type: Schema.Types.ObjectId, ref: 'InvitedClient' }],
     default: [],
   },
 }, { timestamps: true });

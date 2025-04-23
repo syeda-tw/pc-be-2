@@ -1,5 +1,5 @@
 import { messages } from "./messages.js";
-import { getAllClientsService, createClientService } from "./services.js";
+import { getAllClientsService, createClientService, getInvitedClientsService } from "./services.js";
 
 const getAllClients = async (req, res, next) => {
   try {
@@ -25,4 +25,16 @@ const createClient = async (req, res, next) => {
   }
 };
 
-export { getAllClients, createClient }; 
+const getInvitedClients = async (req, res, next) => {
+  try {
+    const clients = await getInvitedClientsService(req.body.decodedToken._id);
+    return res.status(200).json({
+      clients,
+      message: messages.clients.getInvitedSuccess
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export { getAllClients, createClient, getInvitedClients }; 

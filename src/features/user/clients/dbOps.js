@@ -107,6 +107,20 @@ const updateClientWithUserDbOp = async (clientId, userId) => {
     throw error;
   }
 };
+
+const getUserInvitedClientsIdDbOp = async (userId) => {
+  try {
+    const user = await User.findById(userId).populate({
+      path: 'invited_clients',
+      select: '_id phone first_name last_name email'
+    });
+    return user.invited_clients;
+  } catch (error) {
+    console.error("Error in getUserInvitedClientsIdDbOp:", error);
+    throw error;
+  }
+};
+
 export {
   getUsersClientsByIdDbOp,
   getUserWithClientsByIdDbOp,
@@ -116,5 +130,6 @@ export {
   updateUserWithInvitedClientDbOp,
   updateUserWithClientDbOp,
   updateClientWithUserDbOp,
+  getUserInvitedClientsIdDbOp,
   updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp,
 };

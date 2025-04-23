@@ -1,8 +1,7 @@
-import { getUsersClientsByIdDbOp, getUserWithClientsByIdDbOp, updateUserWithInvitedClientDbOp, updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp, getClientByPhoneNumberDbOp, getInvitedClientByPhoneNumberDbOp, updateUserWithClientDbOp, createInvitedClientDbOp } from "./dbOps.js";
+import { getUsersClientsByIdDbOp, getUserInvitedClientsIdDbOp, getUserWithClientsByIdDbOp, updateUserWithInvitedClientDbOp, updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp, getClientByPhoneNumberDbOp, getInvitedClientByPhoneNumberDbOp, updateUserWithClientDbOp, createInvitedClientDbOp } from "./dbOps.js";
 import { messages } from "./messages.js";
 import { generateRegistrationCode, sendRegistrationCode, sendOnboardingCode } from "./utils.js";
 import CustomError from "../../../common/utils/customError.js";
-import user from "../../../common/models/user.js";
 
 const getAllClientsService = async (userId) => {
   const clients = await getUsersClientsByIdDbOp(userId);
@@ -68,7 +67,18 @@ const createClientService = async (clientData, userId) => {
   }
 };
 
+const getInvitedClientsService = async (userId) => {
+  try {
+    const invitedClients = await getUserInvitedClientsIdDbOp(userId);
+    return invitedClients;
+  } catch (error) {
+    console.error("Error in getInvitedClientsService:", error);
+    throw error;
+  }
+};
+
 export {
   getAllClientsService,
-  createClientService
+  createClientService,
+  getInvitedClientsService,
 };
