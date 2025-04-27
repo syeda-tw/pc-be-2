@@ -7,7 +7,7 @@
 
 /**
  * @swagger
- * /auth/register:
+ * /user/auth/register:
  *   post:
  *     summary: Register a new user
  *     description: Register a new user by providing a valid email and password. The email must be unique, and the password must meet the required length (8-20 characters).

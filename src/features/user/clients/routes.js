@@ -1,7 +1,8 @@
 import express from "express";
-import { getAllClients, createClient, getInvitedClients } from "./controllers.js";
+import { getAllClients, getInvitedClients } from "./controllers.js";
 import { secureRequestMiddleware } from "../../../common/middlewares/secureRequestMiddleware.js";
 import { createClientValidation } from "./middleware.js";
+import { createClientHandler } from "./createClientHandler.js";
 
 const router = express.Router();
 
@@ -12,6 +13,6 @@ router.get("/invited", secureRequestMiddleware, getInvitedClients);
 router.post("/",
     createClientValidation,
     secureRequestMiddleware, 
-    createClient);
+    createClientHandler);
 
 export default router; 

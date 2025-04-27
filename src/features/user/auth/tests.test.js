@@ -5,7 +5,7 @@ import OtpVerification from "../../../common/models/otpVerification.js";
 import { comparePassword, generateToken, hashPassword } from "./utils.js";
 
 //TESTING REGISTER CALL
-describe.skip("Testing register validity of request", () => {
+describe("Testing register validity of request", () => {
   it("should not register a user with missing email", async () => {
     const res = await request(app).post("/auth/register").send({
       email: "",
@@ -39,7 +39,7 @@ describe.skip("Testing register validity of request", () => {
   });
 });
 
-describe.skip("Testing register endpoint functionality", () => {
+describe("Testing register endpoint functionality", () => {
   it("should send otp to the user who is registering for the first time", async () => {
     await User.deleteMany();
     const res = await request(app).post("/auth/register").send({
@@ -144,7 +144,7 @@ export const mockUserComplete = {
 };
 
 //TESTING VERIFY REGISTRATION OTP CALL
-describe.skip("Verify Registration OTP - Testing Request Validity", () => {
+describe("Verify Registration OTP - Testing Request Validity", () => {
   beforeEach(async () => {
     await OtpVerification.create({
       email: "test@example.com",
@@ -177,7 +177,7 @@ describe.skip("Verify Registration OTP - Testing Request Validity", () => {
   });
 });
 
-describe.skip("Verify Registration OTP - Testing Endpoint Functionality", () => {
+describe("Verify Registration OTP - Testing Endpoint Functionality", () => {
   beforeEach(async () => {
     await OtpVerification.create({
       email: "test@example.com",
@@ -230,7 +230,7 @@ describe.skip("Verify Registration OTP - Testing Endpoint Functionality", () => 
   }, 30000); // 30 second timeout
 });
 
-describe.skip("Verify User Token - Testing Endpoint Functionality", () => {
+describe("Verify User Token - Testing Endpoint Functionality", () => {
   it("should return code greater than 400 if empty authorization", async () => {
     const res = await request(app)
       .post("/auth/verify-user-token")
@@ -270,7 +270,7 @@ describe.skip("Verify User Token - Testing Endpoint Functionality", () => {
   });
 });
 
-describe.skip("Login - Testing Request Validity", () => {
+describe("Login - Testing Request Validity", () => {
   it("should return 400 if email is missing", async () => {
     const res = await request(app).post("/auth/login").send({
       email: "",
@@ -288,7 +288,7 @@ describe.skip("Login - Testing Request Validity", () => {
   });
 });
 
-describe.skip("Login - Testing Endpoint Functionality", () => {
+describe("Login - Testing Endpoint Functionality", () => {
   beforeEach(async () => {
     const hashedPassword = await hashPassword("Test1234!");
     await User.create({
@@ -337,7 +337,7 @@ describe.skip("Login - Testing Endpoint Functionality", () => {
   }, 30000);
 });
 
-describe.skip("Request Reset Password - Testing Request Validity", () => {
+describe("Request Reset Password - Testing Request Validity", () => {
   it("should return 400 if email is missing", async () => {
     const res = await request(app).post("/auth/request-reset-password").send({
       email: "",
@@ -353,7 +353,7 @@ describe.skip("Request Reset Password - Testing Request Validity", () => {
   });
 });
 
-describe.skip("Request Reset Password - Testing Endpoint Functionality", () => {
+describe("Request Reset Password - Testing Endpoint Functionality", () => {
   beforeEach(async () => {
     const hashedPassword = await hashPassword("Test1234!");
     await User.create({
@@ -381,7 +381,7 @@ describe.skip("Request Reset Password - Testing Endpoint Functionality", () => {
   }, 30000); // 30 second timeout
 });
 
-describe.skip("Reset Password - Testing Request Validity", () => {
+describe("Reset Password - Testing Request Validity", () => {
   it("should return 400 if token is missing", async () => {
     const res = await request(app).post("/auth/reset-password").send({
       token: "",
@@ -405,7 +405,7 @@ describe.skip("Reset Password - Testing Request Validity", () => {
   });
 });
 
-describe.skip("Reset Password - Testing Endpoint Functionality", () => {
+describe("Reset Password - Testing Endpoint Functionality", () => {
   beforeEach(async () => {
     const hashedPassword = await hashPassword("Test1234!");
     await User.create({
@@ -454,7 +454,7 @@ describe.skip("Reset Password - Testing Endpoint Functionality", () => {
   }, 30000);
 });
 
-describe.skip("Testing Change Password - Testing Request Validity", () => {
+describe("Testing Change Password - Testing Request Validity", () => {
   beforeEach(async () => {
     const hashedPassword = await hashPassword("Test1234!");
     await User.create({
@@ -505,7 +505,7 @@ describe.skip("Testing Change Password - Testing Request Validity", () => {
   });
 });
 
-describe.skip("Testing Change Password - Testing Endpoint Functionality", () => {
+describe("Testing Change Password - Testing Endpoint Functionality", () => {
   beforeEach(async () => {
     const oldPassword = "Test1234!";
     const hashedPassword = await hashPassword(oldPassword);

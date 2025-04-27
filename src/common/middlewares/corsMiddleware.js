@@ -1,13 +1,13 @@
 export const corsMiddleware = (req, res, next) => {
-    const allowedOrigin = process.env.NODE_ENV === 'production' 
-        ? process.env.FRONTEND_URL_PRODUCTION 
-        : process.env.FRONTEND_URL_LOCAL;
+    const origin = req.headers.origin || ''; // Fallback in case origin is undefined
 
-    const origin = req.headers.origin;
+    const allowedOrigin = process.env.NODE_ENV === 'production'
+        ? process.env.FRONTEND_URL_PRODUCTION || ''
+        : process.env.FRONTEND_URL_LOCAL || '';
 
-    if (origin === allowedOrigin) {
+    if (origin && origin === allowedOrigin) {
         res.header("Access-Control-Allow-Origin", origin);
-    } else {
+    } else if (origin) {
         console.log(`Origin mismatch: ${origin} vs ${allowedOrigin}`);
     }
 

@@ -2,13 +2,72 @@ import Client from "../../../common/models/client.js";
 import User from "../../../common/models/user.js";
 import InvitedClient from "../../../common/models/invitedClient.js";
 
-const getUsersClientsByIdDbOp = async (userId) => {
+const getUsersClientsByIdDbOp = async (userId, search = '', start = 0, limit = 20, page = 1, sortBy = 'first_name', sortOrder = 'asc') => {
   try {
-    const user = await User.findById(userId).populate({
-      path: 'clients',
-      select: '_id first_name last_name middle_name is_active phone email'
-    });
-    return user.clients;
+    const startIndex = parseInt(start, 10) || (parseInt(page, 10) - 1) * limit;
+    const limitNum = Math.min(parseInt(limit, 10), 100); // protect limit
+
+    const user = await User.findById(userId)
+      .populate({
+        path: 'invited_clients',
+        match: search
+          ? {
+              $or: [
+                { first_name: { $regex: search, $options: 'i' } },
+                { last_name: { $regex: search, $options: 'i' } },
+                { middle_name: { $regex: search, $options: 'i' } },
+                { phone: { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } }
+              ]
+            }
+          : {},
+        select: '_id first_name last_name middle_name is_active phone email',
+        options: {
+          sort: { [sortBy]: sortOrder === 'desc' ? -1 : 1 },
+          skip: startIndex,
+          limit: limitNum
+        }
+      })
+      .lean();
+
+    if (!user) {
+      return null;
+    }
+
+    const totalClients = await User.aggregate([
+      { $match: { _id: mongoose.Types.ObjectId(userId) } },
+      { $lookup: {
+          from: 'clients', // make sure collection name matches
+          localField: 'clients',
+          foreignField: '_id',
+          as: 'clientsData'
+        }
+      },
+      { $unwind: '$clientsData' },
+      { $match: search
+          ? {
+              $or: [
+                { 'clientsData.first_name': { $regex: search, $options: 'i' } },
+                { 'clientsData.last_name': { $regex: search, $options: 'i' } },
+                { 'clientsData.middle_name': { $regex: search, $options: 'i' } },
+                { 'clientsData.phone': { $regex: search, $options: 'i' } },
+                { 'clientsData.email': { $regex: search, $options: 'i' } }
+              ]
+            }
+          : {}
+      },
+      { $count: 'total' }
+    ]);
+
+    const total = totalClients.length > 0 ? totalClients[0].total : 0;
+
+    return {
+      clients: user.clients,
+      total,
+      page: parseInt(page, 10),
+      totalPages: Math.ceil(total / limitNum)
+    };
+
   } catch (error) {
     console.error("Error in getUsersClientsByIdDbOp:", error);
     return null;

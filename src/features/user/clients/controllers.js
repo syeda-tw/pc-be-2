@@ -1,9 +1,9 @@
 import { messages } from "./messages.js";
-import { getAllClientsService, createClientService, getInvitedClientsService } from "./services.js";
+import { getAllClientsService, getInvitedClientsService } from "./services.js";
 
 const getAllClients = async (req, res, next) => {
   try {
-    const clients = await getAllClientsService(req.body.decodedToken._id);
+    const clients = await getAllClientsService(req.body.decodedToken._id, req.query);
     return res.status(200).json({
       clients,
       message: messages.clients.getAllSuccess
@@ -13,17 +13,6 @@ const getAllClients = async (req, res, next) => {
   }
 };
 
-const createClient = async (req, res, next) => {
-  try {
-    const client = await createClientService(req.body.data, req.body.decodedToken._id);
-    return res.status(201).json({
-      client,
-      message: messages.clients.createSuccess
-    });
-  } catch (err) {
-    next(err);
-  }
-};
 
 const getInvitedClients = async (req, res, next) => {
   try {
@@ -37,4 +26,4 @@ const getInvitedClients = async (req, res, next) => {
   }
 };
 
-export { getAllClients, createClient, getInvitedClients }; 
+export { getAllClients, getInvitedClients }; 
