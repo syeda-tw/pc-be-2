@@ -13,7 +13,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
   try {
     // Step 1: Fetch user and populate invited_clients
     const user = await User.findById(userId).populate({
-      path: 'invited_clients',
+      path: 'clients',
       match: search ? {
         $or: [
           { first_name: { $regex: search, $options: 'i' } },
@@ -40,21 +40,21 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       { $match: { _id: new mongoose.Types.ObjectId(userId) } },
       {
         $lookup: {
-          from: 'invitedclients', // <-- correct
-          localField: 'invited_clients',
+          from: 'clients', // <-- correct
+          localField: 'Clients',
           foreignField: '_id',
-          as: 'invitedClient'
+          as: 'Client'
         }
       },
-      { $unwind: '$invitedClient' },
+      { $unwind: '$client' },
       ...(search ? [{
         $match: {
           $or: [
-            { 'invitedClient.first_name': { $regex: search, $options: 'i' } },
-            { 'invitedClient.last_name': { $regex: search, $options: 'i' } },
-            { 'invitedClient.middle_name': { $regex: search, $options: 'i' } },
-            { 'invitedClient.phone': { $regex: search, $options: 'i' } },
-            { 'invitedClient.email': { $regex: search, $options: 'i' } }
+            { 'client.first_name': { $regex: search, $options: 'i' } },
+            { 'client.last_name': { $regex: search, $options: 'i' } },
+            { 'client.middle_name': { $regex: search, $options: 'i' } },
+            { 'client.phone': { $regex: search, $options: 'i' } },
+            { 'client.email': { $regex: search, $options: 'i' } }
           ]
         }
       }] : []),
@@ -64,7 +64,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
     const total = totalClients.length > 0 ? totalClients[0].total : 0;
 
     return {
-      clients: user.invited_clients || [],
+      clients: user.clients || [],
       total,
       page,
       totalPages: Math.ceil(total / limit)
@@ -78,23 +78,23 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
 
 const messages = {
   clients: {
-    getInvitedSuccess: "Successfully fetched the invited clients.",
-    getInvitedError: "There was an error fetching the invited clients."
+    getInvitedSuccess: "Successfully fetched the clients.",
+    getInvitedError: "There was an error fetching the clients."
   },
   error: {
     generalError: "An error occurred. Please try again later."
   }
 };
 
-const getInvitedClientsHandler = async (req, res, next) => {
+const getClientsHandler = async (req, res, next) => {
   try {
     const data = await getUsersClientsByIdDbOp(req.body.decodedToken._id, req.query);
     return res.status(200).json({
       data,
-      message: messages.clients.getInvitedSuccess
+      message: messages.clients.getSuccess
     });
   } catch (err) {
-    console.error("Error in getInvitedClientsHandler:", err);
+    console.error("Error in getClientsHandler:", err);
     return res.status(500).json({
       message: messages.error.generalError
     });
@@ -102,4 +102,4 @@ const getInvitedClientsHandler = async (req, res, next) => {
 };
 
 
-export { getInvitedClientsHandler };
+export { getClientsHandler };
