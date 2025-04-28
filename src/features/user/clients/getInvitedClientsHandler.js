@@ -1,20 +1,21 @@
 import User from "../../../common/models/user.js";
 import mongoose from "mongoose";
 
-const getUsersClientsByIdDbOp = async (userId, params={}) => {
-  const {
-    search = '', 
-    start = 0, 
-    limit = 20, 
-    page = 1, 
-    sortBy = 'first_name', 
-    sortOrder = 'asc'
-  } = params || {};
+const getUsersClientsByIdDbOp = async (userId, params = {}) => {
+  // Safely parsing params coming from query (which are strings)
+  const search = typeof params.search === 'string' ? params.search : '';
+  const page = params.page ? parseInt(params.page, 10) : 1;
+  const limit = params.limit ? Math.min(parseInt(params.limit, 10), 100) : 20;
+  const skip = (page - 1) * limit;
+  const sortBy = typeof params.sortBy === 'string' ? params.sortBy : 'first_name';
+  const sortOrder = params.sortOrder === 'desc' ? 'desc' : 'asc'; // default to 'asc' unless explicitly 'desc'
+
+  console.log("Function getUsersClientsByIdDbOp called with:");
+  console.log("userId:", userId);
+  console.log("parsed params:", { search, page, limit, skip, sortBy, sortOrder });
 
   try {
-    const startIndex = parseInt(start, 10) || (parseInt(page, 10) - 1) * limit;
-    const limitNum = Math.min(parseInt(limit, 10), 100);
-
+    // Step 1: Fetch user and populate invited_clients
     const user = await User.findById(userId).populate({
       path: 'invited_clients',
       match: search ? {
@@ -29,20 +30,25 @@ const getUsersClientsByIdDbOp = async (userId, params={}) => {
       select: '_id first_name last_name middle_name is_active phone email',
       options: {
         sort: { [sortBy]: sortOrder === 'desc' ? -1 : 1 },
-        skip: startIndex,
-        limit: limitNum
+        skip,
+        limit
       }
     }).lean();
 
+    console.log("Fetched User with populated invited_clients:", JSON.stringify(user, null, 2));
+
     if (!user) {
+      console.error("User not found with ID:", userId);
       throw new Error('User not found');
     }
 
+    // Step 2: Aggregation to calculate total
+    console.log("Starting aggregation for total count...");
     const totalClients = await User.aggregate([
       { $match: { _id: new mongoose.Types.ObjectId(userId) } },
       {
         $lookup: {
-          from: 'invited_clients',
+          from: 'invitedclients', // <-- correct
           localField: 'invited_clients',
           foreignField: '_id',
           as: 'invitedClient'
@@ -62,21 +68,25 @@ const getUsersClientsByIdDbOp = async (userId, params={}) => {
       }] : []),
       { $count: 'total' }
     ]);
+    
+    console.log("Aggregation result (totalClients):", JSON.stringify(totalClients, null, 2));
 
     const total = totalClients.length > 0 ? totalClients[0].total : 0;
+    console.log("Calculated total:", total);
 
     return {
-      clients: user.invited_clients,
+      clients: user.invited_clients || [],
       total,
-      page: parseInt(page, 10),
-      totalPages: Math.ceil(total / limitNum)
+      page,
+      totalPages: Math.ceil(total / limit)
     };
 
   } catch (error) {
     console.error("Error in getUsersClientsByIdDbOp:", error);
-    throw error; // <--- better to throw so the service can catch it properly
+    throw error;
   }
 };
+
 
 const messages = {
   clients: {
@@ -88,28 +98,20 @@ const messages = {
   }
 };
 
-const getInvitedClientsService = async (userId, params) => {
-  try {
-    return await getUsersClientsByIdDbOp(userId, params );
-  } catch (error) {
-    console.error("Error in getInvitedClientsService:", error);
-    throw error;
-  }
-};
-
 const getInvitedClientsHandler = async (req, res, next) => {
   try {
-    const data = await getInvitedClientsService(req.body.decodedToken._id, req.params);
+    const data = await getUsersClientsByIdDbOp(req.body.decodedToken._id, req.query);
     return res.status(200).json({
       data,
       message: messages.clients.getInvitedSuccess
     });
   } catch (err) {
-    console.error("Error in getInvitedClients:", err);
+    console.error("Error in getInvitedClientsHandler:", err);
     return res.status(500).json({
       message: messages.error.generalError
     });
   }
 };
+
 
 export { getInvitedClientsHandler };

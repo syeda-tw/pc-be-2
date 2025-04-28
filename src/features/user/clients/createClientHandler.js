@@ -150,8 +150,8 @@ const createClientService = async (clientData, userId) => {
             else {
                 //client is invited by another user
                 const newRegistrationCode = utils.generateRegistrationCode();
-                await updateUserWithInvitedClientDbOp(userId, clientAlreadyInvited._id);
-                await updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp(clientAlreadyInvited._id, newRegistrationCode, userId);
+                await dbOps.updateUserWithInvitedClientDbOp(userId, clientAlreadyInvited._id);
+                await dbOps.updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp(clientAlreadyInvited._id, newRegistrationCode, userId);
                 await utils.sendRegistrationCode(clientAlreadyInvited.phone, newRegistrationCode);
             }
         }
