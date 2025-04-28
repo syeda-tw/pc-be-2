@@ -10,10 +10,6 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
   const sortBy = typeof params.sortBy === 'string' ? params.sortBy : 'first_name';
   const sortOrder = params.sortOrder === 'desc' ? 'desc' : 'asc'; // default to 'asc' unless explicitly 'desc'
 
-  console.log("Function getUsersClientsByIdDbOp called with:");
-  console.log("userId:", userId);
-  console.log("parsed params:", { search, page, limit, skip, sortBy, sortOrder });
-
   try {
     // Step 1: Fetch user and populate invited_clients
     const user = await User.findById(userId).populate({
@@ -35,15 +31,11 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       }
     }).lean();
 
-    console.log("Fetched User with populated invited_clients:", JSON.stringify(user, null, 2));
-
     if (!user) {
-      console.error("User not found with ID:", userId);
       throw new Error('User not found');
     }
 
     // Step 2: Aggregation to calculate total
-    console.log("Starting aggregation for total count...");
     const totalClients = await User.aggregate([
       { $match: { _id: new mongoose.Types.ObjectId(userId) } },
       {
@@ -68,11 +60,8 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       }] : []),
       { $count: 'total' }
     ]);
-    
-    console.log("Aggregation result (totalClients):", JSON.stringify(totalClients, null, 2));
 
     const total = totalClients.length > 0 ? totalClients[0].total : 0;
-    console.log("Calculated total:", total);
 
     return {
       clients: user.invited_clients || [],
