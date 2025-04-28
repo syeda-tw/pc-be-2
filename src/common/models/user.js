@@ -64,13 +64,17 @@ const UserSchema = new Schema({
     default: [],
   },
   clients: {
-    type: [{ type: Schema.Types.ObjectId, ref: 'Client' }, { status: { type: String, enum: ['accepted', 'rejected', 'pending'], default: 'pending' } }],
-    default: [],
+    type: [{
+      client: { type: mongoose.Schema.Types.ObjectId, ref: 'Client', required: true },
+      status: { type: String, enum: ['accepted', 'rejected', 'pending'], default: 'pending' },
+      _id: false,
+    }],
+    default: []
   },
   invited_clients: {
-    type: [{ type: Schema.Types.ObjectId, ref: 'InvitedClient' }],
-    default: [],
-  },
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'InvitedClient' }],
+    default: []
+  }
 }, { timestamps: true });
 
 export default mongoose.model("User", UserSchema);

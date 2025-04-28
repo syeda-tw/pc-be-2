@@ -4,6 +4,7 @@ import { configureSwagger } from "./swagger.js";
 import { corsMiddleware } from "../middlewares/corsMiddleware.js";
 import { errorHandler } from "../middlewares/errorHandlingMiddleware.js";
 import { userRouter } from "../../features/user/routes.js";
+import { clientRouter } from "../../features/client/routes.js";
 const app = express();
 
 // CORS middleware
@@ -21,6 +22,7 @@ configureSwagger(app);
 
 // Routes
 app.use('/user', userRouter);  
+app.use('/client', clientRouter);
 app.use(errorHandler);
 
 

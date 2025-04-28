@@ -2,6 +2,7 @@ import Client from "../../../common/models/client.js";
 import InvitedClient from "../../../common/models/invitedClient.js";
 import User from "../../../common/models/user.js";
 import CustomError from "../../../common/utils/customError.js";
+import { sanitizeClient } from "../../client/auth/utils.js";
 
 
 const messages = {
@@ -73,7 +74,7 @@ const dbOps = {
     updateUserWithInvitedClientDbOp: async (userId, invitedClientId) => {
         try {
             const user = await User.findById(userId);
-            user.invited_clients = [...user.invited_clients, { _id: invitedClientId, status: 'pending' }];
+            user.invited_clients = [...user.invited_clients, invitedClientId];
             await user.save();
         } catch (error) {
             console.error("Error in updateUserWithInvitedClientDbOp:", error);
@@ -152,7 +153,7 @@ const createClientService = async (clientData, userId) => {
                 const newRegistrationCode = utils.generateRegistrationCode();
                 await dbOps.updateUserWithInvitedClientDbOp(userId, clientAlreadyInvited._id);
                 await dbOps.updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp(clientAlreadyInvited._id, newRegistrationCode, userId);
-                await utils.sendRegistrationCode(clientAlreadyInvited.phone, newRegistrationCode);
+                console.log(utils.sendRegistrationCode(clientAlreadyInvited.phone, newRegistrationCode));
             }
         }
         else {
@@ -177,7 +178,7 @@ export const createClientHandler = async (req, res, next) => {
     try {
         const client = await createClientService(req.body.data, req.body.decodedToken._id);
         return res.status(201).json({
-            client,
+            data: sanitizeClient(client),
             message: messages.success.createSuccess
         });
     } catch (error) {

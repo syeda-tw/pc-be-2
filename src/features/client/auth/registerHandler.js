@@ -1,6 +1,7 @@
 import Client from "../../../common/models/client.js";
 import InvitedClient from "../../../common/models/invitedClient.js";
 import User from "../../../common/models/user.js";
+import jwt from "jsonwebtoken";
 
 const messages = {
     success: {
@@ -9,63 +10,85 @@ const messages = {
     },
     error: {
         clientCreationFailed: "Failed to create client",
-        clientUpdateFailed: "Failed to update client"
+        clientUpdateFailed: "Failed to update client",
+        clientNotFound: "The phone number you entered is not registered with Practicare"
     }
 };
 
 const generateToken = (payload) => {
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-      throw new Error("JWT_SECRET is not defined");
+        throw new Error("JWT_SECRET is not defined");
     }
     return jwt.sign(payload, secret, { expiresIn: "200h" });
-  };
+};
+
+// Function to create a new client from an invited client
+const createClientDbOp = async (phone, code, password) => {
+
+    // Find the invited client by phone number
+    const invitedClient = await InvitedClient.findOne({ phone });
+
+    // Check if the invited client exists
+    if (!invitedClient) {
+        // Throw error if the invited client is not found
+        throw new Error(messages.error.clientNotFound);
+    }
+
+    // Validate the registration code
+    if (invitedClient.registration_code !== code) {
+        // Throw error if the registration code is invalid
+        throw new Error("Invalid registration code");
+    }
+
+
+    // Prepare client data for creation
+    const clientData = {
+        password,
+        phone,
+        first_name: invitedClient.first_name,
+        last_name: invitedClient.last_name,
+        middle_name: invitedClient.middle_name,
+        email: invitedClient.email,
+        users: invitedClient.users_who_have_invited.map(userId => ({ user: userId, status: "pending" }))
+    };
+
+    // Create and save the new client
+    const client = new Client(clientData);
+    await client.save();
+
+    // Update each user who invited the client
+    for (const userId of invitedClient.users_who_have_invited) {
+        const user = await User.findById(userId);
+        if (user) {
+            // Remove the specific invited client from the user's invited_clients list
+            user.invited_clients = user.invited_clients.filter(
+                invitedClientId => invitedClientId.toString() !== invitedClient._id.toString()
+            );
+            // Add the new client to the user's clients list
+            user.clients = [...user.clients, { client: client._id, status: "pending" }];
+            await user.save();
+        }
+    }
+
+    // Delete the invited client record
+    await InvitedClient.deleteOne({ phone });
+
+    // Return the newly created client
+    return client;
+}
 
 const registerHandler = async (req, res) => {
     try {
-        const { email, password, phone, code } = req.body;
+        const { password, phone, code } = req.body;
+        const client = await createClientDbOp(phone, code, password);
+        const token = generateToken({ id: client._id });
+        res.status(201).json({ message: messages.success.clientCreated, data: sanitizeClient(client), token });
 
-        const invitedClient = await InvitedClient.findOne({ phone });
-
-        if (!invitedClient) {
-            return res.status(400).json({ message: messages.error.clientNotFound });
-        }
-        if (invitedClient.registration_code !== code) {
-            return res.status(400).json({ message: "Invalid registration code" });
-        }
-
-        const clientData = {
-            email,
-            password,
-            phone,
-            first_name: invitedClient.first_name,
-            last_name: invitedClient.last_name,
-            users_who_have_invited: invitedClient.users_who_have_invited
-        };
-
-        const client = new Client(clientData);
-        await client.save();
-
-        for (const userId of invitedClient.users_who_have_invited) {
-            const user = await User.findById(userId);
-            if (user) {
-                user.invited_clients = user.invited_clients.filter(
-                    invitedClient => invitedClient._id.toString() !== invitedClient._id.toString()
-                );
-                user.clients = [...user.clients, client._id];
-                await user.save();
-            }
-        }
-
-        await InvitedClient.deleteOne({ phone });
-        const token = generateToken({ id: client._id, email: client.email });
-        res.status(201).json({ message: messages.success.clientCreated, client, token });
-
-        res.status(201).json({ message: messages.success.clientCreated });
     } catch (error) {
         console.error("Error in registerHandler:", error);
-        res.status(500).json({ message: messages.error.clientCreationFailed });
+        res.status(500).json({ message: messages.error.clientCreationFailed, error: {} });
     }
 }
 
-export default registerHandler;
+export default registerHandler; 
