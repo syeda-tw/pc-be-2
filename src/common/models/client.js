@@ -9,6 +9,8 @@ const ClientSchema = new Schema({
   last_name: { type: String },
   date_of_birth: { type: Date },
   pronouns: { type: String },
+  users_who_have_invited: { type: [Schema.Types.ObjectId], ref: 'User' },
+  status: { type: String, enum: ['onboarding-step-1', 'onboarding-step-2', 'onboarding-step-3', 'onboarded'], default: 'onboarding-step-1' },
   email: { type: String, unique: true, sparse: true, index: { unique: true, sparse: true } },
   gender: { type: String },
   users: [{

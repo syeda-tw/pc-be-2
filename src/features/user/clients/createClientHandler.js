@@ -13,7 +13,7 @@ const messages = {
     success: {
         createSuccess: "Client created successfully"
     }
-}   
+}
 
 const utils = {
     generateRegistrationCode: () => {
@@ -29,7 +29,7 @@ const utils = {
       
       Use this code to log in and complete your setup.
       
-      Get started at: practicare.co/client-register`;
+      Get started at: ${process.env.NODE_ENV === 'development' ? process.env.FRONTEND_URL_LOCAL : process.env.FRONTEND_URL_PRODUCTION}/client-registration`;
     }
 }
 
@@ -166,7 +166,8 @@ const createClientService = async (clientData, userId) => {
                 users_who_have_invited: [userId],
             }
             const invitedClient = await dbOps.createInvitedClientDbOp(invitedClientData);
-            await utils.sendRegistrationCode(invitedClient.phone, invitedClient.registration_code);
+            // TODO: use message sending
+            console.log(utils.sendRegistrationCode(invitedClient.phone, invitedClient.registration_code));
             await dbOps.updateUserWithInvitedClientDbOp(userId, invitedClient._id);
         }
     }
