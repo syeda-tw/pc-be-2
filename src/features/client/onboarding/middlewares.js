@@ -23,8 +23,13 @@ export const onboardingStep1Middleware = (req, res, next) => {
 };
 
 export const onboardingStep2Middleware = (req, res, next) => {
-    // Logic for onboarding step 2
-    console.log("Onboarding Step 2");
+    const onboardingStep2Schema = Joi.object({
+        paymentMethod: Joi.string().required()
+    });
+    const { error } = onboardingStep2Schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
     next();
 };
 

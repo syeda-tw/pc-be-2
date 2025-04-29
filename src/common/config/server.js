@@ -6,7 +6,9 @@ import { errorHandler } from "../middlewares/errorHandlingMiddleware.js";
 import { userRouter } from "../../features/user/routes.js";
 import { clientRouter } from "../../features/client/routes.js";
 import { commonRouter } from "../../features/common/routes.js";
+
 const app = express();
+
 
 // CORS middleware
 app.use(corsMiddleware);

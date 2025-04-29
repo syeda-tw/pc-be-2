@@ -13,6 +13,8 @@ const ClientSchema = new Schema({
   status: { type: String, enum: ['onboarding-step-1', 'onboarding-step-2', 'onboarding-step-3', 'onboarded'], default: 'onboarding-step-1' },
   email: { type: String, unique: true, sparse: true, index: { unique: true, sparse: true } },
   gender: { type: String },
+  stripeCustomerId: { type: String },
+  defaultPaymentMethod: { type: mongoose.Schema.Types.Mixed },
   users: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     status: { type: String, enum: ['pending', 'rejected', 'accepted'], default: 'pending' },
