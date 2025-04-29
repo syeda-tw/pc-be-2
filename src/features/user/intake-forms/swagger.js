@@ -7,16 +7,16 @@
 
 /**
  * @swagger
- * /intake-forms:
+ * /user/intake-forms:
  *   get:
  *     summary: Get all intake forms
- *     description: Retrieve all intake forms associated with the authenticated user.
+ *     description: Retrieve all intake forms associated with the authenticated user
  *     tags: [Intake Forms]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Successfully retrieved all intake forms.
+ *         description: List of intake forms retrieved successfully
  *         content:
  *           application/json:
  *             schema:
@@ -24,7 +24,6 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Success message.
  *                 forms:
  *                   type: array
  *                   items:
@@ -32,26 +31,30 @@
  *                     properties:
  *                       _id:
  *                         type: string
- *                         description: The unique identifier of the form.
  *                       name:
  *                         type: string
- *                         description: The name of the form.
- *                       createdAt:
+ *                       created_at:
  *                         type: string
  *                         format: date-time
- *                         description: The creation timestamp of the form.
- *       401:
- *         description: Unauthorized - Invalid or missing authentication token.
+ *                       s3_url:
+ *                         type: string
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 
 /**
  * @swagger
- * /intake-forms/{id}:
+ * /user/intake-forms/{id}:
  *   get:
  *     summary: Get a single intake form
- *     description: Retrieve a specific intake form by its ID.
+ *     description: Retrieve a specific intake form by ID and download it as a PDF
  *     tags: [Intake Forms]
  *     security:
  *       - bearerAuth: []
@@ -61,32 +64,50 @@
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the intake form to retrieve.
+ *         description: The ID of the intake form to retrieve
  *     responses:
  *       200:
- *         description: Successfully retrieved the intake form.
+ *         description: Intake form retrieved successfully
  *         content:
  *           application/pdf:
  *             schema:
  *               type: string
  *               format: binary
- *             description: The PDF file of the intake form.
  *       400:
- *         description: Invalid form ID format.
- *       401:
- *         description: Unauthorized - Invalid or missing authentication token.
+ *         description: Invalid form ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  *       404:
- *         description: Form not found.
+ *         description: Form not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 
 /**
  * @swagger
- * /intake-forms/add:
+ * /user/intake-forms/add:
  *   post:
  *     summary: Create a new intake form
- *     description: Create a new intake form with a PDF file.
+ *     description: Upload a new intake form PDF file
  *     tags: [Intake Forms]
  *     security:
  *       - bearerAuth: []
@@ -103,13 +124,13 @@
  *               file:
  *                 type: string
  *                 format: binary
- *                 description: The PDF file for the intake form.
+ *                 description: The PDF file to upload
  *               formName:
  *                 type: string
- *                 description: The name of the intake form.
+ *                 description: Name of the form
  *     responses:
  *       200:
- *         description: Successfully created the intake form.
+ *         description: Intake form created successfully
  *         content:
  *           application/json:
  *             schema:
@@ -117,34 +138,44 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Success message.
  *                 form:
  *                   type: object
  *                   properties:
  *                     _id:
  *                       type: string
- *                       description: The unique identifier of the created form.
  *                     name:
  *                       type: string
- *                       description: The name of the form.
- *                     createdAt:
+ *                     created_at:
  *                       type: string
  *                       format: date-time
- *                       description: The creation timestamp of the form.
+ *                     s3_url:
+ *                       type: string
  *       400:
- *         description: Invalid form format or missing required fields.
- *       401:
- *         description: Unauthorized - Invalid or missing authentication token.
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 
 /**
  * @swagger
- * /intake-forms/{id}:
+ * /user/intake-forms/{id}:
  *   delete:
  *     summary: Delete an intake form
- *     description: Delete a specific intake form by its ID.
+ *     description: Delete a specific intake form by ID
  *     tags: [Intake Forms]
  *     security:
  *       - bearerAuth: []
@@ -154,10 +185,10 @@
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the intake form to delete.
+ *         description: The ID of the intake form to delete
  *     responses:
  *       200:
- *         description: Successfully deleted the intake form.
+ *         description: Intake form deleted successfully
  *         content:
  *           application/json:
  *             schema:
@@ -165,13 +196,31 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Success message.
  *       400:
- *         description: Invalid form ID format.
- *       401:
- *         description: Unauthorized - Invalid or missing authentication token.
+ *         description: Invalid form ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  *       404:
- *         description: Form not found.
+ *         description: Form not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */

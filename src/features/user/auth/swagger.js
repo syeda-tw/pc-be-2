@@ -10,7 +10,7 @@
  * /user/auth/register:
  *   post:
  *     summary: Register a new user
- *     description: Register a new user by providing a valid email and password. The email must be unique, and the password must meet the required length (8-20 characters).
+ *     description: Register a new user by providing a valid email and password. The email must be unique, and the password must be between 8-20 characters.
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -29,13 +29,16 @@
  *                 properties:
  *                   email:
  *                     type: string
- *                     description: The user's email address (must be unique).
+ *                     format: email
+ *                     description: The user's email address
  *                   password:
  *                     type: string
- *                     description: The user's password (must be between 8 and 20 characters long).
+ *                     minLength: 8
+ *                     maxLength: 20
+ *                     description: The user's password
  *     responses:
  *       200:
- *         description: User successfully registered, OTP sent to email.
+ *         description: OTP sent successfully
  *         content:
  *           application/json:
  *             schema:
@@ -43,12 +46,12 @@
  *               properties:
  *                 email:
  *                   type: string
- *                   description: The email address of the registered user.
+ *                   description: The registered email address
  *                 message:
  *                   type: string
- *                   description: Message indicating that OTP has been sent.
+ *                   description: Success message
  *       400:
- *         description: Invalid input or user already exists.
+ *         description: Invalid input
  *         content:
  *           application/json:
  *             schema:
@@ -56,25 +59,15 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: The error message indicating the validation issue or that the user already exists.
- *       500:
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Message indicating that an unexpected error occurred.
+ *                   description: Error message
  */
 
 /**
  * @swagger
- * /auth/verify-registration-otp:
+ * /user/auth/verify-registration-otp:
  *   post:
  *     summary: Verify registration OTP
- *     description: Verify the OTP sent to the user's email during registration.
+ *     description: Verify the OTP sent to the user's email during registration
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -93,13 +86,15 @@
  *                 properties:
  *                   email:
  *                     type: string
- *                     description: The user's email address.
+ *                     format: email
+ *                     description: The user's email address
  *                   otp:
  *                     type: string
- *                     description: The OTP sent to the user's email.
+ *                     length: 5
+ *                     description: The 5-digit OTP sent to the email
  *     responses:
  *       200:
- *         description: OTP verified successfully.
+ *         description: OTP verified successfully
  *         content:
  *           application/json:
  *             schema:
@@ -107,15 +102,15 @@
  *               properties:
  *                 user:
  *                   type: object
- *                   description: The sanitized user object.
+ *                   description: The sanitized user object
  *                 token:
  *                   type: string
- *                   description: JWT token for the user.
+ *                   description: JWT token for authentication
  *                 message:
  *                   type: string
- *                   description: Message indicating OTP verification success.
+ *                   description: Success message
  *       400:
- *         description: Invalid OTP or email.
+ *         description: Invalid input
  *         content:
  *           application/json:
  *             schema:
@@ -123,25 +118,15 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Error message indicating the issue.
- *       500:
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Message indicating that an unexpected error occurred.
+ *                   description: Error message
  */
 
 /**
  * @swagger
- * /auth/login:
+ * /user/auth/login:
  *   post:
  *     summary: User login
- *     description: Authenticate a user using email and password.
+ *     description: Authenticate a user with email and password
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -160,13 +145,14 @@
  *                 properties:
  *                   email:
  *                     type: string
- *                     description: The user's email address.
+ *                     format: email
+ *                     description: The user's email address
  *                   password:
  *                     type: string
- *                     description: The user's password.
+ *                     description: The user's password
  *     responses:
  *       200:
- *         description: User logged in successfully.
+ *         description: Login successful
  *         content:
  *           application/json:
  *             schema:
@@ -174,15 +160,15 @@
  *               properties:
  *                 user:
  *                   type: object
- *                   description: The sanitized user object.
+ *                   description: The sanitized user object
  *                 token:
  *                   type: string
- *                   description: JWT token for the user.
+ *                   description: JWT token for authentication
  *                 message:
  *                   type: string
- *                   description: Message indicating login success.
- *       401:
- *         description: Invalid credentials.
+ *                   description: Success message
+ *       400:
+ *         description: Invalid credentials
  *         content:
  *           application/json:
  *             schema:
@@ -190,25 +176,15 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Error message indicating invalid credentials.
- *       500:
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Message indicating that an unexpected error occurred.
+ *                   description: Error message
  */
 
 /**
  * @swagger
- * /auth/request-reset-password:
+ * /user/auth/request-reset-password:
  *   post:
  *     summary: Request password reset
- *     description: Send a password reset link to the user's email.
+ *     description: Request a password reset link to be sent to the user's email
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -226,10 +202,11 @@
  *                 properties:
  *                   email:
  *                     type: string
- *                     description: The user's email address.
+ *                     format: email
+ *                     description: The user's email address
  *     responses:
  *       200:
- *         description: Password reset link sent successfully.
+ *         description: Reset password link sent successfully
  *         content:
  *           application/json:
  *             schema:
@@ -237,9 +214,9 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Message indicating that the reset link has been sent.
- *       404:
- *         description: User not found.
+ *                   description: Success message
+ *       400:
+ *         description: Invalid input
  *         content:
  *           application/json:
  *             schema:
@@ -247,25 +224,15 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Error message indicating user not found.
- *       500:
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Message indicating that an unexpected error occurred.
+ *                   description: Error message
  */
 
 /**
  * @swagger
- * /auth/reset-password:
+ * /user/auth/reset-password:
  *   post:
  *     summary: Reset password
- *     description: Reset user's password using the token received in the reset password email.
+ *     description: Reset user's password using the token from reset password email
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -279,13 +246,15 @@
  *             properties:
  *               token:
  *                 type: string
- *                 description: The reset password token received via email.
+ *                 description: The reset password token
  *               password:
  *                 type: string
- *                 description: The new password.
+ *                 minLength: 8
+ *                 pattern: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]
+ *                 description: The new password (must contain at least one uppercase letter, one lowercase letter, one number and one special character)
  *     responses:
  *       200:
- *         description: Password reset successfully.
+ *         description: Password reset successful
  *         content:
  *           application/json:
  *             schema:
@@ -293,12 +262,12 @@
  *               properties:
  *                 user:
  *                   type: object
- *                   description: The sanitized user object.
+ *                   description: The sanitized user object
  *                 token:
  *                   type: string
- *                   description: New JWT token for the user.
+ *                   description: New JWT token for authentication
  *       400:
- *         description: Invalid token or password.
+ *         description: Invalid input
  *         content:
  *           application/json:
  *             schema:
@@ -306,25 +275,15 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Error message indicating the issue.
- *       500:
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Message indicating that an unexpected error occurred.
+ *                   description: Error message
  */
 
 /**
  * @swagger
- * /auth/change-password:
+ * /user/auth/change-password:
  *   post:
  *     summary: Change password
- *     description: Change user's password while logged in.
+ *     description: Change user's password while logged in
  *     tags: [Authentication]
  *     security:
  *       - bearerAuth: []
@@ -340,13 +299,13 @@
  *             properties:
  *               oldPassword:
  *                 type: string
- *                 description: The current password.
+ *                 description: Current password
  *               newPassword:
  *                 type: string
- *                 description: The new password.
+ *                 description: New password
  *     responses:
  *       200:
- *         description: Password changed successfully.
+ *         description: Password changed successfully
  *         content:
  *           application/json:
  *             schema:
@@ -354,9 +313,19 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Message indicating password change success.
+ *                   description: Success message
+ *       400:
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Error message
  *       401:
- *         description: Invalid current password or unauthorized.
+ *         description: Unauthorized
  *         content:
  *           application/json:
  *             schema:
@@ -364,20 +333,10 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Error message indicating the issue.
- *       500:
- *         description: Internal server error.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Message indicating that an unexpected error occurred.
+ *                   description: Error message
  */
 
-
+/**
  * @swagger
  * /auth/verify-user-token:
  *   post:

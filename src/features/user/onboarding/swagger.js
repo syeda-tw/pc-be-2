@@ -7,10 +7,10 @@
 
 /**
  * @swagger
- * /onboarding/onboarding-step-1:
+ * /user/onboarding/onboarding-step-1:
  *   post:
  *     summary: Complete onboarding step 1
- *     description: Update user information for the first step of onboarding.
+ *     description: Update user's personal information and set status to onboarding-step-2
  *     tags: [Onboarding]
  *     security:
  *       - bearerAuth: []
@@ -25,10 +25,44 @@
  *             properties:
  *               data:
  *                 type: object
- *                 description: User information for step 1
+ *                 required:
+ *                   - title
+ *                   - pronouns
+ *                   - gender
+ *                   - dateOfBirth
+ *                   - firstName
+ *                   - lastName
+ *                   - username
+ *                 properties:
+ *                   title:
+ *                     type: string
+ *                     maxLength: 100
+ *                   pronouns:
+ *                     type: string
+ *                     maxLength: 100
+ *                   gender:
+ *                     type: string
+ *                     maxLength: 100
+ *                   dateOfBirth:
+ *                     type: string
+ *                     format: date
+ *                     description: Must be at least 18 years old
+ *                   firstName:
+ *                     type: string
+ *                     maxLength: 100
+ *                   lastName:
+ *                     type: string
+ *                     maxLength: 100
+ *                   middleName:
+ *                     type: string
+ *                     maxLength: 100
+ *                   username:
+ *                     type: string
+ *                     maxLength: 100
+ *                     pattern: ^[a-zA-Z0-9]+$
  *     responses:
  *       200:
- *         description: User information updated successfully.
+ *         description: User information updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -36,60 +70,59 @@
  *               properties:
  *                 user:
  *                   type: object
- *                   description: The sanitized user object with updated information.
- *       401:
- *         description: Unauthorized - Invalid or missing authentication token.
- *       500:
- *         description: Internal server error.
- */
-
-/**
- * @swagger
- * /onboarding/validate-address:
- *   post:
- *     summary: Validate address
- *     description: Validate a given address using the Geoapify service.
- *     tags: [Onboarding]
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - address
- *             properties:
- *               address:
- *                 type: string
- *                 description: The address to validate.
- *     responses:
- *       200:
- *         description: Address validation result.
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     title:
+ *                       type: string
+ *                     pronouns:
+ *                       type: string
+ *                     gender:
+ *                       type: string
+ *                     date_of_birth:
+ *                       type: string
+ *                       format: date
+ *                     first_name:
+ *                       type: string
+ *                     last_name:
+ *                       type: string
+ *                     middle_name:
+ *                       type: string
+ *                     username:
+ *                       type: string
+ *                     status:
+ *                       type: string
+ *                       enum: [onboarding-step-2]
+ *       400:
+ *         description: Validation error or username already exists
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 formatted:
+ *                 message:
  *                   type: string
- *                   description: The formatted address.
- *                 components:
- *                   type: object
- *                   description: The address components.
- *       401:
- *         description: Unauthorized - Invalid or missing authentication token.
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 
 /**
  * @swagger
- * /onboarding/autocomplete-address:
+ * /user/onboarding/validate-address:
  *   post:
- *     summary: Autocomplete address
- *     description: Get address suggestions based on partial input using the Geoapify service.
+ *     summary: Validate address
+ *     description: Validate an address using Google's address validation service
  *     tags: [Onboarding]
  *     security:
  *       - bearerAuth: []
@@ -109,38 +142,120 @@
  *                 properties:
  *                   address:
  *                     type: string
- *                     description: Partial address input for autocomplete.
+ *                     minLength: 1
+ *                     maxLength: 255
  *     responses:
  *       200:
- *         description: List of address suggestions.
+ *         description: Address validated successfully
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 features:
+ *                 formatted_address:
+ *                   type: string
+ *                 address_components:
  *                   type: array
  *                   items:
  *                     type: object
- *                     properties:
- *                       properties:
- *                         type: object
- *                         properties:
- *                           formatted:
- *                             type: string
- *                             description: The formatted address suggestion.
- *       401:
- *         description: Unauthorized - Invalid or missing authentication token.
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 
 /**
  * @swagger
- * /onboarding/validate-username:
+ * /user/onboarding/autocomplete-address:
+ *   post:
+ *     summary: Autocomplete address
+ *     description: Get address suggestions using Google's address autocomplete service
+ *     tags: [Onboarding]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - data
+ *             properties:
+ *               data:
+ *                 type: object
+ *                 required:
+ *                   - address
+ *                 properties:
+ *                   address:
+ *                     type: string
+ *                     minLength: 1
+ *                     maxLength: 255
+ *     responses:
+ *       200:
+ *         description: Address suggestions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 predictions:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       description:
+ *                         type: string
+ *                       place_id:
+ *                         type: string
+ *       400:
+ *         description: Validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ */
+
+/**
+ * @swagger
+ * /user/onboarding/validate-username:
  *   post:
  *     summary: Validate username
- *     description: Check if a username is available for use.
+ *     description: Check if a username is available
  *     tags: [Onboarding]
  *     security:
  *       - bearerAuth: []
@@ -160,10 +275,12 @@
  *                 properties:
  *                   username:
  *                     type: string
- *                     description: The username to validate.
+ *                     minLength: 3
+ *                     maxLength: 30
+ *                     pattern: ^[a-zA-Z0-9]+$
  *     responses:
  *       200:
- *         description: Username is available.
+ *         description: Username is available
  *         content:
  *           application/json:
  *             schema:
@@ -171,12 +288,11 @@
  *               properties:
  *                 isValid:
  *                   type: boolean
- *                   description: Whether the username is available.
+ *                   example: true
  *                 message:
  *                   type: string
- *                   description: Success message.
  *       400:
- *         description: Username already exists.
+ *         description: Username already exists or validation error
  *         content:
  *           application/json:
  *             schema:
@@ -184,19 +300,27 @@
  *               properties:
  *                 message:
  *                   type: string
- *                   description: Error message indicating username is taken.
- *       401:
- *         description: Unauthorized - Invalid or missing authentication token.
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 
 /**
  * @swagger
- * /onboarding/onboarding-individual-step-2:
+ * /user/onboarding/onboarding-individual-step-2:
  *   post:
  *     summary: Complete individual onboarding step 2
- *     description: Update individual user information for the second step of onboarding.
+ *     description: Create a practice for an individual user and complete onboarding
  *     tags: [Onboarding]
  *     security:
  *       - bearerAuth: []
@@ -211,10 +335,22 @@
  *             properties:
  *               data:
  *                 type: object
- *                 description: Individual user information for step 2
+ *                 required:
+ *                   - businessName
+ *                   - address
+ *                 properties:
+ *                   businessName:
+ *                     type: string
+ *                     maxLength: 100
+ *                   website:
+ *                     type: string
+ *                     maxLength: 255
+ *                   address:
+ *                     type: string
+ *                     maxLength: 255
  *     responses:
  *       200:
- *         description: User information updated successfully.
+ *         description: Practice created and onboarding completed successfully
  *         content:
  *           application/json:
  *             schema:
@@ -222,19 +358,44 @@
  *               properties:
  *                 user:
  *                   type: object
- *                   description: The updated user object.
- *       401:
- *         description: Unauthorized - Invalid or missing authentication token.
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     practice:
+ *                       type: string
+ *                     status:
+ *                       type: string
+ *                       enum: [onboarded]
+ *       400:
+ *         description: Validation error or user not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
 
 /**
  * @swagger
- * /onboarding/onboarding-company-step-2:
+ * /user/onboarding/onboarding-company-step-2:
  *   post:
  *     summary: Complete company onboarding step 2
- *     description: Update company user information for the second step of onboarding.
+ *     description: Create a practice for a company and complete onboarding
  *     tags: [Onboarding]
  *     security:
  *       - bearerAuth: []
@@ -249,10 +410,28 @@
  *             properties:
  *               data:
  *                 type: object
- *                 description: Company user information for step 2
+ *                 required:
+ *                   - businessName
+ *                   - address
+ *                   - members
+ *                 properties:
+ *                   businessName:
+ *                     type: string
+ *                     maxLength: 100
+ *                   website:
+ *                     type: string
+ *                     maxLength: 255
+ *                   address:
+ *                     type: string
+ *                     maxLength: 255
+ *                   members:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                       format: email
  *     responses:
  *       200:
- *         description: User information updated successfully.
+ *         description: Practice created and onboarding completed successfully
  *         content:
  *           application/json:
  *             schema:
@@ -260,9 +439,34 @@
  *               properties:
  *                 user:
  *                   type: object
- *                   description: The updated user object.
- *       401:
- *         description: Unauthorized - Invalid or missing authentication token.
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     practice:
+ *                       type: string
+ *                     status:
+ *                       type: string
+ *                       enum: [onboarded]
+ *       400:
+ *         description: Validation error or user not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
  *       500:
- *         description: Internal server error.
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
  */
