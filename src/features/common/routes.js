@@ -67,6 +67,7 @@ router.post('/verify-token', validateTokenFormat, async (req, res) => {
   if (!secret) {
     return res.status(500).json({ error: responseMessages.error.jwtSecretMissing });
   }
+  console.log("token", token);
 
   jwt.verify(token, secret, async (err, decoded) => {
     if (err) {

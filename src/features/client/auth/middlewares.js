@@ -47,4 +47,27 @@ const validateRegisterMiddleware = (req, res, next) => {
     next();
 }
 
-export { validateRegisterMiddleware };
+const validateLoginMiddleware = (req, res, next) => {
+    const schema = Joi.object({
+        phone: Joi.string()
+            .pattern(/^\+?[0-9]+$/, 'numbers')
+            .required()
+            .messages({
+                'string.pattern.name': 'Phone must contain only {#name}',
+                'any.required': 'Phone is required'
+            }),
+        password: Joi.string()
+            .required()
+            .messages({
+                'any.required': 'Password is required'
+            })
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
+    next();
+}
+
+export { validateRegisterMiddleware, validateLoginMiddleware };

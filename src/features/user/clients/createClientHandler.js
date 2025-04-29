@@ -2,7 +2,6 @@ import Client from "../../../common/models/client.js";
 import InvitedClient from "../../../common/models/invitedClient.js";
 import User from "../../../common/models/user.js";
 import CustomError from "../../../common/utils/customError.js";
-import { sanitizeClient } from "../../client/auth/utils.js";
 
 
 const messages = {
@@ -122,6 +121,7 @@ const createClientService = async (clientData, userId) => {
     //if client is already on the platform
     const user = await User.findById(userId);
     const clientAlreadyOnPlatform = await dbOps.getClientByPhoneNumberDbOp(phoneNumber);
+    
     if (clientAlreadyOnPlatform) {
         //user has previously interacted with this client
         const userClientRelationship = await clientAlreadyOnPlatform.users.find(user => user._id.equals(userId));
@@ -158,6 +158,8 @@ const createClientService = async (clientData, userId) => {
             }
         }
         else {
+            console.log("client is not invited nor on the platform - then we are inviting client to the platform");
+            console.log("clientData", clientData);
             //client is not invited nor on the platform - then we are inviting client to the platform
             const invitedClientData = {
                 phone: phoneNumber,
@@ -171,6 +173,7 @@ const createClientService = async (clientData, userId) => {
             // TODO: use message sending
             console.log(utils.sendRegistrationCode(user, invitedClient.registration_code));
             await dbOps.updateUserWithInvitedClientDbOp(userId, invitedClient._id);
+            return invitedClient;
         }
     }
 };
@@ -179,7 +182,13 @@ export const createClientHandler = async (req, res, next) => {
     try {
         const client = await createClientService(req.body.data, req.body.decodedToken._id);
         return res.status(201).json({
-            data: sanitizeClient(client),
+            data: {
+                first_name: client.first_name,
+                last_name: client.last_name,
+                email: client.email,
+                phone: client.phone,
+                type: "client",
+            },
             message: messages.success.createSuccess
         });
     } catch (error) {
