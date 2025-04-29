@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 
 const messages = {
   error: {
-    serverError: "Server error",
     invalidToken: "Invalid token",
     invalidTokenFormat: "Invalid token format",
   },

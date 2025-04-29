@@ -8,10 +8,6 @@ const errorHandler = (err, req, res, next) => {
       context: err.context || {},
     });
   }
-
-  // Default 500 error response for other errors
-  // Log the error with stack trace for debugging
-  console.error('Unexpected error:', err?.message);
   console.error('Stack trace:', err?.stack);
   
   // Provide a user-friendly response

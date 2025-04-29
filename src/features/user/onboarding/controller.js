@@ -5,7 +5,7 @@ import { onboardingStep1Service,
    onboardingCompanyStep2Service
  } from "./services.js";
 import { googleAutocompleteAddress, googleValidateAddress } from "./utils.js";
-import { sanitizeUser } from "../../../common/utils/sanitizeUser.js";
+import { sanitizeUser } from "./utils.js";
 
 const onboardingStep1 = async (req, res, next) => {
   try {

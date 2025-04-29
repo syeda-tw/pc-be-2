@@ -5,10 +5,9 @@ import {
   requestResetPasswordService,
   resetPasswordService,
   changePasswordService,
-  verifyUserTokenService
 } from "./services.js";
 import { messages } from "./messages.js";
-import { sanitizeUser } from "../../../common/utils/sanitizeUser.js";
+import { sanitizeUser } from "./utils.js";
 
 //return object is data: {email} and message: "OTP sent to the email address"
 const register = async (req, res, next) => {

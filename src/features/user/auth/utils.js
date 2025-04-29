@@ -6,8 +6,28 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import CustomError from "../../../common/utils/customError.js";
 
+// This function is used to remove the password and internal Mongoose properties from the user object
+export const sanitizeUser = (user) => {
+  // Convert the Mongoose document to a plain JavaScript object, removing Mongoose-specific internal properties
+  try {
+      const userObject = user?.toObject({ versionKey: false }); // `versionKey: false` removes the `__v` field
+      // Destructure to remove the password field
+      const { password, ...userWithoutPassword } = userObject;
+
+      // Add type: "user" to the sanitized user object
+      const sanitizedUserWithType = { ...userWithoutPassword, type: "user" };
+
+      // Return the sanitized user object with type
+      return sanitizedUserWithType;
+  } catch (err) {
+      console.log("err", err);
+      return null;
+  }
+};
+
+
 // Send OTP Registration Email
-const sendRegistrationEmail = async (email, otp) => {
+export const sendRegistrationEmail = async (email, otp) => {
   const subject = "Your OTP Code for Secure Verification on Practicare";
   const htmlContent = `
     <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4; border-radius: 8px;">
@@ -30,19 +50,19 @@ const sendRegistrationEmail = async (email, otp) => {
   }
 };
 
-const generateOtp = () => {
+export const generateOtp = () => {
   return Math.floor(10000 + Math.random() * 90000).toString();
 };
 
-const hashPassword = async (password) => {
+export const hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);
 };
 
-const comparePassword = async (password, hashedPassword) => {
+export const comparePassword = async (password, hashedPassword) => {
   return await bcrypt.compare(password, hashedPassword);
 };
 
-const sendWelcomeEmail = async (user) => {
+export const sendWelcomeEmail = async (user) => {
   const subject = "Welcome to Practicare!";
   const htmlContent = `
     <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4; border-radius: 8px;">
@@ -69,7 +89,7 @@ const sendWelcomeEmail = async (user) => {
   }
 };
 
-const isPasswordCorrect = async (password, userPassword) => {
+export const isPasswordCorrect = async (password, userPassword) => {
   return await bcrypt.compare(password, userPassword);
 };
 
@@ -93,20 +113,10 @@ export const sendPasswordResetEmail = async (email, resetLink) => {
   );
 };
 
-const generateToken = (payload) => {
+export const generateToken = (payload) => {
   const secret = process.env.JWT_SECRET;
   if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }
   return jwt.sign(payload, secret, { expiresIn: "200h" });
-};
-
-export {
-  sendRegistrationEmail,
-  generateOtp,
-  hashPassword,
-  sendWelcomeEmail,
-  isPasswordCorrect,
-  generateToken,
-  comparePassword,
 };
