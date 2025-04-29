@@ -120,6 +120,7 @@ const dbOps = {
 const createClientService = async (clientData, userId) => {
     const { phone: phoneNumber } = clientData;
     //if client is already on the platform
+    const user = await User.findById(userId);
     const clientAlreadyOnPlatform = await dbOps.getClientByPhoneNumberDbOp(phoneNumber);
     if (clientAlreadyOnPlatform) {
         //user has previously interacted with this client
@@ -153,7 +154,7 @@ const createClientService = async (clientData, userId) => {
                 const newRegistrationCode = utils.generateRegistrationCode();
                 await dbOps.updateUserWithInvitedClientDbOp(userId, clientAlreadyInvited._id);
                 await dbOps.updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp(clientAlreadyInvited._id, newRegistrationCode, userId);
-                console.log(utils.sendRegistrationCode(clientAlreadyInvited.phone, newRegistrationCode));
+                console.log(utils.sendRegistrationCode(user, newRegistrationCode));
             }
         }
         else {
@@ -168,7 +169,7 @@ const createClientService = async (clientData, userId) => {
             }
             const invitedClient = await dbOps.createInvitedClientDbOp(invitedClientData);
             // TODO: use message sending
-            console.log(utils.sendRegistrationCode(invitedClient.phone, invitedClient.registration_code));
+            console.log(utils.sendRegistrationCode(user, invitedClient.registration_code));
             await dbOps.updateUserWithInvitedClientDbOp(userId, invitedClient._id);
         }
     }

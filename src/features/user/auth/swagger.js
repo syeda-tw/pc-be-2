@@ -377,7 +377,7 @@
  *                   description: Message indicating that an unexpected error occurred.
  */
 
-/**
+
  * @swagger
  * /auth/verify-user-token:
  *   post:

@@ -96,19 +96,6 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-const verifyUserToken = async (req, res, next) => {
-  try {
-    const { decodedToken } = req.body;
-    const user  = await verifyUserTokenService(decodedToken);
-    return res.status(200).json({
-      user: sanitizeUser(user),
-      message: messages.user.userVerified,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
-
 export {
   register,
   verifyRegistrationOtp,
@@ -116,5 +103,4 @@ export {
   requestResetPassword,
   resetPassword,
   changePassword,
-  verifyUserToken,
 };

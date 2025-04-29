@@ -2,6 +2,8 @@ import Client from "../../../common/models/client.js";
 import InvitedClient from "../../../common/models/invitedClient.js";
 import User from "../../../common/models/user.js";
 import jwt from "jsonwebtoken";
+import { sanitizeClient } from "./utils.js";
+import CustomError from "../../../common/utils/customError.js";
 
 const messages = {
     success: {
@@ -28,17 +30,18 @@ const createClientDbOp = async (phone, code, password) => {
 
     // Find the invited client by phone number
     const invitedClient = await InvitedClient.findOne({ phone });
+    
 
     // Check if the invited client exists
     if (!invitedClient) {
         // Throw error if the invited client is not found
-        throw new Error(messages.error.clientNotFound);
+        throw new CustomError(400, messages.error.clientNotFound);
     }
 
     // Validate the registration code
     if (invitedClient.registration_code !== code) {
         // Throw error if the registration code is invalid
-        throw new Error("Invalid registration code");
+        throw new CustomError(400, "Invalid registration code");
     }
 
 
@@ -84,10 +87,9 @@ const registerHandler = async (req, res) => {
         const client = await createClientDbOp(phone, code, password);
         const token = generateToken({ id: client._id });
         res.status(201).json({ message: messages.success.clientCreated, data: sanitizeClient(client), token });
-
     } catch (error) {
         console.error("Error in registerHandler:", error);
-        res.status(500).json({ message: messages.error.clientCreationFailed, error: {} });
+        res.status(500).json({ message: error.message || messages.error.clientCreationFailed});
     }
 }
 

@@ -6,12 +6,10 @@ import {
   requestResetPassword,
   resetPassword,
   changePassword,
-  verifyUserToken
 } from "./controllers.js";
 import {
   validateRegisterMiddleware,
   validateVerifyRegistrationOtpMiddleware,
-  validateVerifyUserTokenMiddleware,
   validateLoginMiddleware,
   validateRequestResetPasswordMiddleware,
   validateResetPasswordMiddleware,
@@ -25,12 +23,6 @@ router.post(
   "/verify-registration-otp",
   validateVerifyRegistrationOtpMiddleware,
   verifyRegistrationOtp
-);
-router.post(
-  "/verify-user-token",
-  validateVerifyUserTokenMiddleware,
-  secureRequestMiddleware,
-  verifyUserToken
 );
 router.post("/login", validateLoginMiddleware, login);
 router.post(

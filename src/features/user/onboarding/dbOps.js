@@ -22,7 +22,7 @@ const findUserByUsernameDbOp = async (username) => {
   try {
     return await User.findOne({ username });
   } catch (error) {
-    console.error();
+    console.error(error);
   }
 };
 
