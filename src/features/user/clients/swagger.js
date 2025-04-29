@@ -13,7 +13,7 @@
  *     description: Retrieve a paginated list of clients associated with the user
  *     tags: [Clients]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: search
@@ -104,7 +104,7 @@
  *     description: Retrieve a paginated list of clients invited by the user
  *     tags: [Clients]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: search
@@ -194,7 +194,7 @@
  *     description: Create a new client or invite an existing client to join the user's network
  *     tags: [Clients]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

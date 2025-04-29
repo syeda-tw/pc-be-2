@@ -3,7 +3,7 @@ export const corsMiddleware = (req, res, next) => {
 
     const allowedOrigin = process.env.NODE_ENV === 'production'
         ? process.env.FRONTEND_URL_PRODUCTION || ''
-        : process.env.FRONTEND_URL_LOCAL || '';
+        : process.env.FRONTEND_URL_LOCAL || "" || '';
 
     if (origin && origin === allowedOrigin) {
         res.header("Access-Control-Allow-Origin", origin);
