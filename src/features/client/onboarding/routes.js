@@ -7,8 +7,8 @@ import onboardingStep3Handler from "./handlers/onboardingStep3Handler.js";
 
 const router = express.Router();
 
-router.post("/onboarding-step-1", secureRequestMiddleware, onboardingStep1Middleware, onboardingStep1Handler);
-router.post("/onboarding-step-2", secureRequestMiddleware, onboardingStep2Middleware, onboardingStep2Handler);
-router.post("/onboarding-step-3", secureRequestMiddleware, onboardingStep3Middleware, onboardingStep3Handler);
+router.post("/onboarding-step-1",onboardingStep1Middleware, secureRequestMiddleware, onboardingStep1Handler);
+router.post("/onboarding-step-2", onboardingStep2Middleware, secureRequestMiddleware, onboardingStep2Handler);
+router.post("/onboarding-step-3", onboardingStep3Middleware, secureRequestMiddleware, onboardingStep3Handler);
 
 export default router;

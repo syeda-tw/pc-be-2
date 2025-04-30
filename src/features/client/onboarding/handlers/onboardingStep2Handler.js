@@ -1,4 +1,5 @@
-import client from "../../../../common/models/client";
+import Client from "../../../../common/models/client.js";
+import Stripe from "stripe";
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -42,7 +43,7 @@ const onboardingStep2Handler = async (req, res) => {
     const { paymentMethod } = req.body;
 
     try {
-        const client = await client.findById(_id);
+        const client = await Client.findById(_id);
         if (!client) {
             return res.status(404).json({ message: messages.error.clientNotFound });
         }

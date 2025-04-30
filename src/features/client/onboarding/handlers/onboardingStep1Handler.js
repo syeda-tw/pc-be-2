@@ -1,5 +1,5 @@
 import Client from "../../../../common/models/client.js";
-import { sanitizeClient } from "../../../utils.js";
+import { sanitizeClient } from "../../utils.js";
 
 const messages = {
     success: "Client information updated successfully",
@@ -10,17 +10,17 @@ const messages = {
     }
 };
 
-const updateClientInformation = async (clientData) => {
-    const { id, first_name, last_name, middle_name, pronouns, gender, email, date_of_birth } = clientData;
+const updateClientInformation = async (clientData, _id) => {
+    const { first_name, last_name, middle_name, pronouns, gender, email, date_of_birth } = clientData;
 
     // Find the client by ID
-    const client = await Client.findById(id);
+    const client = await Client.findById(_id);
     if (!client) {
         throw new Error(messages.error.clientNotFound);
     }
 
     // Check if the email is unique
-    const emailExists = await Client.findOne({ email, _id: { $ne: id } });
+    const emailExists = await Client.findOne({ email, _id: { $ne: _id } });
     if (emailExists) {
         throw new Error(messages.error.emailExists);
     }
@@ -42,7 +42,8 @@ const updateClientInformation = async (clientData) => {
 
 const onboardingStep1Handler = async (req, res) => {
     try {
-        const updatedClient = await updateClientInformation(req.body);
+        const { _id } = req.body.decodedToken;
+        const updatedClient = await updateClientInformation(req.body, _id);
         res.status(200).json({ message: messages.success, data: updatedClient });
     } catch (error) {
         console.error("Error in onboardingStep1Handler:", error);
