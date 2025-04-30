@@ -15,6 +15,8 @@ const ClientSchema = new Schema({
   gender: { type: String },
   stripeCustomerId: { type: String },
   defaultPaymentMethod: { type: mongoose.Schema.Types.Mixed },
+  stripe_customer_id: { type: String },
+  stripe_setup_intent_id: { type: String },
   users: [{
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     status: { type: String, enum: ['pending', 'rejected', 'accepted'], default: 'pending' },
