@@ -1,20 +1,30 @@
-// This function is used to remove the password and internal Mongoose properties from the user object
+// This function is used to extract specific fields from the user object
 export const sanitizeClient = (user) => {
-    // Convert the Mongoose document to a plain JavaScript object, removing Mongoose-specific internal properties
     try {
-      const userObject = user?.toObject({ versionKey: false }); // `versionKey: false` removes the `__v` field
-      // Destructure to remove the password field
-      const { password, ...userWithoutPassword } = userObject;
-  
-      // Add type: "user" to the sanitized user object
-      const sanitizedUserWithType = { ...userWithoutPassword, type: "client" };
-  
-      // Return the sanitized user object with type
-      return sanitizedUserWithType;
+      const userObject = user?.toObject({ versionKey: false });
+      const {
+        first_name,
+        last_name,
+        middle_name,
+        pronouns,
+        gender,
+        date_of_birth,
+        users
+      } = userObject;
+
+      // Return an object containing only the specified fields
+      return {
+        type: "client",
+        first_name,
+        last_name,
+        middle_name,
+        pronouns,
+        gender,
+        date_of_birth,
+        users
+      };
     } catch (err) {
       console.log("err", err);
       return null;
     }
   };
-  
-  

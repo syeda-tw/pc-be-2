@@ -1,3 +1,4 @@
+import Stripe from "stripe";
 import Client from "../../../../common/models/client.js";
 import { sanitizeClient } from "../../utils.js";
 
@@ -6,7 +7,19 @@ const messages = {
     error: {
         clientNotFound: "Client not found",
         emailExists: "Email already exists",
-        updateFailed: "Failed to update client information"
+        updateFailed: "Failed to update client information",
+        stripeCreateFailed: "Failed to create Stripe customer"
+    }
+};
+
+const createClientStripeCustomer = async (email) => {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    try {
+        const customer = await stripe.customers.create({ email });
+        return customer.id;
+    } catch (error) {
+        console.error("Error in createClientStripeCustomer:", error);
+        throw new Error(messages.error.stripeCreateFailed);
     }
 };
 
@@ -25,6 +38,9 @@ const updateClientInformation = async (clientData, _id) => {
         throw new Error(messages.error.emailExists);
     }
 
+    // Create Stripe customer
+    const stripeCustomerId = await createClientStripeCustomer(email);
+
     // Update client information
     client.first_name = first_name;
     client.last_name = last_name;
@@ -34,7 +50,7 @@ const updateClientInformation = async (clientData, _id) => {
     client.email = email;
     client.date_of_birth = date_of_birth;
     client.status = "onboarding-step-2";
-
+    client.stripe_customer_id = stripeCustomerId;
     await client.save();
 
     return sanitizeClient(client);
