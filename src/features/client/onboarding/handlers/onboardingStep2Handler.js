@@ -1,4 +1,7 @@
 import Client from "../../../../common/models/client.js";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const messages = {
     success: {
@@ -9,49 +12,42 @@ const messages = {
         stripeError: "Error with Stripe operation",
         internalServerError: "Internal server error",
         setupIntentFailed: "SetupIntent not successful",
-        stripeCustomerIdMismatch: "Stripe customer ID mismatch"
+        stripeCustomerIdMismatch: "Stripe customer ID mismatch",
+        paymentMethodNotAdded: "Payment method not added"
     }
 };
 
-const updateClient = async (clientId, paymentMethodId) => {
+
+const verifyPaymentMethodAndUpdateClient = async (setupIntentId, clientId) => {
     try {
-        console.log(`Retrieving client with ID: ${clientId}`);
         const client = await Client.findById(clientId);
         if (!client) {
             console.error(messages.error.userNotFound);
             throw new Error(messages.error.userNotFound);
         }
-        client.stripe_payment_method_id = paymentMethodId;
-        client.status = "onboarding-step-3";
-        await client.save();
-        console.log(`Client updated successfully: ${clientId}`);
-        return client;
-    } catch (error) {
-        console.error("Error in updateClient:", error);
-        throw error;
-    }
-}
+        const expectedCustomerId = client.stripe_customer_id;
 
-const verifyPaymentMethod = async (setupIntent, customerId, paymentMethodId) => {
-    try {
-        console.log(`Verifying setup intent with ID: ${setupIntent}`);
-        const intent = await stripe.setupIntents.retrieve(setupIntent);
+        const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
 
-        if (intent.status !== 'succeeded') {
-            console.error(`SetupIntent status: ${intent.status}`);
-            throw new Error(messages.error.setupIntentFailed);
-        }
-
-        if (intent.customer !== customerId) {
+        if (setupIntent.customer !== expectedCustomerId) {
             console.error(messages.error.stripeCustomerIdMismatch);
             throw new Error(messages.error.stripeCustomerIdMismatch);
         }
 
-        if (intent.payment_method !== paymentMethodId) {
-            console.error("Payment method ID mismatch");
-            throw new Error("Payment method ID mismatch");
+        if (setupIntent.status !== "succeeded") {
+            console.error(messages.error.setupIntentFailed);
+            throw new Error(messages.error.setupIntentFailed);
         }
-        console.log("Setup intent verification successful");
+
+        const paymentMethodId = setupIntent.payment_method;
+        client.stripe_payment_method_id = paymentMethodId;
+
+        const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+
+        client.defaultPaymentMethod = paymentMethod;
+        client.status = "onboarding-step-3";
+        await client.save();
+
         return true;
     } catch (error) {
         console.error("Error in verifyPaymentMethod:", error);
@@ -61,12 +57,8 @@ const verifyPaymentMethod = async (setupIntent, customerId, paymentMethodId) => 
 
 const onboardingStep2Handler = async (req, res) => {
     try {
-        const { decodedToken, setupIntent, customerId, paymentMethodId } = req.body;
-        const paymentMethodAddedSuccessfully = await verifyPaymentMethod(setupIntent, customerId, paymentMethodId);
-        if (!paymentMethodAddedSuccessfully) {
-            throw new Error(messages.error.paymentMethodNotAdded);
-        }
-        const client = await updateClient(decodedToken._id, paymentMethodId);
+        const { decodedToken } = req.body;
+        const client = await verifyPaymentMethodAndUpdateClient(req.body.setupIntentId, decodedToken._id);
         res.status(200).send({
             message: messages.success.onboardingStep2,
             client: client

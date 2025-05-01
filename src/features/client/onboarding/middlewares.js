@@ -25,7 +25,7 @@ export const onboardingStep1Middleware = (req, res, next) => {
 
 export const onboardingStep2Middleware = (req, res, next) => {
     const onboardingStep2Schema = Joi.object({
-        paymentMethod: Joi.string().required()
+        setupIntentId: Joi.string().required(),
     });
     const { error } = onboardingStep2Schema.validate(req.body);
     if (error) {

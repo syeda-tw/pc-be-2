@@ -14,7 +14,10 @@ const ClientSchema = new Schema({
   email: { type: String, unique: true, sparse: true, index: { unique: true, sparse: true } },
   gender: { type: String },
   stripeCustomerId: { type: String },
-  defaultPaymentMethod: { type: mongoose.Schema.Types.Mixed },
+  defaultPaymentMethod: { 
+    type: mongoose.Schema.Types.Mixed, 
+    // We could specify validation, but it is flexible enough to store the complex card data
+  },
   stripe_customer_id: { type: String },
   stripe_payment_method_id: { type: String },
   users: [{
