@@ -3,7 +3,7 @@ import User from "../../../../common/models/user.js";
 
 const getUsersHandler = async (req, res) => {
     try {
-        const { _id } = req.decoded;
+        const { _id } = req.body.decodedToken;
         const { page = 1, limit = 20, status, sortBy = 'status', sortOrder = 'asc' } = req.query;
         const pageNum = parseInt(page, 10);
         const limitNum = Math.min(parseInt(limit, 10), 100);
@@ -40,17 +40,19 @@ const getUsersHandler = async (req, res) => {
         // Populate user and their practice
         const populatedUsers = await Promise.all(
             paginatedUsers.map(async (userObj) => {
-                const user = await User.findById(userObj.user)
-                    .select('first_name last_name title practice')
+                const user = await User.findById(userObj.user.toString())
+                    .select('first_name username last_name title practice')
                     .populate({ path: 'practice', select: 'name' })
                     .lean();
                 return {
                     ...userObj,
+                    userId: userObj.user.toString(),
                     user: user ? {
                         _id: user._id,
                         first_name: user.first_name,
                         last_name: user.last_name,
                         title: user.title,
+                        username: user.username,
                         practice: user.practice ? {
                             _id: user.practice._id,
                             name: user.practice.name

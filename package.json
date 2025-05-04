@@ -8,7 +8,8 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles",
-    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles --watch"
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles --watch",
+    "seed": "node src/seeder.js"
   },
   "keywords": [],
   "author": "",
