@@ -1,8 +1,8 @@
 // errorHandler.js
 const errorHandlingMiddleware = (err, req, res, next) => {
   // Log the error stack trace if not in production
-  if (process.env.NODE_ENV !== 'production') {
-    console.error('Error Stack:', err?.stack);
+  if (process.env.NODE_ENV == 'development') {
+    console?.error('Error Stack:', err?.stack);
   }
 
   // If the error has a custom status, message, and context (CustomError instance)

@@ -10,12 +10,14 @@ export const TIMEZONES = [
 ];
 
 export const DAYS_OF_WEEK = [
-    "Monday", 
-    "Tuesday", 
-    "Wednesday", 
-    "Thursday", 
-    "Friday", 
-    "Saturday", 
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
     "Sunday"
-  ];
-  
+];
+
+
+export const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[^\s]{8,}$/;

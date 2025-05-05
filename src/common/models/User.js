@@ -1,13 +1,11 @@
 import mongoose from "mongoose";
-import { DAYS_OF_WEEK, TIMEZONES } from "../../features/common/constants.js";
+import { DAYS_OF_WEEK, TIMEZONES, PASSWORD_REGEX } from "../../features/common/constants.js";
 
 const { Schema } = mongoose;
 
 // Email Validation Regex
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-// Password Validation Regex (e.g., minimum 8 characters, at least one letter, and one number)
-const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
 const UserSchema = new Schema(
   {
@@ -19,29 +17,29 @@ const UserSchema = new Schema(
     gender: { type: String },
     qualifications: { type: [{ type: Schema.Types.Mixed }], default: [] },
     practice: { type: Schema.Types.ObjectId, ref: "Practice" },
-    password: { 
-      type: String, 
-      required: true, 
-      match: [passwordRegex, "Password must be at least 8 characters and contain at least one letter and one number."]
+    password: {
+      type: String,
+      required: true,
+      match: [PASSWORD_REGEX, "Password must be at least 8 characters and contain at least one letter and one number, and no spaces."]
     },
-    username: { 
-      type: String, 
-      unique: true, 
-      sparse: true, 
+    username: {
+      type: String,
+      unique: true,
+      sparse: true,
       validate: {
         validator: (value) => value === "" || value === null || value.length >= 3,
         message: "Username must be at least 3 characters long if provided."
       }
     },
-    email: { 
-      type: String, 
-      unique: true, 
-      sparse: true, 
+    email: {
+      type: String,
+      unique: true,
+      sparse: true,
       match: [emailRegex, "Please enter a valid email address."],
     },
-    holidays: { 
-      type: [{ name: String, startDate: Date, endDate: Date }], 
-      default: [] 
+    holidays: {
+      type: [{ name: String, startDate: Date, endDate: Date }],
+      default: []
     },
     status: {
       type: String,
@@ -66,15 +64,15 @@ const UserSchema = new Schema(
         weeklySchedule: [
           new Schema(
             {
-              day: { 
-                type: String, 
-                required: true, 
+              day: {
+                type: String,
+                required: true,
                 enum: DAYS_OF_WEEK,  // Use the constant here
               },
               startTime: { type: String },
               endTime: { type: String },
               isOpen: { type: Boolean, default: true },
-            }, 
+            },
             { _id: false }
           ),
         ],

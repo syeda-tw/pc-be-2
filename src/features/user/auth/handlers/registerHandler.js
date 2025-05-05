@@ -6,42 +6,51 @@ import OtpVerification from "../../../../common/models/OtpVerification.js";
 const messages = {
     error: {
         userAlreadyExists: "User already exists"
+    },
+    success: {
+        otpSent: "OTP sent to email"
     }
 }
 
-const registerOperation = async (email, password) => {
-        // Check if the user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            next(messages.error.userAlreadyExists)
-        }
-        const otpVerification = await OtpVerification.findOne({ email });
-        const otp = generateOtp();
-        const hashedPassword = await hashPassword(password);
-        console.log("otp", otp);
-    
-        if (otpVerification) {
-            //If OTP verification already exists, update the password and otp
-            Object.assign(otpVerification, { email, password: hashedPassword, otp });
-            await otpVerification.save();
-            await sendRegistrationEmail(email, otp)
-        } else {
-                //If OTP verification does not exist, create a new one
-            await OtpVerification.create({ email, password: hashedPassword, otp });
-        }
+const registerOperation = async (email, password, next) => {
+    // Check if the user already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        next({
+            status: 400,
+            message: messages.error.userAlreadyExists
+        })
+    }
+    const otpVerification = await OtpVerification.findOne({ email });
+    const otp = generateOtp();
+    const hashedPassword = await hashPassword(password);
+    console.log("otp", otp);
+
+    if (otpVerification) {
+        //If OTP verification already exists, update the password and otp
+        Object.assign(otpVerification, { email, password: hashedPassword, otp });
+        await otpVerification.save();
+        await sendRegistrationEmail(email, otp)
         return;
-    };
+    } else {
+        //If OTP verification does not exist, create a new one
+        await OtpVerification.create({ email, password: hashedPassword, otp });
+        await sendRegistrationEmail(email, otp)
+        return;
+    }
+    return;
+};
 
 
-export const registerHandler = async (req, res) => {
+export const registerHandler = async (req, res, next) => {
     const { email, password } = req.body.data;
     try {
-        await registerOperation(email, password);
+        await registerOperation(email, password, next);
         return res.status(200).json({
             data: { email },
-            message: messages.register.otpSent,
+            message: messages.success.otpSent,
         });
     } catch (err) {
-        next(err);
+        next(err?.status || 500, err?.message || "Internal server error");
     }
 };

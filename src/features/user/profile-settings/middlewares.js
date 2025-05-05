@@ -32,7 +32,6 @@ const validateUpdatePersonalInformationMiddleware = (req, res, next) => {
   const { error } = schema.validate(req.body.data);
 
   if (error) {
-    console.log(error);
     return res.status(400).json({
       errors: error.details.map(detail => ({
         message: detail.message,
@@ -84,7 +83,6 @@ const validateAddHolidayMiddleware = (req, res, next) => {
   const { error } = schema.validate(req.body.data);
 
   if (error) {
-    console.log(error);
     return res.status(400).json({
       errors: error.details.map(detail => ({
         message: detail.message,
@@ -116,7 +114,6 @@ const validateUpdateDailyLunchMiddleware = (req, res, next) => {
   const { error } = schema.validate(req.body.data);
 
   if (error) {
-    console.log(error);
     return res.status(400).json({
       errors: error.details.map(detail => ({
         message: detail.message,

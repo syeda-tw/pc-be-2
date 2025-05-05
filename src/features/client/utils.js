@@ -24,7 +24,6 @@ export const sanitizeClient = (user) => {
         users
       };
     } catch (err) {
-      console.log("err", err);
       return null;
     }
   };

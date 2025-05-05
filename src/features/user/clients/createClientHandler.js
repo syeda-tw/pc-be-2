@@ -154,12 +154,9 @@ const createClientService = async (clientData, userId) => {
                 const newRegistrationCode = utils.generateRegistrationCode();
                 await dbOps.updateUserWithInvitedClientDbOp(userId, clientAlreadyInvited._id);
                 await dbOps.updateInvitedClientWithNewRegistrationCodeAndUserWhoInvitedDbOp(clientAlreadyInvited._id, newRegistrationCode, userId);
-                console.log(utils.sendRegistrationCode(user, newRegistrationCode));
             }
         }
         else {
-            console.log("client is not invited nor on the platform - then we are inviting client to the platform");
-            console.log("clientData", clientData);
             //client is not invited nor on the platform - then we are inviting client to the platform
             const invitedClientData = {
                 phone: phoneNumber,

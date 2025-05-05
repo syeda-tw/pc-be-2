@@ -12,7 +12,6 @@ export const sanitizeUser = (user) => {
         // Return the sanitized user object with type
         return sanitizedUserWithType;
     } catch (err) {
-        console.log("err", err);
         return null;
     }
 };
