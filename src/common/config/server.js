@@ -2,7 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import { configureSwagger } from "./swagger.js";
 import { corsMiddleware } from "../middlewares/corsMiddleware.js";
-import { errorHandler } from "../middlewares/errorHandlingMiddleware.js";
+import { errorHandlingMiddleware } from "../middlewares/errorHandlingMiddleware.js";
 import { userRouter } from "../../features/user/routes.js";
 import { clientRouter } from "../../features/client/routes.js";
 import { commonRouter } from "../../features/common/routes.js";
@@ -27,7 +27,9 @@ configureSwagger(app);
 app.use('/common', commonRouter);
 app.use('/user', userRouter);
 app.use('/client', clientRouter);
-app.use(errorHandler);
+
+// Error handling middleware -- this will be the last middleware in the chain and will catch all errors and send a response to the client in a structured format
+app.use(errorHandlingMiddleware);
 
 
 // Root route
@@ -35,8 +37,5 @@ app.get("/", (req, res) => {
   const currentTime = new Date().toISOString();
   res.send({ message: "OK", time: currentTime });
 });
-
-// Error handler middleware
-app.use(errorHandler);
 
 export default app;

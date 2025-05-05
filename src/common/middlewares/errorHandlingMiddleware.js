@@ -1,23 +1,26 @@
 // errorHandler.js
-import CustomError from '../utils/customError.js';
-import { env } from '../config/env.js';
+const errorHandlingMiddleware = (err, req, res, next) => {
+  // Log the error stack trace if not in production
+  if (process.env.NODE_ENV !== 'production') {
+    console.error('Error Stack:', err?.stack);
+  }
 
-const errorHandler = (err, req, res, next) => {
-  if (err instanceof CustomError) {
-    return res.status(err.status || 500).json({
-      message: err.message || 'Unknown error',
-      context: err.context || {},
+  // If the error has a custom status, message, and context (CustomError instance)
+  if (err.status && err.message) {
+    return res.status(err.status).json({
+      status: 'error',
+      message: err.message, // The error message to be displayed to the user
+      context: err.context || {}, // Additional context (optional)
     });
   }
-  console.error('Stack trace:', err?.stack);
-  
-  // Provide a user-friendly response
-  const isDevelopment = env.NODE_ENV !== 'production';
-  
+
+  // For unexpected errors
+  console.error('Unexpected Error:', err);
+
   return res.status(500).json({
+    status: 'error',
     message: 'An unexpected error occurred. Please try again later.',
-    ...(isDevelopment && { error: err.message, stack: err.stack })
   });
 };
 
-export { errorHandler };
+export { errorHandlingMiddleware };

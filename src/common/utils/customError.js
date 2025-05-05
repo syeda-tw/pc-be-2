@@ -1,4 +1,5 @@
-// customError.js
+// customError.
+//TODO: to be deleted as made this directly in the errorHandlingMiddleware.js file
 class CustomError extends Error {
   constructor(status, message, context = {}) {
     super(message);
