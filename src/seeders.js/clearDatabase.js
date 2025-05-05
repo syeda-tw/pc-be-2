@@ -6,12 +6,12 @@ import InvitedClient from '../common/models/invitedClient.js';
 import OtpVerification from '../common/models/otpVerification.js';
 import Practice from '../common/models/practice.js';
 import User from '../common/models/user.js';
+import { env } from '../common/config/env.js';  
 
-dotenv.config();
 
 async function seedDatabase() {
   try {
-    await mongoose.connect(process.env.MONGO_URI_LOCAL || 'mongodb://localhost:27017/your-db-name', {
+    await mongoose.connect(env.MONGO_URI_LOCAL || '', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

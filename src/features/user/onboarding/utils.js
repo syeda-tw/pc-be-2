@@ -1,5 +1,7 @@
+import { env } from "../../../common/config/env.js";
+
 export async function extractAddressPartsFromGoogle(address) {
-  const url = `https://addressvalidation.googleapis.com/v1:validateAddress?key=${process.env.GOOGLE_MAPS_API_KEY}`;
+  const url = `https://addressvalidation.googleapis.com/v1:validateAddress?key=${env.GOOGLE_MAPS_API_KEY}`;
 
   const payload = {
     address: {
@@ -48,7 +50,7 @@ export async function googleAutocompleteAddress(address) {
 
   const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
     address
-  )}&types=address&components=country:us&key=${process.env.GOOGLE_MAPS_API_KEY}`;
+  )}&types=address&components=country:us&key=${env.GOOGLE_MAPS_API_KEY}`;
 
   try {
     const response = await fetch(url, requestOptions);
@@ -66,7 +68,7 @@ export async function googleAutocompleteAddress(address) {
 }
 
 export async function googleValidateAddress(address) {
-  const url = `https://addressvalidation.googleapis.com/v1:validateAddress?key=${process.env.GOOGLE_MAPS_API_KEY}`;
+  const url = `https://addressvalidation.googleapis.com/v1:validateAddress?key=${env.GOOGLE_MAPS_API_KEY}`;
 
   const payload = {
     address: {

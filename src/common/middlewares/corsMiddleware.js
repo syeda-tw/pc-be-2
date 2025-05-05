@@ -1,9 +1,11 @@
+import { env } from '../config/env.js';
+
 export const corsMiddleware = (req, res, next) => {
     const origin = req.headers.origin || ''; // Fallback in case origin is undefined
 
-    const allowedOrigin = process.env.NODE_ENV === 'production'
-        ? process.env.FRONTEND_URL_PRODUCTION || ''
-        : process.env.FRONTEND_URL_LOCAL || process.env.BACKEND_URL_LOCAL;
+    const allowedOrigin = env.NODE_ENV === 'production'
+        ? env.FRONTEND_URL_PRODUCTION || ''
+        : env.FRONTEND_URL_LOCAL || env.BACKEND_URL_LOCAL;
 
     if (origin && origin === allowedOrigin) {
         res.header("Access-Control-Allow-Origin", origin);

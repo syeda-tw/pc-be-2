@@ -2,7 +2,7 @@
 
 import Stripe from "stripe";
 import Client from "../../../../common/models/client.js";
-
+import { env } from "../../../../common/config/env.js";
 const messages = {
     error: {
         userNotFound: "User not found",
@@ -14,7 +14,7 @@ const messages = {
 
 const createStripeCustomer = async (email) => {
     try {
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+        const stripe = new Stripe(env.STRIPE_SECRET_KEY);
         const customer = await stripe.customers.create({ email });
         return customer;
     } catch (error) {
@@ -26,7 +26,7 @@ const createStripeCustomer = async (email) => {
 //creare setup intent
 const createSetupIntent = async (userId) => {
     try {
-        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+        const stripe = new Stripe(env.STRIPE_SECRET_KEY);
         const user = await Client.findById(userId);
         if (!user) {
             throw new Error(messages.error.userNotFound);

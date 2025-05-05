@@ -1,5 +1,6 @@
 // errorHandler.js
 import CustomError from '../utils/customError.js';
+import { env } from '../config/env.js';
 
 const errorHandler = (err, req, res, next) => {
   if (err instanceof CustomError) {
@@ -11,7 +12,7 @@ const errorHandler = (err, req, res, next) => {
   console.error('Stack trace:', err?.stack);
   
   // Provide a user-friendly response
-  const isDevelopment = process.env.NODE_ENV !== 'production';
+  const isDevelopment = env.NODE_ENV !== 'production';
   
   return res.status(500).json({
     message: 'An unexpected error occurred. Please try again later.',

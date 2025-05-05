@@ -9,7 +9,7 @@
     "dev": "nodemon src/index.js",
     "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles",
     "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles --watch",
-    "seed": "node src/seeder.js"
+    "clear-db": "node src/seeder.js/clearDatabase.js"
   },
   "keywords": [],
   "author": "",

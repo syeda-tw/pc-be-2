@@ -12,12 +12,13 @@ import {
 } from "@aws-sdk/client-s3";
 import { v4 as uuidv4 } from "uuid";
 import { Readable } from "stream";
+import { env } from "../../../common/config/env.js";
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION,
+  region: env.AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: env.AWS_SECRET_ACCESS_KEY,
   },
 });
 
@@ -36,10 +37,10 @@ const createIntakeFormService = async (id, file, formName) => {
     }
 
     // Construct file URL
-    const fileUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${formName}`;
+    const fileUrl = `https://${env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${formName}`;
 
     const params = {
-      Bucket: process.env.AWS_S3_BUCKET_NAME,
+      Bucket: env.AWS_S3_BUCKET_NAME,
       Key: formName,
       Body: buffer,
       ContentType: mimetype || "application/pdf",
@@ -114,7 +115,7 @@ const getSingleIntakeFormService = async (formId, userId) => {
     let s3Object;
     try {
       const s3Params = {
-        Bucket: process.env.AWS_S3_BUCKET_NAME || "default-bucket-name",
+        Bucket: env.AWS_S3_BUCKET_NAME || "default-bucket-name",
         Key: formId,
       };
 
@@ -153,7 +154,7 @@ const deleteIntakeFormService = async (formId, userId) => {
     // Try to delete from S3
     try {
       const deleteParams = {
-        Bucket: process.env.AWS_S3_BUCKET_NAME || "default-bucket-name",
+        Bucket: env.AWS_S3_BUCKET_NAME || "default-bucket-name",
         Key: form.s3_url.split("/").pop(),
       };
 

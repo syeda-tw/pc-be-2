@@ -5,6 +5,7 @@ import {
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import CustomError from "../../../common/utils/customError.js";
+import { env } from "../../../common/config/env.js";
 
 // This function is used to remove the password and internal Mongoose properties from the user object
 export const sanitizeUser = (user) => {
@@ -114,7 +115,7 @@ export const sendPasswordResetEmail = async (email, resetLink) => {
 };
 
 export const generateToken = (payload) => {
-  const secret = process.env.JWT_SECRET;
+  const secret = env.JWT_SECRET;
   if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }

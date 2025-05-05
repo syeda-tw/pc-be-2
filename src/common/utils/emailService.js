@@ -4,7 +4,7 @@ import CustomError from "./customError.js";
 
 //THIS IS CREATED SO THAT TEST ACCOUNTS CAN BE CREATED WITH THE SAME EMAIL ADDRESS
 const getEmailForDevelopment = (email) => {
-  if (process.env.ENV === "development" && email.includes("+")) {
+  if (env.NODE_ENV === "development" && email.includes("+")) {
     // Split by '+' and get the part before '@'
     const beforeAt = email.split("+")[0];
     const domain = email.split("@")[1];
@@ -105,7 +105,7 @@ export const sendEmail = async (to, subject, htmlContent) => {
     });
 
     const mailOptions = {
-      from: process.env.NODEMAILER_EMAIL,
+      from: env.NODEMAILER_EMAIL,
       to,
       subject,
       html: htmlContent,

@@ -2,6 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../../common/models/user.js';
 import Client from '../../common/models/client.js';
+import { env } from '../../common/config/env.js';
 
 const router = express.Router();
 
@@ -62,7 +63,7 @@ const sanitizeClientData = (client) => {
 router.post('/verify-token', validateTokenFormat, async (req, res) => {
   const authorizationHeader = req.headers.authorization;
   const token = authorizationHeader.slice(7);
-  const secret = process.env.JWT_SECRET;
+  const secret = env.JWT_SECRET;
 
   if (!secret) {
     return res.status(500).json({ error: responseMessages.error.jwtSecretMissing });

@@ -2,7 +2,7 @@ import Client from "../../../common/models/client.js";
 import InvitedClient from "../../../common/models/invitedClient.js";
 import User from "../../../common/models/user.js";
 import CustomError from "../../../common/utils/customError.js";
-
+import { env } from "../../../common/config/env.js";
 
 const messages = {
     error: {
@@ -29,7 +29,7 @@ const utils = {
       
       Use this code to log in and complete your setup.
       
-      Get started at: ${process.env.NODE_ENV === 'development' ? process.env.FRONTEND_URL_LOCAL : process.env.FRONTEND_URL_PRODUCTION}/client-registration`;
+      Get started at: ${env.NODE_ENV === 'development' ? env.FRONTEND_URL_LOCAL : env.FRONTEND_URL_PRODUCTION}/client-registration`;
     }
 }
 

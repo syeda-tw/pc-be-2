@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { env } from "../../../common/config/env.js";
 
 export const hashPassword = async (password) => {
     return await bcrypt.hash(password, 10);
@@ -14,7 +15,7 @@ export const isPasswordCorrect = async (password, userPassword) => {
 };
 
 export const generateToken = (payload) => {
-    const secret = process.env.JWT_SECRET;
+    const secret = env.JWT_SECRET;
     if (!secret) {
       throw new Error("JWT_SECRET is not defined");
     }

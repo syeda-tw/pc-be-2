@@ -1,6 +1,7 @@
 import Stripe from "stripe";
 import Client from "../../../../common/models/client.js";
 import { sanitizeClient } from "../../utils.js";
+import { env } from "../../../../common/config/env.js";
 
 const messages = {
     success: "Client information updated successfully",
@@ -13,7 +14,7 @@ const messages = {
 };
 
 const createClientStripeCustomer = async (email) => {
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const stripe = new Stripe(env.STRIPE_SECRET_KEY);
     try {
         const customer = await stripe.customers.create({ email });
         return customer.id;

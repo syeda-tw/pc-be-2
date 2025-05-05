@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
 
 const messages = {
   error: {
@@ -9,7 +10,7 @@ const messages = {
 
 const secureRequestMiddleware = (req, res, next) => {
   const token = req.headers.authorization;
-  const secret = process.env.JWT_SECRET;
+  const secret = env.JWT_SECRET;
   try {
     const decoded = jwt.verify(token.split(" ")[1], secret);
     if (!decoded?._id) {

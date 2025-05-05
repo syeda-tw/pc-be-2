@@ -1,7 +1,8 @@
 import Client from "../../../../common/models/client.js";
 import Stripe from "stripe";
+import { env } from "../../../../common/config/env.js";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
 const messages = {
     success: {

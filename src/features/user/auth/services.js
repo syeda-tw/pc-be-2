@@ -21,6 +21,7 @@ import { messages } from "./messages.js";
 import CustomError from "../../../common/utils/customError.js";
 import Practice from "../../../common/models/practice.js";
 import jwt from "jsonwebtoken";
+import { env } from "../../../common/config/env.js";
 
 const registerUserService = async (email, password) => {
   // Check if the user already exists
@@ -115,16 +116,16 @@ const requestResetPasswordService = async (email) => {
   }
   const token = generateToken({ _id: user._id.toString() }, "1h");
   const frontendUrl =
-    process.env.NODE_ENV === "production"
-      ? process.env.FRONTEND_URL_PRODUCTION
-      : process.env.FRONTEND_URL_LOCAL;
+    env.NODE_ENV === "production"
+      ? env.FRONTEND_URL_PRODUCTION
+      : env.FRONTEND_URL_LOCAL;
   const resetLink = `${frontendUrl}/reset-password?token=${token}`;
   await sendPasswordResetEmail(email, resetLink);
   return;
 };
 
 const resetPasswordService = async (token, password) => {
-  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  const decodedToken = jwt.verify(token, env.JWT_SECRET);
   if (!decodedToken) {
     throw new CustomError(401, messages.error.invalidPasswordChangeUrl);
   }
