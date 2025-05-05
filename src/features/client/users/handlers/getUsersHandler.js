@@ -1,5 +1,5 @@
 import Client from "../../../../common/models/client.js";
-import User from "../../../../common/models/user.js";
+import User from "../../../../common/models/User.js";
 
 const getUsersHandler = async (req, res) => {
     try {

@@ -3,9 +3,9 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import Client from '../common/models/client.js';
 import InvitedClient from '../common/models/invitedClient.js';
-import OtpVerification from '../common/models/otpVerification.js';
+import OtpVerification from '../common/models/OtpVerification.js';
 import Practice from '../common/models/practice.js';
-import User from '../common/models/user.js';
+import User from '../common/models/User.js';
 import { env } from '../common/config/env.js';  
 
 

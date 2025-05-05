@@ -23,29 +23,6 @@ import Practice from "../../../common/models/practice.js";
 import jwt from "jsonwebtoken";
 import { env } from "../../../common/config/env.js";
 
-const registerUserService = async (email, password) => {
-  // Check if the user already exists
-  const existingUser = await findUserByEmailDbOp(email);
-  if (existingUser) {
-    throw new CustomError(400, messages.error.userAlreadyExists);
-  }
-
-  const otpVerification = await findOtpVerificationByEmailDbOp(email);
-  const otp = generateOtp();
-  const hashedPassword = await hashPassword(password);
-  console.log("otp", otp);
-
-  if (otpVerification) {
-    //If OTP verification already exists, update the password and otp
-    Object.assign(otpVerification, { email, password: hashedPassword, otp });
-    await otpVerification.save();
-    await sendRegistrationEmail(email, otp)
-  } else {
-    //If OTP verification does not exist, create a new one
-    await createOtpVerificationDbOp(email, hashedPassword, otp);
-  }
-  return;
-};
 
 const verifyRegistrationOtpService = async (email, otp) => {
   // Find OTP verification record
@@ -180,7 +157,6 @@ const changePasswordService = async (id, oldPassword, newPassword) => {
 
 
 export {
-  registerUserService,
   verifyRegistrationOtpService,
   loginService,
   requestResetPasswordService,

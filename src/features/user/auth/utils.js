@@ -55,6 +55,7 @@ export const generateOtp = () => {
   return Math.floor(10000 + Math.random() * 90000).toString();
 };
 
+//TODO: delete this function and use from common utils
 export const hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);
 };

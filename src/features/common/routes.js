@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../../common/models/user.js';
+import User from '../../common/models/User.js';
 import Client from '../../common/models/client.js';
 import { env } from '../../common/config/env.js';
 

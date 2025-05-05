@@ -1,4 +1,4 @@
-import User from "../../../common/models/user.js";
+import User from "../../../common/models/User.js";
 
 
 export const findUserByIdDbOp = async (id) => {

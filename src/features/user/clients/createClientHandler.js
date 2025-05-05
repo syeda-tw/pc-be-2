@@ -1,6 +1,6 @@
 import Client from "../../../common/models/client.js";
 import InvitedClient from "../../../common/models/invitedClient.js";
-import User from "../../../common/models/user.js";
+import User from "../../../common/models/User.js";
 import CustomError from "../../../common/utils/customError.js";
 import { env } from "../../../common/config/env.js";
 

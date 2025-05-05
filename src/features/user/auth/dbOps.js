@@ -1,5 +1,5 @@
-import User from "../../../common/models/user.js";
-import OTPVerification from "../../../common/models/otpVerification.js";
+import User from "../../../common/models/User.js";
+import OTPVerification from "../../../common/models/OtpVerification.js";
 
 const findUserByEmailDbOp = async (email) => {
   try {
