@@ -39,9 +39,7 @@ const registerSchema = Joi.object({
 
 
 const validateRegisterMiddleware = (req, res, next) => {
-  console.log(req.body.data);
   const { error } = registerSchema.validate(req.body.data);
-  console.log(error+ ".............");
   if (error) {
    return next({
       status: 400,
@@ -66,7 +64,10 @@ const validateVerifyRegistrationOtpMiddleware = (req, res, next) => {
   const { error } = verifyRegistrationOtpSchema.validate(req.body.data);
 
   if (error) {
-    return res.status(400).json({ message: error.details[0].message });
+    return next({
+      status: 400,
+      message: error.details[0].message,
+    });
   }
 
   next();
@@ -92,7 +93,10 @@ const loginSchema = Joi.object({
 const validateLoginMiddleware = (req, res, next) => {
   const { error } = loginSchema.validate(req.body.data);
   if (error) {
-    return res.status(400).json({ message: error.details[0].message });
+    return next({
+      status: 400,
+      message: error.details[0].message,
+    });
   }
   next();
 };
@@ -107,7 +111,10 @@ const requestResetPasswordSchema = Joi.object({
 const validateRequestResetPasswordMiddleware = (req, res, next) => {
   const { error } = requestResetPasswordSchema.validate(req.body.data);
   if (error) {
-    return res.status(400).json({ message: error.details[0].message });
+    return next({
+      status: 400,
+      message: error.details[0].message,
+    });
   }
   next();
 };
@@ -118,7 +125,7 @@ const resetPasswordSchema = Joi.object({
   }),
   password: Joi.string()
     .min(8)
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .pattern(PASSWORD_REGEX)
     .required()
     .messages({
       "string.min": messages.error.invalidPasswordFormat,
@@ -130,7 +137,10 @@ const resetPasswordSchema = Joi.object({
 const validateResetPasswordMiddleware = (req, res, next) => {
   const { error } = resetPasswordSchema.validate(req.body);
   if (error) {
-    return res.status(400).json({ message: error.details[0].message });
+    return next({
+      status: 400,
+      message: error.details[0].message,
+    });
   }
   next();
 };
@@ -139,15 +149,24 @@ const validateChangePasswordSchema = Joi.object({
   oldPassword: Joi.string().required().messages({
     "any.required": messages.error.invalidPasswordFormat,
   }),
-  newPassword: Joi.string().required().messages({
-    "any.required": messages.error.invalidPasswordFormat,
-  }),
+  newPassword: Joi.string()
+    .min(8)
+    .pattern(PASSWORD_REGEX)
+    .required()
+    .messages({
+      "string.min": messages.error.invalidPasswordFormat,
+      "string.pattern.base": messages.error.invalidPasswordFormat,
+      "any.required": messages.error.invalidPasswordFormat,
+    }),
 });
 
 const validateChangePasswordMiddleware = (req, res, next) => {
   const { error } = validateChangePasswordSchema.validate(req.body);
   if (error) {
-    return res.status(400).json({ message: error.details[0].message });
+    return next({
+      status: 400,
+      message: error.details[0].message,
+    });
   }
   next();
 };

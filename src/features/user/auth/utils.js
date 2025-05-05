@@ -58,6 +58,7 @@ export const generateOtp = () => {
 export const hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);
 };
+//TODO: delete this function and use from common utils
 
 export const comparePassword = async (password, hashedPassword) => {
   return await bcrypt.compare(password, hashedPassword);
@@ -89,6 +90,7 @@ export const sendWelcomeEmail = async (user) => {
     throw new CustomError(400, "Error sending welcome email.");
   }
 };
+//TODO: delete this function and use from common utils
 
 export const isPasswordCorrect = async (password, userPassword) => {
   return await bcrypt.compare(password, userPassword);
@@ -114,10 +116,15 @@ export const sendPasswordResetEmail = async (email, resetLink) => {
   );
 };
 
+//TODO: delete this function and use from common utils
 export const generateToken = (payload) => {
   const secret = env.JWT_SECRET;
   if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }
   return jwt.sign(payload, secret, { expiresIn: "200h" });
+};
+
+export const generateOtpExpiration = () => {
+  return new Date(Date.now() + 10 * 60 * 1000);
 };

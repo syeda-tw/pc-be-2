@@ -1,5 +1,5 @@
 import User from "../../../../common/models/User.js";
-import { generateOtp, sendRegistrationEmail } from "../utils.js";
+import { generateOtp, sendRegistrationEmail, generateOtpExpiration } from "../utils.js";
 import { hashPassword } from "../../../common/utils.js";
 import OtpVerification from "../../../../common/models/OtpVerification.js";
 
@@ -28,17 +28,16 @@ const registerOperation = async (email, password, next) => {
 
     if (otpVerification) {
         //If OTP verification already exists, update the password and otp
-        Object.assign(otpVerification, { email, password: hashedPassword, otp });
+        Object.assign(otpVerification, { email, password: hashedPassword, otp, expiresAt: generateOtpExpiration() });
         await otpVerification.save();
         await sendRegistrationEmail(email, otp)
         return;
     } else {
         //If OTP verification does not exist, create a new one
-        await OtpVerification.create({ email, password: hashedPassword, otp });
+        await OtpVerification.create({ email, password: hashedPassword, otp, expiresAt: generateOtpExpiration() });
         await sendRegistrationEmail(email, otp)
         return;
     }
-    return;
 };
 
 

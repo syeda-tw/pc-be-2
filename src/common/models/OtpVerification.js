@@ -7,6 +7,7 @@ const OtpVerificationSchema = new Schema(
     email: { type: String, required: true, unique: true },
     otp: { type: String, required: true },
     password: { type: String, required: true },
+    expiresAt: { type: Date, required: true },
   },
   {
     timestamps: true, // Add createdAt and updatedAt fields

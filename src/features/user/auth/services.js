@@ -23,50 +23,6 @@ import Practice from "../../../common/models/practice.js";
 import jwt from "jsonwebtoken";
 import { env } from "../../../common/config/env.js";
 
-
-const verifyRegistrationOtpService = async (email, otp) => {
-  // Find OTP verification record
-
-  const otpVerification = await findOtpVerificationByEmailDbOp(email);
-
-  if (!otpVerification) {
-    throw new CustomError(404, messages.notFound.resource);
-  }
-
-  // Check if OTP matches
-  if (otpVerification.otp !== otp) {
-    throw new CustomError(400, messages.error.invalidOtp);
-  }
-
-  //ALL IS OK
-  // Create new practice with default values
-  const newPractice = await Practice.create({});
-
-  // Create new user
-  const user = await createUserDbOp({
-    email: otpVerification.email,
-    password: otpVerification.password,
-    status: "onboarding-step-1",
-    is_admin: true,
-    practice_id: newPractice._id,
-  });
-
-  // Delete OTP verification record
-  await deleteOtpVerificationDbOp(email);
-
-  // Generate JWT token
-  const _id = user._id.toString();
-  const token = generateToken({ _id });
-
-  // Send welcome email
-  await sendWelcomeEmail(user);
-
-  return {
-    user,
-    token,
-  };
-};
-
 const loginService = async (email, password) => {
   const user = await findUserByEmailDbOp(email);
   if (!user) throw new CustomError(401, messages.error.invalidEmailFormat);
@@ -157,7 +113,6 @@ const changePasswordService = async (id, oldPassword, newPassword) => {
 
 
 export {
-  verifyRegistrationOtpService,
   loginService,
   requestResetPasswordService,
   resetPasswordService,

@@ -22,7 +22,7 @@ describe("User Registration", () => {
   });
 
   describe("Validation", () => {
-    it.skip.each([
+    it.each([
       [{ email: "", password: "Test1234!" }, "missing email"],
       [{ email: "test@example.com", password: "" }, "missing password"],
       [{ email: "invalid", password: "Test1234!" }, "invalid email"],
@@ -35,28 +35,28 @@ describe("User Registration", () => {
   });
 
   describe("Functionality", () => {
-    it.skip("should send OTP to new user", async () => {
+    it("should send OTP to new user", async () => {
       const data = createUserPayload();
       const res = await request(app).post("/user/auth/register").send({ data });
       const otpUser = await OtpVerification.findOne({ email: data.email });
       expect(otpUser).not.toBeNull();
       expect(res.statusCode).toBe(200);
-    }, 10000); // Adding a longer timeout of 10 seconds
+    }, 50000); // Adding a longer timeout of 10 seconds
 
     it("should update OTP for existing OTP user", async () => {
       const data = createUserPayload();
-      await OtpVerification.create({ email: data.email, otp: "123456", password: data.password });
+      await OtpVerification.create({ email: data.email, otp: "12345", password: data.password, expiresAt: new Date(Date.now() + 10 * 60 * 1000) });
       const res = await request(app).post("/user/auth/register").send({ data });
       const otpUser = await OtpVerification.findOne({ email: data.email });
-      expect(otpUser.otp).not.toBe("123456");
+      expect(otpUser.otp).not.toBe("12345");
       expect(res.statusCode).toBe(200);
-    });
+    }, 10000);
 
     it("should not register if user already exists", async () => {
       const data = createUserPayload();
       await User.create({ ...data }); // ← flattening data
       const res = await request(app).post("/user/auth/register").send({ data });
       expect(res.statusCode).toBeGreaterThanOrEqual(400);
-    });
+    }, 10000);
   });
 });

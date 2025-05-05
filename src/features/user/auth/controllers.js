@@ -1,5 +1,4 @@
 import {
-  verifyRegistrationOtpService,
   loginService,
   requestResetPasswordService,
   resetPasswordService,
@@ -8,22 +7,6 @@ import {
 import { messages } from "./messages.js";
 import { sanitizeUser } from "./utils.js";
 
-
-
-// return object is data: {email} and message: "OTP verified"
-const verifyRegistrationOtp = async (req, res, next) => {
-  try {
-    const { email, otp } = req.body.data;
-    const { user, token } = await verifyRegistrationOtpService(email, otp);
-    return res.status(200).json({
-      user: sanitizeUser(user),
-      token,
-      message: messages.register.otpVerified,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
 
 const login = async (req, res, next) => {
   try {
@@ -83,7 +66,6 @@ const changePassword = async (req, res, next) => {
 };
 
 export {
-  verifyRegistrationOtp,
   login,
   requestResetPassword,
   resetPassword,
