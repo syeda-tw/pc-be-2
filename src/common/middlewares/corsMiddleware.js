@@ -5,6 +5,7 @@ export const corsMiddleware = (req, res, next) => {
 
     const allowedOrigin = env.NODE_ENV === 'production'
         ? env.FRONTEND_URL_PRODUCTION || ''
+        //when in development, we allow the local backend to be used for swagger and frontend to be used for the frontend
         : env.FRONTEND_URL_LOCAL || env.BACKEND_URL_LOCAL;
 
     if (origin && origin === allowedOrigin) {

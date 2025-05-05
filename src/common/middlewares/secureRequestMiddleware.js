@@ -1,3 +1,4 @@
+//TODO: Remove this middleware from here as it is used in many places but is related to requests side, not configuration side of the app
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
 
@@ -8,6 +9,7 @@ const messages = {
   },
 };
 
+//this middleware is used to secure the request and check if the token is valid
 const secureRequestMiddleware = (req, res, next) => {
   const token = req.headers.authorization;
   const secret = env.JWT_SECRET;
