@@ -18,3 +18,7 @@ export const sanitizeUserAndAppendType = (user, type) => {
   const { password, ...userWithoutPassword } = user;
   return { ...userWithoutPassword, type: type || "user" };
 };
+
+export const isPasswordCorrect = async (password, correctPassword) => {
+  return await bcrypt.compare(password, correctPassword);
+};

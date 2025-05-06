@@ -1,5 +1,4 @@
 import {
-  loginService,
   requestResetPasswordService,
   resetPasswordService,
   changePasswordService,
@@ -7,20 +6,6 @@ import {
 import { messages } from "./messages.js";
 import { sanitizeUser } from "./utils.js";
 
-
-const login = async (req, res, next) => {
-  try {
-    const { email, password } = req?.body?.data;
-    const { user, token } = await loginService(email, password);
-    return res.status(200).json({
-      user: sanitizeUser(user),
-      token,
-      message: messages.login.loginSuccessful,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
 
 const requestResetPassword = async (req, res, next) => {
   const { email } = req.body.data;
@@ -66,7 +51,6 @@ const changePassword = async (req, res, next) => {
 };
 
 export {
-  login,
   requestResetPassword,
   resetPassword,
   changePassword,

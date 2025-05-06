@@ -23,24 +23,6 @@ import Practice from "../../../common/models/practice.js";
 import jwt from "jsonwebtoken";
 import { env } from "../../../common/config/env.js";
 
-const loginService = async (email, password) => {
-  const user = await findUserByEmailDbOp(email);
-  if (!user) throw new CustomError(401, messages.error.invalidEmailFormat);
-
-  // Validate password
-  const isPasswordValid = await isPasswordCorrect(password, user.password);
-  if (!isPasswordValid)
-    throw new CustomError(401, messages.error.invalidCredentials);
-
-  // Generate JWT token
-  const _id = user._id.toString();
-  const token = generateToken({ _id });
-
-  return {
-    user,
-    token,
-  };
-};
 
 const requestResetPasswordService = async (email) => {
   const user = await findUserByEmailDbOp(email);
@@ -113,7 +95,6 @@ const changePasswordService = async (id, oldPassword, newPassword) => {
 
 
 export {
-  loginService,
   requestResetPasswordService,
   resetPasswordService,
   changePasswordService,

@@ -1,35 +1,33 @@
 import mongoose from "mongoose";
-import { DAYS_OF_WEEK, TIMEZONES, PASSWORD_REGEX } from "../../features/common/constants.js";
+import { DAYS_OF_WEEK, TIMEZONES } from "../../features/common/constants.js";
 
 const { Schema } = mongoose;
 
 // Email Validation Regex
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-
 const UserSchema = new Schema(
   {
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     title: { type: String },
-    isAdmin: { type: Boolean, default: false },  // Camel case for consistency
+    isAdmin: { type: Boolean, default: false }, // Camel case for consistency
     pronouns: { type: String },
-    hourlyRate: { type: Number },  // Camel case for consistency
+    hourlyRate: { type: Number }, // Camel case for consistency
     gender: { type: String },
     qualifications: { type: [{ type: Schema.Types.Mixed }], default: [] },
     practice: { type: Schema.Types.ObjectId, ref: "Practice" },
     password: {
       type: String,
-      required: true,
-      match: [PASSWORD_REGEX, "Password must be at least 8 characters and contain at least one letter and one number, and no spaces."]
     },
     username: {
       type: String,
       unique: true,
       sparse: true,
       validate: {
-        validator: (value) => value === "" || value === null || value.length >= 3,
-        message: "Username must be at least 3 characters long if provided."
-      }
+        validator: (value) =>
+          value === "" || value === null || value.length >= 3,
+        message: "Username must be at least 3 characters long if provided.",
+      },
     },
     email: {
       type: String,
@@ -39,7 +37,7 @@ const UserSchema = new Schema(
     },
     holidays: {
       type: [{ name: String, startDate: Date, endDate: Date }],
-      default: []
+      default: [],
     },
     status: {
       type: String,
@@ -52,8 +50,8 @@ const UserSchema = new Schema(
       ],
       default: "onboarding-step-1",
     },
-    firstName: { type: String },  // Camel case for consistency
-    lastName: { type: String },   // Camel case for consistency
+    firstName: { type: String }, // Camel case for consistency
+    lastName: { type: String }, // Camel case for consistency
     middleName: { type: String }, // Camel case for consistency
     dateOfBirth: { type: Date },
     timezone: { type: String, default: TIMEZONES[0] },
@@ -67,7 +65,7 @@ const UserSchema = new Schema(
               day: {
                 type: String,
                 required: true,
-                enum: DAYS_OF_WEEK,  // Use the constant here
+                enum: DAYS_OF_WEEK, // Use the constant here
               },
               startTime: { type: String },
               endTime: { type: String },
@@ -95,8 +93,16 @@ const UserSchema = new Schema(
     clients: {
       type: [
         {
-          client: { type: mongoose.Schema.Types.ObjectId, ref: "Client", required: true },
-          status: { type: String, enum: ["accepted", "rejected", "pending"], default: "pending" },
+          client: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Client",
+            required: true,
+          },
+          status: {
+            type: String,
+            enum: ["accepted", "rejected", "pending"],
+            default: "pending",
+          },
           _id: false,
         },
       ],

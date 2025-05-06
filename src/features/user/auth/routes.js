@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  login,
   requestResetPassword,
   resetPassword,
   changePassword,
@@ -16,7 +15,7 @@ import {
 import { secureRequestMiddleware } from "../../../common/middlewares/secureRequestMiddleware.js";
 import { registerHandler } from "./handlers/registerHandler.js";
 import { verifyRegistrationOtpHandler } from "./handlers/verifyRegisterationOtpHandler.js";
-
+import { loginHandler } from "./handlers/loginHandler.js";
 const router = express.Router();
 
 router.post("/register", validateRegisterMiddleware, registerHandler);
@@ -27,7 +26,8 @@ router.post(
   verifyRegistrationOtpHandler
 );
 
-router.post("/login", validateLoginMiddleware, login);
+router.post("/login", validateLoginMiddleware, loginHandler);
+
 router.post(
   "/request-reset-password",
   validateRequestResetPasswordMiddleware,

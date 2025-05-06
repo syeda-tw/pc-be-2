@@ -28,7 +28,6 @@ const verifyRegistrationOtpOperation = async (email, otp, next) => {
     }
 
     if (otpVerification.expiresAt < new Date()) {
-        console.log("OTP expired");
         return next({ status: 400, message: messages.error.expiredOtp });
     }
 
@@ -54,7 +53,7 @@ const verifyRegistrationOtpOperation = async (email, otp, next) => {
     await sendWelcomeEmail(user);
 
     return {
-        user,
+        user: user.toObject(),
         token,
     };
 };

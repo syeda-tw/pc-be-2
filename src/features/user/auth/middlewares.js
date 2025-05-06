@@ -69,15 +69,8 @@ const validateVerifyRegistrationOtpMiddleware = (req, res, next) => {
       message: error.details[0].message,
     });
   }
-
   next();
 };
-
-const verifyValidTokenSchema = Joi.object({
-  token: Joi.string().required().messages({
-    "any.required": messages.error.tokenNotFound,
-  }),
-});
 
 
 const loginSchema = Joi.object({
@@ -91,11 +84,20 @@ const loginSchema = Joi.object({
 });
 
 const validateLoginMiddleware = (req, res, next) => {
-  const { error } = loginSchema.validate(req.body.data);
-  if (error) {
+  const data = req.body.data;
+  if (!data || Object.keys(data).length === 0) {
     return next({
       status: 400,
-      message: error.details[0].message,
+      message: "Request body cannot be empty",
+    });
+  }
+  
+  const { error } = loginSchema.validate(data);
+  if (error) {
+    const errorMessage = error.details.map(detail => detail.message).join(', ');
+    return next({
+      status: 400,
+      message: errorMessage,
     });
   }
   next();

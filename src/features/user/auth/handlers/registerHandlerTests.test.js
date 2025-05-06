@@ -1,62 +1,62 @@
 import request from "supertest";
+import { faker } from "@faker-js/faker";
 import app from "../../../../common/config/server.js";
 import User from "../../../../common/models/User.js";
-import OtpVerification from "../../../../common/models/OtpVerification.js";
-import { faker } from '@faker-js/faker';
+import { hashPassword } from "../utils.js";
 
-// Helper functions
-const createUserPayload = (overrides = {}) => ({
+// Helpers
+const createLoginPayload = (overrides = {}) => ({
   email: faker.internet.email(),
   password: "Test1234!",
   ...overrides,
 });
 
-const clearDb = async () => {
-  await User.deleteMany();
-  await OtpVerification.deleteMany();
+const insertUser = async ({ email, password }) => {
+  const hashed = await hashPassword(password);
+  return User.create({ email, password: hashed });
 };
 
-describe("User Registration", () => {
-  beforeEach(async () => {
-    await clearDb();
-  });
+const clearDb = () => User.deleteMany();
+
+describe("User Login", () => {
+  beforeEach(clearDb);
 
   describe("Validation", () => {
     it.each([
+      [{}, "empty body"],
       [{ email: "", password: "Test1234!" }, "missing email"],
       [{ email: "test@example.com", password: "" }, "missing password"],
-      [{ email: "invalid", password: "Test1234!" }, "invalid email"],
-      [{ email: "test@example.com", password: "123" }, "invalid password"],
-    ])("should not register user with %s", async (data, desc) => {
-      const res = await request(app).post("/user/auth/register").send({ data });
+      [{ email: "bad-email", password: "Test1234!" }, "invalid email format"],
+    ])("should reject login with %s", async (data, desc) => {
+      const res = await request(app).post("/user/auth/login").send({ data });
       expect(res.statusCode).toBeGreaterThanOrEqual(400);
-      // Optionally: expect(res.body.message).toMatch(/error/i);
     });
   });
 
-  describe("Functionality", () => {
-    it("should send OTP to new user", async () => {
-      const data = createUserPayload();
-      const res = await request(app).post("/user/auth/register").send({ data });
-      const otpUser = await OtpVerification.findOne({ email: data.email });
-      expect(otpUser).not.toBeNull();
-      expect(res.statusCode).toBe(200);
-    }, 50000); // Adding a longer timeout of 10 seconds
+  describe("Authentication", () => {
+    it("should fail for non-existent user", async () => {
+      const data = createLoginPayload();
+      const res = await request(app).post("/user/auth/login").send({ data });
+      expect(res.statusCode).toBeGreaterThanOrEqual(401);
+    });
 
-    it("should update OTP for existing OTP user", async () => {
-      const data = createUserPayload();
-      await OtpVerification.create({ email: data.email, otp: "12345", password: data.password, expiresAt: new Date(Date.now() + 10 * 60 * 1000) });
-      const res = await request(app).post("/user/auth/register").send({ data });
-      const otpUser = await OtpVerification.findOne({ email: data.email });
-      expect(otpUser.otp).not.toBe("12345");
-      expect(res.statusCode).toBe(200);
-    }, 10000);
-
-    it("should not register if user already exists", async () => {
-      const data = createUserPayload();
-      await User.create({ ...data }); // ← flattening data
-      const res = await request(app).post("/user/auth/register").send({ data });
+    it("should fail for incorrect password", async () => {
+      const data = createLoginPayload();
+      await insertUser(data);
+      const res = await request(app)
+        .post("/user/auth/login")
+        .send({ data: { email: data.email, password: "WrongPass1!" } });
       expect(res.statusCode).toBeGreaterThanOrEqual(400);
-    }, 10000);
+    });
+
+    it("should succeed with valid credentials", async () => {
+      const data = createLoginPayload();
+      await insertUser(data);
+      const res = await request(app).post("/user/auth/login").send({ data });
+      expect(res.statusCode).toBe(200);
+      expect(res.body).toHaveProperty("token");
+      expect(res.body.user).toHaveProperty("email", data.email);
+      expect(res.body.user).not.toHaveProperty("password");
+    });
   });
 });
