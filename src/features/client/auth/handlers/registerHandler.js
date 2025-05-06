@@ -3,7 +3,7 @@ import InvitedClient from "../../../../common/models/invitedClient.js";
 import User from "../../../../common/models/User.js";
 import { sanitizeClient } from "../../utils.js";
 import CustomError from "../../../../common/utils/customError.js";
-import { hashPassword, generateToken } from "../../../user/auth/utils.js";
+import { hashPassword, generateToken } from "../../../common/utils.js";
 
 const messages = {
     success: {

@@ -12,7 +12,7 @@ const messages = {
     }
 }
 
-const registerOperation = async (email, password, next) => {
+const registerService = async (email, password, next) => {
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -44,7 +44,7 @@ const registerOperation = async (email, password, next) => {
 export const registerHandler = async (req, res, next) => {
     const { email, password } = req.body.data;
     try {
-        await registerOperation(email, password, next);
+        await registerService(email, password, next);
         return res.status(200).json({
             data: { email },
             message: messages.success.otpSent,

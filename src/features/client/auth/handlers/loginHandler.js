@@ -1,6 +1,6 @@
 import Client from '../../../../common/models/client.js';
 import { sanitizeClient } from '../../utils.js';
-import { isPasswordCorrect, generateToken } from '../../../user/auth/utils.js';
+import { isPasswordCorrect, generateToken } from '../../../common/utils.js';
 
 const loginHandler = async (req, res) => {
     try {

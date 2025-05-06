@@ -158,8 +158,15 @@ const resetPasswordSchema = Joi.object({
 });
 
 const validateResetPasswordMiddleware = (req, res, next) => {
-  const { error } = resetPasswordSchema.validate(req.body);
-  if (error) {
+  const data = req.body.data;
+  if (!data || Object.keys(data).length === 0) {
+    return next({
+      status: 400,
+      message: "Request body cannot be empty",
+    });
+  }
+  const { error } = resetPasswordSchema.validate(req.body.data);
+  if (error) {  
     return next({
       status: 400,
       message: error.details[0].message,
@@ -184,7 +191,14 @@ const validateChangePasswordSchema = Joi.object({
 });
 
 const validateChangePasswordMiddleware = (req, res, next) => {
-  const { error } = validateChangePasswordSchema.validate(req.body);
+  const data = req.body.data;
+  if (!data || Object.keys(data).length === 0) {
+    return next({
+      status: 400,
+      message: "Request body cannot be empty",
+    });
+  }
+  const { error } = validateChangePasswordSchema.validate(req.body.data);
   if (error) {
     return next({
       status: 400,

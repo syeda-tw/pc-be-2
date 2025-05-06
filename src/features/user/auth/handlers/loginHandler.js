@@ -10,7 +10,7 @@ const messages = {
   loginSuccessful: "Login successful",
 };
 
-const loginOperation = async (email, password, next) => {
+const loginService = async (email, password, next) => {
   const user = await User.findOne({ email });
   if (!user) {
     return next({ status: 401, message: messages.invalidEmailOrPassword });
@@ -35,7 +35,7 @@ const loginOperation = async (email, password, next) => {
 export const loginHandler = async (req, res, next) => {
   const { email, password } = req?.body?.data;
   try {
-    const { user, token } = await loginOperation(email, password, next);
+    const { user, token } = await loginService(email, password, next);
     return res.status(200).json({
       user: sanitizeUserAndAppendType(user, "user"),
       token,

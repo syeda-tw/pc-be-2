@@ -2,29 +2,7 @@ import {
   generateEmailHtml,
   sendEmail,
 } from "../../../common/utils/emailService.js";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import CustomError from "../../../common/utils/customError.js";
-import { env } from "../../../common/config/env.js";
-
-// This function is used to remove the password and internal Mongoose properties from the user object
-export const sanitizeUser = (user) => {
-  // Convert the Mongoose document to a plain JavaScript object, removing Mongoose-specific internal properties
-  try {
-      const userObject = user?.toObject({ versionKey: false }); // `versionKey: false` removes the `__v` field
-      // Destructure to remove the password field
-      const { password, ...userWithoutPassword } = userObject;
-
-      // Add type: "user" to the sanitized user object
-      const sanitizedUserWithType = { ...userWithoutPassword, type: "user" };
-
-      // Return the sanitized user object with type
-      return sanitizedUserWithType;
-  } catch (err) {
-      return null;
-  }
-};
-
 
 // Send OTP Registration Email
 export const sendRegistrationEmail = async (email, otp) => {
@@ -54,16 +32,6 @@ export const generateOtp = () => {
   return Math.floor(10000 + Math.random() * 90000).toString();
 };
 
-//TODO: delete this function and use from common utils
-export const hashPassword = async (password) => {
-  return await bcrypt.hash(password, 10);
-};
-//TODO: delete this function and use from common utils
-
-export const comparePassword = async (password, hashedPassword) => {
-  return await bcrypt.compare(password, hashedPassword);
-};
-
 export const sendWelcomeEmail = async (user) => {
   const subject = "Welcome to Practicare!";
   const htmlContent = `
@@ -90,11 +58,6 @@ export const sendWelcomeEmail = async (user) => {
     throw new CustomError(400, "Error sending welcome email.");
   }
 };
-//TODO: delete this function and use from common utils
-
-export const isPasswordCorrect = async (password, userPassword) => {
-  return await bcrypt.compare(password, userPassword);
-};
 
 export const sendPasswordResetEmail = async (email, resetLink) => {
   await sendEmail(
@@ -114,15 +77,6 @@ export const sendPasswordResetEmail = async (email, resetLink) => {
       The Practicare Team`
     )
   );
-};
-
-//TODO: delete this function and use from common utils
-export const generateToken = (payload) => {
-  const secret = env.JWT_SECRET;
-  if (!secret) {
-    throw new Error("JWT_SECRET is not defined");
-  }
-  return jwt.sign(payload, secret, { expiresIn: "200h" });
 };
 
 export const generateOtpExpiration = () => {

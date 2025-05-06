@@ -20,7 +20,7 @@ const messages = {
     },
 };
 
-const verifyRegistrationOtpOperation = async (email, otp, next) => {
+const verifyRegistrationOtpService = async (email, otp, next) => {
     const otpVerification = await OtpVerification.findOne({ email });
 
     if (!otpVerification) {
@@ -61,7 +61,7 @@ const verifyRegistrationOtpOperation = async (email, otp, next) => {
 export const verifyRegistrationOtpHandler = async (req, res, next) => {
     try {
         const { email, otp } = req.body.data;
-        const { user, token } = await verifyRegistrationOtpOperation(email, otp, next);
+        const { user, token } = await verifyRegistrationOtpService(email, otp, next);
         return res.status(200).json({
             user: sanitizeUserAndAppendType(user, "user"),
             token,

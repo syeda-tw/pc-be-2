@@ -7,7 +7,7 @@ const messages = {
   userNotFound: "User not found",
 };
 
-const requestResetPasswordOperation = async (email, next) => {
+const requestResetPasswordService = async (email, next) => {
   const user = await User.findOne({ email });
   if (!user) {
     return next({ status: 404, message: messages.userNotFound });
@@ -25,7 +25,7 @@ const requestResetPasswordOperation = async (email, next) => {
 export const requestResetPasswordHandler = async (req, res, next) => {
   const { email } = req.body.data;
   try {
-    await requestResetPasswordOperation(email, next);
+    await requestResetPasswordService(email, next);
     return res.status(200).json({
       message: messages.passwordResetLinkSent,
     });
