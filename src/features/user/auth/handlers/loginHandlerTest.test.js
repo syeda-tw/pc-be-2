@@ -1,7 +1,7 @@
 import request from "supertest";
 import app from "../../../../common/config/server.js";
 import User from "../../../../common/models/User.js";
-import { hashPassword } from "../utils.js";
+import { hashPassword } from '../../../common/utils.js';
 
 describe("POST /login", () => {
   beforeAll(async () => {

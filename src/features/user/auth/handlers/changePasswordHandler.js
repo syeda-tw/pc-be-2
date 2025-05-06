@@ -1,5 +1,5 @@
-import User from '../../../../common/models/User.js';
-import { hashPassword, isPasswordCorrect } from '../../../common/utils.js';
+import User from "../../../../common/models/User.js";
+import { hashPassword, isPasswordCorrect } from "../../../common/utils.js";
 
 const messages = {
   error: {
@@ -15,37 +15,44 @@ const messages = {
 const changePasswordService = async (id, oldPassword, newPassword, next) => {
   const user = await User.findById(id);
   if (!user) {
-    next({
+    throw {
       status: 404,
       message: messages.error.userNotFound,
-    });
+    };
   }
-  const isPasswordCorrectLocal = await isPasswordCorrect(oldPassword, user.password);
-  if (!isPasswordCorrectLocal) {
-    next({
+  const isOldPasswordCorrect = await isPasswordCorrect(
+    oldPassword,
+    user.password
+  );
+  if (!isOldPasswordCorrect) {
+    throw {
       status: 400,
       message: messages.error.invalidOldPassword,
-    });
+    };
   }
   const arePasswordsSame = await isPasswordCorrect(newPassword, user.password);
   if (arePasswordsSame) {
-    next({
+    throw {
       status: 400,
       message: messages.error.cannotUseSamePassword,
-    });
+    };
   }
-
   const hashedNewPassword = await hashPassword(newPassword);
-  const userUpdated = await User.findByIdAndUpdate(user._id, { password: hashedNewPassword }, { new: true });
+
+  const userUpdated = await User.findByIdAndUpdate(
+    user._id,
+    { password: hashedNewPassword },
+    { new: true }
+  );
+
   if (!userUpdated) {
-    next({
+    throw {
       status: 404,
       message: messages.error.userNotFound,
-    });
+    };
   }
   return;
 };
-
 
 export const changePasswordHandler = async (req, res, next) => {
   try {

@@ -39,21 +39,25 @@ const registerSchema = Joi.object({
 
 
 const validateRegisterMiddleware = (req, res, next) => {
+try {
   const data = req.body.data;
   if (!data || Object.keys(data).length === 0) {
-    return next({
+    throw {
       status: 400,
       message: "Request body cannot be empty",
-    });
+    };
   }
   const { error } = registerSchema.validate(data);
   if (error) {
-   return next({
+    throw {
       status: 400,
       message: error.details[0].message,
-    });
-    }
+    };
+  }
   next();
+} catch (err) {
+  next(err);
+}
 };
 
 const verifyRegistrationOtpSchema = Joi.object({
@@ -68,22 +72,26 @@ const verifyRegistrationOtpSchema = Joi.object({
 });
 
 const validateVerifyRegistrationOtpMiddleware = (req, res, next) => {
-  const data = req.body.data;
-  if (!data || Object.keys(data).length === 0) {
-    return next({
-      status: 400,
-      message: "Request body cannot be empty",
-    });
-  }
-  const { error } = verifyRegistrationOtpSchema.validate(req.body.data);
+  try {
+    const data = req.body.data;
+    if (!data || Object.keys(data).length === 0) {
+      throw {
+        status: 400,
+        message: "Request body cannot be empty",
+      };
+    }   
+    const { error } = verifyRegistrationOtpSchema.validate(req.body.data);
 
   if (error) {
-    return next({
+    throw {
       status: 400,
       message: error.details[0].message,
-    });
+    };
   }
   next();
+} catch (err) {
+  next(err);
+}
 };
 
 
@@ -99,22 +107,25 @@ const loginSchema = Joi.object({
 
 const validateLoginMiddleware = (req, res, next) => {
   const data = req.body.data;
-  if (!data || Object.keys(data).length === 0) {
-    return next({
+  try {   if (!data || Object.keys(data).length === 0) {
+    throw {
       status: 400,
       message: "Request body cannot be empty",
-    });
+    };
   }
   
-  const { error } = loginSchema.validate(data);
-  if (error) {
-    const errorMessage = error.details.map(detail => detail.message).join(', ');
-    return next({
-      status: 400,
-      message: errorMessage,
-    });
-  }
-  next();
+    const { error } = loginSchema.validate(data);
+    if (error) {
+      const errorMessage = error.details.map(detail => detail.message).join(', ');
+      throw {
+        status: 400,
+        message: errorMessage,
+      };
+    }
+    next();
+  } catch (err) {
+  next(err);
+}
 };
 
 const requestResetPasswordSchema = Joi.object({
@@ -125,21 +136,25 @@ const requestResetPasswordSchema = Joi.object({
 });
 
 const validateRequestResetPasswordMiddleware = (req, res, next) => {
-  const data = req.body.data;
-  if (!data || Object.keys(data).length === 0) {
-    return next({
+  try { 
+    const data = req.body.data;
+    if (!data || Object.keys(data).length === 0) {
+      throw {
       status: 400,
       message: "Request body cannot be empty",
-    });
+    };
   }
   const { error } = requestResetPasswordSchema.validate(req.body.data);
   if (error) {
-    return next({
+    throw {
       status: 400,
       message: error.details[0].message,
-    });
+    };
   }
   next();
+} catch (err) {
+  next(err);
+}
 };
 
 const resetPasswordSchema = Joi.object({
@@ -158,21 +173,25 @@ const resetPasswordSchema = Joi.object({
 });
 
 const validateResetPasswordMiddleware = (req, res, next) => {
-  const data = req.body.data;
-  if (!data || Object.keys(data).length === 0) {
-    return next({
-      status: 400,
-      message: "Request body cannot be empty",
-    });
-  }
-  const { error } = resetPasswordSchema.validate(req.body.data);
+  try {
+    const data = req.body.data;
+    if (!data || Object.keys(data).length === 0) {
+      throw {
+        status: 400,
+        message: "Request body cannot be empty",
+      };
+    }
+    const { error } = resetPasswordSchema.validate(req.body.data);
   if (error) {  
-    return next({
+    throw {
       status: 400,
       message: error.details[0].message,
-    });
+    };
   }
   next();
+} catch (err) {
+  next(err);
+}
 };
 
 const validateChangePasswordSchema = Joi.object({
@@ -192,20 +211,24 @@ const validateChangePasswordSchema = Joi.object({
 
 const validateChangePasswordMiddleware = (req, res, next) => {
   const data = req.body.data;
-  if (!data || Object.keys(data).length === 0) {
-    return next({
-      status: 400,
-      message: "Request body cannot be empty",
-    });
-  }
+  try {
+    if (!data || Object.keys(data).length === 0) {
+      throw {
+        status: 400,
+        message: "Request body cannot be empty",
+      };
+    }
   const { error } = validateChangePasswordSchema.validate(req.body.data);
   if (error) {
-    return next({
+    throw {
       status: 400,
       message: error.details[0].message,
-    });
+    };
   }
   next();
+} catch (err) {
+  next(err);
+}
 };
 
 export {

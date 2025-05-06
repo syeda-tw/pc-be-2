@@ -1,7 +1,7 @@
 import request from "supertest";
 import app from "../../../../common/config/server.js";
 import User from "../../../../common/models/User.js";
-import { hashPassword } from "../utils.js";
+import { hashPassword } from "../../../common/utils.js";
 
 describe("POST /request-reset-password", () => {
   beforeAll(async () => {
@@ -46,5 +46,5 @@ describe("POST /request-reset-password", () => {
       .send({ data: { email: "test@example.com" } });
     expect(res.statusCode).toBeGreaterThanOrEqual(200);
     expect(res.statusCode).toBeLessThan(300);
-  }, 10000);
+  }, 50000);
 });

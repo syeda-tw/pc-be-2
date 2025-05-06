@@ -7,10 +7,10 @@ const messages = {
   userNotFound: "User not found",
 };
 
-const requestResetPasswordService = async (email, next) => {
+const requestResetPasswordService = async (email) => {
   const user = await User.findOne({ email });
   if (!user) {
-    return next({ status: 404, message: messages.userNotFound });
+    throw { status: 404, message: messages.userNotFound };
   }
   const token = generateToken({ _id: user._id.toString(), expiresIn: '1h' });
   const frontendUrl =
@@ -25,7 +25,7 @@ const requestResetPasswordService = async (email, next) => {
 export const requestResetPasswordHandler = async (req, res, next) => {
   const { email } = req.body.data;
   try {
-    await requestResetPasswordService(email, next);
+    await requestResetPasswordService(email);
     return res.status(200).json({
       message: messages.passwordResetLinkSent,
     });

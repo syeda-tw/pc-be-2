@@ -20,19 +20,19 @@ const messages = {
     },
 };
 
-const verifyRegistrationOtpService = async (email, otp, next) => {
+const verifyRegistrationOtpService = async (email, otp) => {
     const otpVerification = await OtpVerification.findOne({ email });
 
     if (!otpVerification) {
-        return next({ status: 404, message: messages.notFound.resource });
+        throw { status: 404, message: messages.notFound.resource };
     }
 
     if (otpVerification.expiresAt < new Date()) {
-        return next({ status: 400, message: messages.error.expiredOtp });
+        throw { status: 400, message: messages.error.expiredOtp };
     }
 
     if (otpVerification.otp !== otp) {
-        return next({ status: 400, message: messages.error.invalidOtp });
+        throw { status: 400, message: messages.error.invalidOtp };
     }
 
     const newPractice = await Practice.create({});
@@ -61,7 +61,7 @@ const verifyRegistrationOtpService = async (email, otp, next) => {
 export const verifyRegistrationOtpHandler = async (req, res, next) => {
     try {
         const { email, otp } = req.body.data;
-        const { user, token } = await verifyRegistrationOtpService(email, otp, next);
+        const { user, token } = await verifyRegistrationOtpService(email, otp);
         return res.status(200).json({
             user: sanitizeUserAndAppendType(user, "user"),
             token,

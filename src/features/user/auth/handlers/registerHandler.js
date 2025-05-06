@@ -12,14 +12,14 @@ const messages = {
     }
 }
 
-const registerService = async (email, password, next) => {
+const registerService = async (email, password) => {
     // Check if the user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-        next({
+        throw {
             status: 400,
             message: messages.error.userAlreadyExists
-        })
+        }
     }
     const otpVerification = await OtpVerification.findOne({ email });
     const otp = generateOtp();
@@ -44,7 +44,7 @@ const registerService = async (email, password, next) => {
 export const registerHandler = async (req, res, next) => {
     const { email, password } = req.body.data;
     try {
-        await registerService(email, password, next);
+        await registerService(email, password);
         return res.status(200).json({
             data: { email },
             message: messages.success.otpSent,

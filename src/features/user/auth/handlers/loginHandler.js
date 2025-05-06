@@ -10,16 +10,16 @@ const messages = {
   loginSuccessful: "Login successful",
 };
 
-const loginService = async (email, password, next) => {
+const loginService = async (email, password) => {
   const user = await User.findOne({ email });
   if (!user) {
-    return next({ status: 401, message: messages.invalidEmailOrPassword });
+    throw { status: 401, message: messages.invalidEmailOrPassword };
   }
 
   // Validate password
   const isPasswordValid = await isPasswordCorrect(password, user.password);
   if (!isPasswordValid) {
-    return next({ status: 401, message: messages.invalidEmailOrPassword });
+    throw { status: 401, message: messages.invalidEmailOrPassword };
   }
 
   // Generate JWT token
@@ -35,7 +35,7 @@ const loginService = async (email, password, next) => {
 export const loginHandler = async (req, res, next) => {
   const { email, password } = req?.body?.data;
   try {
-    const { user, token } = await loginService(email, password, next);
+    const { user, token } = await loginService(email, password);
     return res.status(200).json({
       user: sanitizeUserAndAppendType(user, "user"),
       token,

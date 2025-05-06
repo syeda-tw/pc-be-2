@@ -13,30 +13,30 @@ const messages = {
   cannotUseSamePassword: "Cannot use same password",
 };
 
-const resetPasswordService = async (token, password, next) => {
+const resetPasswordService = async (token, password) => {
   const decodedToken = verifyJWTToken(token);
   if (!decodedToken) {
-    next({
+    throw {
       status: 401,
       message: messages.invalidPasswordChangeUrl,
-    });
+    };
   }
   const userInitial = await User.findById(decodedToken._id);
   if (!userInitial) {
-    next({
+    throw {
       status: 404,
       message: messages.userNotFound,
-    });
+    };
   }
   const isPasswordSameAsOld = await isPasswordCorrect(
     password,
     userInitial.password
   );
   if (isPasswordSameAsOld) {
-    next({
+    throw {
       status: 400,
       message: messages.cannotUseSamePassword,
-    });
+    };
   }
 
   const hashedPassword = await hashPassword(password);
@@ -60,8 +60,7 @@ export const resetPasswordHandler = async (req, res, next) => {
     const { token, password } = req.body;
     const { user, token: loginToken } = await resetPasswordService(
       token,
-      password,
-      next
+      password
     );
     return res.status(200).json({
       user: sanitizeUserAndAppendType(user),
