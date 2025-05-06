@@ -6,7 +6,7 @@ import {
   sendWelcomeEmail,
   sendPasswordResetEmail,
   comparePassword,
-  sendRegistrationEmail
+  sendRegistrationEmail,
 } from "./utils.js";
 import {
   createOtpVerificationDbOp,
@@ -22,22 +22,6 @@ import CustomError from "../../../common/utils/customError.js";
 import Practice from "../../../common/models/practice.js";
 import jwt from "jsonwebtoken";
 import { env } from "../../../common/config/env.js";
-
-
-const requestResetPasswordService = async (email) => {
-  const user = await findUserByEmailDbOp(email);
-  if (!user) {
-    throw new CustomError(404, messages.error.userNotFound);
-  }
-  const token = generateToken({ _id: user._id.toString() }, "1h");
-  const frontendUrl =
-    env.NODE_ENV === "production"
-      ? env.FRONTEND_URL_PRODUCTION
-      : env.FRONTEND_URL_LOCAL;
-  const resetLink = `${frontendUrl}/reset-password?token=${token}`;
-  await sendPasswordResetEmail(email, resetLink);
-  return;
-};
 
 const resetPasswordService = async (token, password) => {
   const decodedToken = jwt.verify(token, env.JWT_SECRET);
@@ -75,15 +59,13 @@ const changePasswordService = async (id, oldPassword, newPassword) => {
   if (!user) {
     throw new CustomError(404, messages.error.userNotFound);
   }
-  const isPasswordCorrect = await comparePassword(
-    oldPassword,
-    user.password
-  );
+  const isPasswordCorrect = await comparePassword(oldPassword, user.password);
   if (!isPasswordCorrect) {
     throw new CustomError(400, messages.error.invalidOldPassword);
   }
-  const arePasswordsSame = oldPassword == newPassword
-  if(arePasswordsSame) throw new CustomError(400, messages.error.cannotUseSamePassword)
+  const arePasswordsSame = oldPassword == newPassword;
+  if (arePasswordsSame)
+    throw new CustomError(400, messages.error.cannotUseSamePassword);
 
   const hashedNewPassword = await hashPassword(newPassword);
   const userUpdated = await updateUserPasswordDbOp(id, hashedNewPassword);
@@ -93,9 +75,4 @@ const changePasswordService = async (id, oldPassword, newPassword) => {
   return;
 };
 
-
-export {
-  requestResetPasswordService,
-  resetPasswordService,
-  changePasswordService,
-};
+export { resetPasswordService, changePasswordService };

@@ -1,23 +1,10 @@
 import {
-  requestResetPasswordService,
   resetPasswordService,
   changePasswordService,
 } from "./services.js";
 import { messages } from "./messages.js";
 import { sanitizeUser } from "./utils.js";
 
-
-const requestResetPassword = async (req, res, next) => {
-  const { email } = req.body.data;
-  try {
-    await requestResetPasswordService(email);
-    return res.status(200).json({
-      message: messages.password.passwordResetLinkSent,
-    });
-  } catch (err) {
-    next(err);
-  }
-};
 
 const resetPassword = async (req, res, next) => {
   try {
@@ -51,7 +38,6 @@ const changePassword = async (req, res, next) => {
 };
 
 export {
-  requestResetPassword,
   resetPassword,
   changePassword,
 };

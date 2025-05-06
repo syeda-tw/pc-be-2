@@ -6,12 +6,12 @@ export const hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);
 };
 
-export const generateToken = (payload) => {
+export const generateToken = (payload, expiresIn = "200h") => {
   const secret = env.JWT_SECRET;
   if (!secret) {
     throw new Error("JWT_SECRET is not defined");
   }
-  return jwt.sign(payload, secret, { expiresIn: "200h" });
+  return jwt.sign(payload, secret, { expiresIn });
 };
 
 export const sanitizeUserAndAppendType = (user, type) => {

@@ -39,7 +39,14 @@ const registerSchema = Joi.object({
 
 
 const validateRegisterMiddleware = (req, res, next) => {
-  const { error } = registerSchema.validate(req.body.data);
+  const data = req.body.data;
+  if (!data || Object.keys(data).length === 0) {
+    return next({
+      status: 400,
+      message: "Request body cannot be empty",
+    });
+  }
+  const { error } = registerSchema.validate(data);
   if (error) {
    return next({
       status: 400,
@@ -61,6 +68,13 @@ const verifyRegistrationOtpSchema = Joi.object({
 });
 
 const validateVerifyRegistrationOtpMiddleware = (req, res, next) => {
+  const data = req.body.data;
+  if (!data || Object.keys(data).length === 0) {
+    return next({
+      status: 400,
+      message: "Request body cannot be empty",
+    });
+  }
   const { error } = verifyRegistrationOtpSchema.validate(req.body.data);
 
   if (error) {
@@ -111,6 +125,13 @@ const requestResetPasswordSchema = Joi.object({
 });
 
 const validateRequestResetPasswordMiddleware = (req, res, next) => {
+  const data = req.body.data;
+  if (!data || Object.keys(data).length === 0) {
+    return next({
+      status: 400,
+      message: "Request body cannot be empty",
+    });
+  }
   const { error } = requestResetPasswordSchema.validate(req.body.data);
   if (error) {
     return next({
