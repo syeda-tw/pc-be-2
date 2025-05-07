@@ -1,7 +1,7 @@
 
 import User from "../../../../common/models/User.js";
 import OtpVerification from "../../../../common/models/OtpVerification.js";
-import Practice from "../../../../common/models/practice.js";
+import Practice from "../../../../common/models/Practice.js";
 import { sendWelcomeEmail } from "../utils.js";
 import { generateToken, sanitizeUserAndAppendType } from "../../../common/utils.js";
 

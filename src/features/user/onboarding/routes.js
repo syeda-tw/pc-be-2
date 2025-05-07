@@ -1,11 +1,4 @@
 import { secureRequestMiddleware } from "../../../common/middlewares/secureRequestMiddleware.js";
-import {
-  validateAddress,
-  autocompleteAddress,
-  validateUsername,
-  onboardingIndividualStep2,
-  onboardingCompanyStep2,
-} from "./controller.js";
 import express from "express";
 import {
   validateOnboardingStep1Middleware,
@@ -15,6 +8,13 @@ import {
   validateOnboardingCompanyStep2Middleware,
 } from "./middlewares.js";
 import { onboardingStep1Handler } from "./handlers/onboardingStep1Handler.js";
+import { validateAddressHandler } from "./handlers/validateAddressHandler.js";
+import { autocompleteAddressHandler } from "./handlers/autocompleteAddressHandler.js";
+import { validateUsernameHandler } from "./handlers/validateUsernameHandler.js";
+import { onboardingIndividualStep2Handler } from "./handlers/onboardingIndividualStep2Handler.js";
+import { onboardingCompanyStep2Handler } from "./handlers/onboardingCompanyStep2Handler.js";
+
+
 const router = express.Router();
 
 router.post(
@@ -23,39 +23,40 @@ router.post(
   secureRequestMiddleware,
   onboardingStep1Handler
 );
+
 router.post(
   "/validate-address",
   validateAddressMiddleware,
   secureRequestMiddleware,
-  validateAddress
+  validateAddressHandler
 );
 
 router.post(
   "/autocomplete-address",
   validateAddressMiddleware,
   secureRequestMiddleware,
-  autocompleteAddress
+  autocompleteAddressHandler
 );
 
 router.post(
   "/validate-username",
   validateUsernameMiddleware,
   secureRequestMiddleware,
-  validateUsername
+  validateUsernameHandler
 );
 
 router.post(
   "/onboarding-individual-step-2",
   validateOnboardingIndividualStep2Middleware,
   secureRequestMiddleware,
-  onboardingIndividualStep2
+  onboardingIndividualStep2Handler
 );
 
 router.post(
   "/onboarding-company-step-2",
   validateOnboardingCompanyStep2Middleware,
   secureRequestMiddleware,
-  onboardingCompanyStep2
+  onboardingCompanyStep2Handler
 );
 
 export default router;

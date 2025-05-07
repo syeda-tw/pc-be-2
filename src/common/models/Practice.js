@@ -10,9 +10,9 @@ const AddressSchema = new Schema({
 });
 
 const PracticeSchema = new Schema({
-  _id: { type: Schema.Types.ObjectId, required: true, auto: true },
-  business_name: { type: String },
-  is_company: { type: Boolean },
+  id: { type: Schema.Types.ObjectId, required: true, auto: true },
+  businessName: { type: String },
+  isCompany: { type: Boolean },
   website: { type: String },
   addresses: { type: [AddressSchema], default: [] },
   members: { type: [String], default: [] },
