@@ -13,7 +13,7 @@
  *     description: Retrieve all intake forms associated with the authenticated user
  *     tags: [Intake Forms]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: List of intake forms retrieved successfully
@@ -57,7 +57,7 @@
  *     description: Retrieve a specific intake form by ID and download it as a PDF
  *     tags: [Intake Forms]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -110,7 +110,7 @@
  *     description: Upload a new intake form PDF file
  *     tags: [Intake Forms]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -178,7 +178,7 @@
  *     description: Delete a specific intake form by ID
  *     tags: [Intake Forms]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

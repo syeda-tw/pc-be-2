@@ -12,7 +12,7 @@
  *     summary: Complete onboarding step 1
  *     tags: [Onboarding]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -90,7 +90,7 @@
  *     summary: Complete onboarding step 2
  *     tags: [Onboarding]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -153,7 +153,7 @@
  *     summary: Complete onboarding step 3
  *     tags: [Onboarding]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Onboarding Step 3 completed successfully

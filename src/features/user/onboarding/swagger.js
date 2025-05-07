@@ -13,7 +13,7 @@
  *     description: Update user's personal information and set status to onboarding-step-2
  *     tags: [Onboarding]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -125,7 +125,7 @@
  *     description: Validate an address using Google's address validation service
  *     tags: [Onboarding]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -190,7 +190,7 @@
  *     description: Get address suggestions using Google's address autocomplete service
  *     tags: [Onboarding]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -258,7 +258,7 @@
  *     description: Check if a username is available
  *     tags: [Onboarding]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -323,7 +323,7 @@
  *     description: Create a practice for an individual user and complete onboarding
  *     tags: [Onboarding]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -398,7 +398,7 @@
  *     description: Create a practice for a company and complete onboarding
  *     tags: [Onboarding]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

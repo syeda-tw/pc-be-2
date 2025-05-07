@@ -13,7 +13,7 @@
  *     description: Update user's personal information
  *     tags: [Profile Settings]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -127,7 +127,7 @@
  *     description: Retrieve the user's current timezone setting
  *     tags: [Profile Settings]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Timezone retrieved successfully
@@ -159,7 +159,7 @@
  *     description: Update the user's timezone setting
  *     tags: [Profile Settings]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -233,7 +233,7 @@
  *     description: Retrieve all holidays set by the user
  *     tags: [Profile Settings]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Holidays retrieved successfully
@@ -287,7 +287,7 @@
  *     description: Add a new holiday to the user's schedule
  *     tags: [Profile Settings]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -389,7 +389,7 @@
  *     description: Remove a holiday from the user's schedule
  *     tags: [Profile Settings]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     parameters:
  *       - in: path
  *         name: holidayId
@@ -434,7 +434,7 @@
  *     description: Retrieve the user's daily lunch break times
  *     tags: [Profile Settings]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Daily lunch times retrieved successfully
@@ -480,7 +480,7 @@
  *     description: Update the user's daily lunch break times
  *     tags: [Profile Settings]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -563,7 +563,7 @@
  *     description: Retrieve the user's weekly schedule
  *     tags: [Profile Settings]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Weekly schedule retrieved successfully
@@ -618,7 +618,7 @@
  *     description: Update the user's weekly schedule
  *     tags: [Profile Settings]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

@@ -286,7 +286,7 @@
  *     description: Change user's password while logged in
  *     tags: [Authentication]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -344,7 +344,7 @@
  *     description: Verify the validity of a user's JWT token.
  *     tags: [Authentication]
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

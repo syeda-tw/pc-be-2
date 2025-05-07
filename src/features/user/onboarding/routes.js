@@ -1,6 +1,5 @@
 import { secureRequestMiddleware } from "../../../common/middlewares/secureRequestMiddleware.js";
 import {
-  onboardingStep1,
   validateAddress,
   autocompleteAddress,
   validateUsername,
@@ -15,13 +14,14 @@ import {
   validateOnboardingIndividualStep2Middleware,
   validateOnboardingCompanyStep2Middleware,
 } from "./middlewares.js";
+import { onboardingStep1Handler } from "./handlers/onboardingStep1Handler.js";
 const router = express.Router();
 
 router.post(
   "/onboarding-step-1",
   validateOnboardingStep1Middleware,
   secureRequestMiddleware,
-  onboardingStep1
+  onboardingStep1Handler
 );
 router.post(
   "/validate-address",
