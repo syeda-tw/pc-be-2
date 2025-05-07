@@ -5,7 +5,7 @@ import {
   autocompleteAddress,
   validateUsername,
   onboardingIndividualStep2,
-  onboardingCompanyStep2
+  onboardingCompanyStep2,
 } from "./controller.js";
 import express from "express";
 import {
@@ -13,7 +13,7 @@ import {
   validateAddressMiddleware,
   validateUsernameMiddleware,
   validateOnboardingIndividualStep2Middleware,
-  validateOnboardingCompanyStep2Middleware
+  validateOnboardingCompanyStep2Middleware,
 } from "./middlewares.js";
 const router = express.Router();
 
@@ -37,10 +37,12 @@ router.post(
   autocompleteAddress
 );
 
-router.post("/validate-username",
+router.post(
+  "/validate-username",
   validateUsernameMiddleware,
   secureRequestMiddleware,
-  validateUsername);
+  validateUsername
+);
 
 router.post(
   "/onboarding-individual-step-2",

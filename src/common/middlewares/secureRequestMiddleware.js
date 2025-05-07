@@ -1,4 +1,3 @@
-//TODO: Remove this middleware from here as it is used in many places but is related to requests side, not configuration side of the app
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
 
