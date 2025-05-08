@@ -15,4 +15,5 @@ export const env = {
   NODEMAILER_EMAIL: process.env.NODEMAILER_EMAIL || '',
   NODEMAILER_PASSWORD: process.env.NODEMAILER_PASSWORD || '',
   STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || '',
+  GOOGLE_MAPS_API_KEY: process.env.GOOGLE_MAPS_API_KEY || '',
 };
