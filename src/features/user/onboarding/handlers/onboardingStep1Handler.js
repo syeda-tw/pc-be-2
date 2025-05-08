@@ -2,9 +2,10 @@ import User from "../../../../common/models/User.js";
 import { sanitizeUserAndAppendType } from '../../../common/utils.js';
 
 const messages = {
-  userNotFound: "User not found",
-  usernameAlreadyExists: "Username already exists",
-  errorUpdatingUser: "Error updating user",
+  userNotFound: "We couldn't find your account. Please check your details and try again.",
+  usernameAlreadyExists: "This username is already taken. Please choose a different one.",
+  errorUpdatingUser: "We encountered an issue while updating your information. Please try again.",
+  invalidUserStatus: "It seems like you're not on the correct onboarding step. Let's get you back on track.",
 };
 
 const onboardingStep1Service = async (
@@ -26,6 +27,12 @@ const onboardingStep1Service = async (
       throw {
         status: 400,
         message: messages.userNotFound,
+      };
+    }
+    if (user.status !== "onboarding-step-1") {
+      throw {
+        status: 400,
+        message: messages.invalidUserStatus,
       };
     }
     const usernameExists = await User.findOne({ username });
@@ -57,7 +64,7 @@ const onboardingStep1Service = async (
   } catch (error) {
     throw {
       status: 500,
-      message: error.errorUpdatingUser,
+      message: error.message || messages.errorUpdatingUser,
     };
   }
 };
