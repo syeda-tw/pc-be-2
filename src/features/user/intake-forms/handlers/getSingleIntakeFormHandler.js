@@ -1,4 +1,4 @@
-import { S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
   import { env } from '../../../../common/config/env.js';
   import User from '../../../../common/models/User.js';
 
@@ -57,6 +57,8 @@ const getSingleIntakeFormService = async (formId, userId) => {
       };
 
       s3Object = await s3Client.send(new GetObjectCommand(s3Params));
+      console.log(s3Object);
+      console.log(user.firstName);
 
       if (!s3Object.Body) {
         throw({

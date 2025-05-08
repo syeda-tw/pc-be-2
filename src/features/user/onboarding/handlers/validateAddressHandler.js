@@ -101,7 +101,7 @@ export async function googleValidateAddress(address) {
 
 export const validateAddressHandler = async (req, res, next) => {
   try {
-    const data = await googleValidateAddress(req.body.data.address);
+    const data = await googleValidateAddress(req.body.address);
     return res.status(200).json(data);
   } catch (err) {
     next(err);

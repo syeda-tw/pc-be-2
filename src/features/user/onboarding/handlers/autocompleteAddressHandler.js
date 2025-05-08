@@ -25,7 +25,7 @@ const googleAutocompleteAddress = async (address) => {
 }
 export const autocompleteAddressHandler = async (req, res, next) => {
   try {
-    const data = await googleAutocompleteAddress(req.body.data.address);
+    const data = await googleAutocompleteAddress(req.body.address);
     return res.status(200).json(data);
   } catch (err) {
     next(err);

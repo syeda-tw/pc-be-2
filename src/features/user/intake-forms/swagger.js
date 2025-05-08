@@ -36,7 +36,7 @@
  *                       created_at:
  *                         type: string
  *                         format: date-time
- *                       s3_url:
+ *                       s3Url:
  *                         type: string
  *       500:
  *         description: Internal server error
@@ -148,7 +148,7 @@
  *                     created_at:
  *                       type: string
  *                       format: date-time
- *                     s3_url:
+ *                     s3Url:
  *                       type: string
  *       400:
  *         description: Invalid input

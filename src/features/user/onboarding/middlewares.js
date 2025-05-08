@@ -46,7 +46,7 @@ export const validateOnboardingStep1Middleware = (req, res, next) => {
       "string.alphanum": messages["string.alphanum"],
     }),
   });
-  const { error } = schema.validate(req.body.data);
+  const { error } = schema.validate(req.body);
   if (error) {
     return next({
       status: 400,
@@ -64,7 +64,7 @@ export const validateAddressMiddleware = (req, res, next) => {
       "string.min": messages["string.min"],
     }),
   });
-  const { error } = schema.validate(req.body.data);
+  const { error } = schema.validate(req.body);
   if (error) {
     return next({
       status: 400,
@@ -83,7 +83,7 @@ export const validateUsernameMiddleware = (req, res, next) => {
       "string.min": messages["string.min"],
     }),
   });
-  const { error } = schema.validate(req.body.data);
+  const { error } = schema.validate(req.body);
   if (error) {
     return next({
       status: 400,
@@ -107,7 +107,7 @@ export const validateOnboardingIndividualStep2Middleware = (req, res, next) => {
       "string.max": messages["string.max"],
     }),
   });
-  const { error } = schema.validate(req.body.data);
+  const { error } = schema.validate(req.body);
   if (error) {
     return next({
       status: 400,
@@ -136,7 +136,7 @@ export const validateOnboardingCompanyStep2Middleware = (req, res, next) => {
       "array.min": messages["array.min"],
     }),
   });
-  const { error } = schema.validate(req.body.data);
+  const { error } = schema.validate(req.body);
   if (error) {
     return next({
       status: 400,

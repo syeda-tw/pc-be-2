@@ -4,11 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 import User from '../../../../common/models/User.js';
 
 const messages = {
-  invalidFileContent: "Invalid file content",
-  failedToUploadFileToS3: "Failed to upload file to S3",
-  failedToUpdateUserWithFormDetails: "Failed to update user with form details",
+  invalidFileContent: "The file content is invalid. Please provide a valid file.",
+  failedToUploadFileToS3: "There was an error uploading the file to S3. Please try again later.",
+  failedToUpdateUserWithFormDetails: "We couldn't update the user with the form details. Please try again.",
+  userNotFound: "We couldn't find the user. Please check the user ID and try again.",
+  formUploadSuccess: "The form was successfully uploaded and saved.",
 };
-
 
 const s3Client = new S3Client({
   region: env.AWS_REGION,
@@ -55,7 +56,7 @@ const createIntakeFormService = async (id, file, formName) => {
       _id: uuidv4(),
       name: formName,
       created_at: new Date(),
-      s3_url: fileUrl,
+      s3Url: fileUrl,
     };
 
     try {
@@ -76,7 +77,7 @@ const createIntakeFormService = async (id, file, formName) => {
         formDetails._id = uuidv4();
       }
 
-      await findByIdAndUpdate(userId, {
+      await User.findByIdAndUpdate(userId, {
         forms: [...user.forms, formDetails],
       });
 
@@ -98,17 +99,14 @@ const createIntakeFormService = async (id, file, formName) => {
 };
 
 export const createIntakeFormHandler = async (req, res, next) => {
-  return res.status(200).json({
-    message: "success",
-  });
   try {
     const form = await createIntakeFormService(
       req.id,
       req.file,
-      req.body.data.formName
+      req.body.formName
     );
     return res.status(200).json({
-      message: messages.intakeForms.createIntakeForm,
+      message: messages.formUploadSuccess,
       form,
     });
   } catch (err) {

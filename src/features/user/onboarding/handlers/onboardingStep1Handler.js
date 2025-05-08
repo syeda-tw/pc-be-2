@@ -72,7 +72,7 @@ const onboardingStep1Service = async (
 export const onboardingStep1Handler = async (req, res, next) => {
   try {
     const user = await onboardingStep1Service(
-      req.body.data,
+      req.body,
       req.id
     );
     return res.status(200).json({ user: sanitizeUserAndAppendType(user, "user") });

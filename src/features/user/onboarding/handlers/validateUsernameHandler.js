@@ -19,7 +19,7 @@ const validateUsernameService = async (username) => {
 export const validateUsernameHandler = async (req, res, next) => {
   try {
     await validateUsernameService(
-      req.body.data.username,
+      req.body.username,
     );
     return res.status(200).json({
       isValid: true,

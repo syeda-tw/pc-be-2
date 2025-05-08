@@ -21,45 +21,40 @@
  *           schema:
  *             type: object
  *             required:
- *               - data
+ *               - title
+ *               - pronouns
+ *               - gender
+ *               - dateOfBirth
+ *               - firstName
+ *               - lastName
+ *               - username
  *             properties:
- *               data:
- *                 type: object
- *                 required:
- *                   - title
- *                   - pronouns
- *                   - gender
- *                   - dateOfBirth
- *                   - firstName
- *                   - lastName
- *                   - username
- *                 properties:
- *                   title:
- *                     type: string
- *                     maxLength: 100
- *                   pronouns:
- *                     type: string
- *                     maxLength: 100
- *                   gender:
- *                     type: string
- *                     maxLength: 100
- *                   dateOfBirth:
- *                     type: string
- *                     format: date
- *                     description: Must be at least 18 years old
- *                   firstName:
- *                     type: string
- *                     maxLength: 100
- *                   lastName:
- *                     type: string
- *                     maxLength: 100
- *                   middleName:
- *                     type: string
- *                     maxLength: 100
- *                   username:
- *                     type: string
- *                     maxLength: 100
- *                     pattern: ^[a-zA-Z0-9]+$
+ *               title:
+ *                 type: string
+ *                 maxLength: 100
+ *               pronouns:
+ *                 type: string
+ *                 maxLength: 100
+ *               gender:
+ *                 type: string
+ *                 maxLength: 100
+ *               dateOfBirth:
+ *                 type: string
+ *                 format: date
+ *                 description: Must be at least 18 years old
+ *               firstName:
+ *                 type: string
+ *                 maxLength: 100
+ *               lastName:
+ *                 type: string
+ *                 maxLength: 100
+ *               middleName:
+ *                 type: string
+ *                 maxLength: 100
+ *               username:
+ *                 type: string
+ *                 maxLength: 100
+ *                 pattern: ^[a-zA-Z0-9]+$
  *     responses:
  *       200:
  *         description: User information updated successfully
@@ -133,17 +128,12 @@
  *           schema:
  *             type: object
  *             required:
- *               - data
+ *               - address
  *             properties:
- *               data:
- *                 type: object
- *                 required:
- *                   - address
- *                 properties:
- *                   address:
- *                     type: string
- *                     minLength: 1
- *                     maxLength: 255
+ *               address:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 255
  *     responses:
  *       200:
  *         description: Address validated successfully
@@ -198,17 +188,12 @@
  *           schema:
  *             type: object
  *             required:
- *               - data
+ *               - address
  *             properties:
- *               data:
- *                 type: object
- *                 required:
- *                   - address
- *                 properties:
- *                   address:
- *                     type: string
- *                     minLength: 1
- *                     maxLength: 255
+ *               address:
+ *                 type: string
+ *                 minLength: 1
+ *                 maxLength: 255
  *     responses:
  *       200:
  *         description: Address suggestions retrieved successfully
@@ -266,18 +251,13 @@
  *           schema:
  *             type: object
  *             required:
- *               - data
+ *               - username
  *             properties:
- *               data:
- *                 type: object
- *                 required:
- *                   - username
- *                 properties:
- *                   username:
- *                     type: string
- *                     minLength: 3
- *                     maxLength: 30
- *                     pattern: ^[a-zA-Z0-9]+$
+ *               username:
+ *                 type: string
+ *                 minLength: 3
+ *                 maxLength: 30
+ *                 pattern: ^[a-zA-Z0-9]+$
  *     responses:
  *       200:
  *         description: Username is available
@@ -331,23 +311,18 @@
  *           schema:
  *             type: object
  *             required:
- *               - data
+ *               - businessName
+ *               - address
  *             properties:
- *               data:
- *                 type: object
- *                 required:
- *                   - businessName
- *                   - address
- *                 properties:
- *                   businessName:
- *                     type: string
- *                     maxLength: 100
- *                   website:
- *                     type: string
- *                     maxLength: 255
- *                   address:
- *                     type: string
- *                     maxLength: 255
+ *               businessName:
+ *                 type: string
+ *                 maxLength: 100
+ *               website:
+ *                 type: string
+ *                 maxLength: 255
+ *               address:
+ *                 type: string
+ *                 maxLength: 255
  *     responses:
  *       200:
  *         description: Practice created and onboarding completed successfully
@@ -406,29 +381,24 @@
  *           schema:
  *             type: object
  *             required:
- *               - data
+ *               - businessName
+ *               - address
+ *               - members
  *             properties:
- *               data:
- *                 type: object
- *                 required:
- *                   - businessName
- *                   - address
- *                   - members
- *                 properties:
- *                   businessName:
- *                     type: string
- *                     maxLength: 100
- *                   website:
- *                     type: string
- *                     maxLength: 255
- *                   address:
- *                     type: string
- *                     maxLength: 255
- *                   members:
- *                     type: array
- *                     items:
- *                       type: string
- *                       format: email
+ *               businessName:
+ *                 type: string
+ *                 maxLength: 100
+ *               website:
+ *                 type: string
+ *                 maxLength: 255
+ *               address:
+ *                 type: string
+ *                 maxLength: 255
+ *               members:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: email
  *     responses:
  *       200:
  *         description: Practice created and onboarding completed successfully
