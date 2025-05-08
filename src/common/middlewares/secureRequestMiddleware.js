@@ -17,10 +17,9 @@ const secureRequestMiddleware = (req, res, next) => {
     if (!decoded?._id) {
       return res.status(401).json({ message: messages.error.invalidToken });
     }
-    req.body.decodedToken = decoded;
+    req.id = decoded._id;
     next();
   } catch (err) {
-    console.log("err", err);
     return res.status(401).json({ message: messages.error.invalidTokenFormat });
   }
 };

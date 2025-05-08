@@ -87,7 +87,7 @@ export const getSingleIntakeFormHandler = async (req, res, next) => {
   try {
     const {fileStream, form} = await getSingleIntakeFormService(
       req.params.id,
-      req.body.decodedToken._id
+      req.id
     );
     // Set headers for the PDF file
     res.setHeader("Content-Type", "application/pdf");

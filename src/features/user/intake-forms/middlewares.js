@@ -23,13 +23,14 @@ const validateGetSingleIntakeFormMiddleware = (req, res, next) => {
 };
 
 const createIntakeFormSchema = Joi.object({
-  form: Joi.object().required().messages({
+  formName: Joi.string().required().messages({
     "any.required": messages.invalidFormFormat,
+    "string.base": messages.invalidFormFormat,
   }),
 });
 
 const validateCreateIntakeFormMiddleware = (req, res, next) => {
-  const { error } = createIntakeFormSchema.validate(req.body.data);
+  const { error } = createIntakeFormSchema.validate(req.body);
   if (error) {
     return next({
       status: 400,

@@ -79,7 +79,7 @@ const deleteIntakeFormService = async (formId, userId) => {
 
 export const deleteIntakeFormHandler = async (req, res, next) => {
   try {
-    await deleteIntakeFormService(req.params.id, req.body.decodedToken._id);
+    await deleteIntakeFormService(req.params.id, req.id);
     return res.status(200).json({
       message: messages.intakeForms.deleteIntakeForm,
     });

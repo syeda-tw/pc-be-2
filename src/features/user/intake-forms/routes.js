@@ -6,11 +6,10 @@ import {
   validateDeleteIntakeFormMiddleware,
 } from "./middlewares.js";
 import multer from "multer";
-import { getAllIntakeFormsHandler } from './handlers/getAllIntakeFormsHandler.js';
-import { getSingleIntakeFormHandler } from './handlers/getSingleIntakeFormHandler.js';
-import { createIntakeFormHandler } from './handlers/createIntakeFormHandler.js';
-import { deleteIntakeFormHandler } from './handlers/deleteIntakeFormHandler.js';
-
+import { getAllIntakeFormsHandler } from "./handlers/getAllIntakeFormsHandler.js";
+import { getSingleIntakeFormHandler } from "./handlers/getSingleIntakeFormHandler.js";
+import { createIntakeFormHandler } from "./handlers/createIntakeFormHandler.js";
+import { deleteIntakeFormHandler } from "./handlers/deleteIntakeFormHandler.js";
 
 const router = express.Router();
 
@@ -30,9 +29,9 @@ router.get(
 // Create an intake form
 router.post(
   "/add",
-  validateCreateIntakeFormMiddleware,
-  upload.single("file"),
   secureRequestMiddleware,
+  upload.single("file"),
+  validateCreateIntakeFormMiddleware,
   createIntakeFormHandler
 );
 
@@ -45,4 +44,3 @@ router.delete(
 );
 
 export default router;
-  

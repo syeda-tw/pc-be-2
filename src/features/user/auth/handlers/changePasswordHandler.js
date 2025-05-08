@@ -12,7 +12,7 @@ const messages = {
   },
 };
 
-const changePasswordService = async (id, oldPassword, newPassword, next) => {
+const changePasswordService = async (id, oldPassword, newPassword) => {
   const user = await User.findById(id);
   if (!user) {
     throw {
@@ -57,10 +57,9 @@ const changePasswordService = async (id, oldPassword, newPassword, next) => {
 export const changePasswordHandler = async (req, res, next) => {
   try {
     await changePasswordService(
-      req.body.decodedToken._id,
-      req.body.data.oldPassword,
-      req.body.data.newPassword,
-      next
+      req.id,
+      req.body.oldPassword,
+      req.body.newPassword,
     );
     return res.status(200).json({
       message: messages.success.passwordChanged,

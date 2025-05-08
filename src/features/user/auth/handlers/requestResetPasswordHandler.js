@@ -23,7 +23,7 @@ const requestResetPasswordService = async (email) => {
 };
 
 export const requestResetPasswordHandler = async (req, res, next) => {
-  const { email } = req.body.data;
+  const { email } = req.body;
   try {
     await requestResetPasswordService(email);
     return res.status(200).json({

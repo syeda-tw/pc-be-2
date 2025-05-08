@@ -177,7 +177,7 @@ const createClientService = async (clientData, userId) => {
 
 export const createClientHandler = async (req, res, next) => {
     try {
-        const client = await createClientService(req.body.data, req.body.decodedToken._id);
+        const client = await createClientService(req.body.data, req.id);
         return res.status(201).json({
             data: {
                 first_name: client.first_name,

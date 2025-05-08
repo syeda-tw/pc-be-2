@@ -98,9 +98,12 @@ const createIntakeFormService = async (id, file, formName) => {
 };
 
 export const createIntakeFormHandler = async (req, res, next) => {
+  return res.status(200).json({
+    message: "success",
+  });
   try {
     const form = await createIntakeFormService(
-      req.body.decodedToken._id,
+      req.id,
       req.file,
       req.body.data.formName
     );

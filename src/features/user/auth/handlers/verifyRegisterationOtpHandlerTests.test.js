@@ -29,7 +29,7 @@ describe("Verify Registration OTP", () => {
 
         const res = await request(app)
             .post("/user/auth/verify-registration-otp")
-            .send({ data: { email, otp } });
+            .send({email, otp  });
 
         expect(res.statusCode).toBe(200);
         expect(await User.findOne({ email })).not.toBeNull();
@@ -41,7 +41,7 @@ describe("Verify Registration OTP", () => {
 
         const res = await request(app)
             .post("/user/auth/verify-registration-otp")
-            .send({ data: { email, otp: "99999" } });
+            .send({email, otp: "99999"  });
 
         expect(res.statusCode).toBeGreaterThanOrEqual(400);
     }, 10000);
@@ -52,7 +52,7 @@ describe("Verify Registration OTP", () => {
         await new Promise(resolve => setTimeout(resolve, 5000)); // Wait for 30 seconds
         const res = await request(app)
             .post("/user/auth/verify-registration-otp")
-            .send({ data: { email, otp: "22222" } });
+            .send({email, otp: "22222"  });
 
         expect(res.statusCode).toBeGreaterThanOrEqual(400);
     }, 100000);
@@ -60,7 +60,7 @@ describe("Verify Registration OTP", () => {
     it("rejects missing fields", async () => {
         const res = await request(app)
             .post("/user/auth/verify-registration-otp")
-            .send({ data: {} });
+            .send({ data: { });
 
         expect(res.statusCode).toBeGreaterThanOrEqual(400);
     }, 10000);

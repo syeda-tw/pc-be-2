@@ -20,7 +20,7 @@ const getAllIntakeFormsService = async (id) => {
 //return object is data: {email} and message: "OTP sent to the email address"
 export const getAllIntakeFormsHandler = async (req, res, next) => {
   try {
-    const forms = await getAllIntakeFormsService(req.body.decodedToken._id);
+    const forms = await getAllIntakeFormsService(req.id);
     return res.status(200).json({
       message: messages.getAllIntakeFormsSuccess,
       forms,

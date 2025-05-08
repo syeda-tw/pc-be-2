@@ -60,7 +60,7 @@ const verifyRegistrationOtpService = async (email, otp) => {
 
 export const verifyRegistrationOtpHandler = async (req, res, next) => {
     try {
-        const { email, otp } = req.body.data;
+        const { email, otp } = req.body;
         const { user, token } = await verifyRegistrationOtpService(email, otp);
         return res.status(200).json({
             user: sanitizeUserAndAppendType(user, "user"),

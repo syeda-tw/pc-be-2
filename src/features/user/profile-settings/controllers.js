@@ -6,7 +6,7 @@ const updatePersonalInformation = async (req, res, next) => {
   try {
     const user = await updatePersonalInformationService(
       req.body.data,
-      req.body.decodedToken._id
+      req.id
     );
     return res.status(200).json({
       user: sanitizeUser(user),
@@ -19,7 +19,7 @@ const updatePersonalInformation = async (req, res, next) => {
 
 const getTimezone = async (req, res, next) => {
   try {
-    const timezone = await getTimezoneService(req.body.decodedToken._id);
+    const timezone = await getTimezoneService(req.id);
     return res.status(200).json({
       timezone: timezone,
       message: messages.timezone.fetched
@@ -31,7 +31,7 @@ const getTimezone = async (req, res, next) => {
 
 const updateTimezone = async (req, res, next) => {
   try {
-    await updateTimezoneService(req.body.timezone, req.body.decodedToken._id);
+    await updateTimezoneService(req.body.timezone, req.id);
     return res.status(200).json({
       message: messages.timezone.updated
     });
@@ -42,7 +42,7 @@ const updateTimezone = async (req, res, next) => {
 
 const getHolidays = async (req, res, next) => {
   try {
-    const holidays = await getHolidaysService(req.body.decodedToken._id);
+    const holidays = await getHolidaysService(req.id);
     return res.status(200).json({
       holidays: holidays,
       message: messages.holiday.fetched
@@ -54,7 +54,7 @@ const getHolidays = async (req, res, next) => {
 
 const addHoliday = async (req, res, next) => {
   try {
-    const holiday = await addHolidayService(req.body.holiday, req.body.decodedToken._id);
+    const holiday = await addHolidayService(req.body.holiday, req.id);
       return res.status(200).json({
       holiday: holiday,
       message: messages.holiday.updated
@@ -66,7 +66,7 @@ const addHoliday = async (req, res, next) => {
 
 const deleteHoliday = async (req, res, next) => {
   try {
-    await deleteHolidayService(req.params.holidayId, req.body.decodedToken._id);
+    await deleteHolidayService(req.params.holidayId, req.id);
     return res.status(200).json({
       message: messages.holiday.deleted
     });
@@ -77,7 +77,7 @@ const deleteHoliday = async (req, res, next) => {
 
 const getDailyLunch = async (req, res, next) => {
   try {
-    const lunchTimes = await getDailyLunchService(req.body.decodedToken._id);
+    const lunchTimes = await getDailyLunchService(req.id);
     return res.status(200).json({
       data: lunchTimes,
       message: messages.lunch.retrieved
@@ -91,7 +91,7 @@ const updateDailyLunch = async (req, res, next) => {
   try {
     const { startTime, endTime } = req.body.data;
     const updatedLunchTimes = await updateDailyLunchService(
-      req.body.decodedToken._id,
+      req.id,
       startTime,
       endTime
     );
@@ -107,7 +107,7 @@ const updateDailyLunch = async (req, res, next) => {
 
 const getWeeklySchedule = async (req, res, next) => {
   try {
-    const userId = req.body.decodedToken._id;
+    const userId = req.id;
     const weeklySchedule = await getWeeklyScheduleService(userId);
     
     return res.status(200).json({
@@ -121,7 +121,7 @@ const getWeeklySchedule = async (req, res, next) => {
 
 const updateWeeklySchedule = async (req, res, next) => {
   try {
-    const userId = req.body.decodedToken._id;
+    const userId = req.id;
     const weeklyScheduleData = req.body.data;
     const updatedWeeklySchedule = await updateWeeklyScheduleService(userId, weeklyScheduleData);
     

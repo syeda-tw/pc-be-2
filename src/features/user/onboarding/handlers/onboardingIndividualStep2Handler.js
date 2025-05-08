@@ -94,7 +94,7 @@ export const onboardingIndividualStep2Handler = async (req, res, next) => {
   try {
     const user = await onboardingIndividualStep2Service(
       req.body.data,
-      req.body.decodedToken._id
+      req.id
     );
     return res.status(200).json({   
       user: sanitizeUserAndAppendType(user, "user"),

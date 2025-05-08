@@ -19,23 +19,18 @@
  *           schema:
  *             type: object
  *             required:
- *               - data
+ *               - email
+ *               - password
  *             properties:
- *               data:
- *                 type: object
- *                 required:
- *                   - email
- *                   - password
- *                 properties:
- *                   email:
- *                     type: string
- *                     format: email
- *                     description: The user's email address
- *                   password:
- *                     type: string
- *                     minLength: 8
- *                     maxLength: 20
- *                     description: The user's password
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The user's email address
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *                 maxLength: 20
+ *                 description: The user's password
  *     responses:
  *       200:
  *         description: OTP sent successfully
@@ -76,22 +71,17 @@
  *           schema:
  *             type: object
  *             required:
- *               - data
+ *               - email
+ *               - otp
  *             properties:
- *               data:
- *                 type: object
- *                 required:
- *                   - email
- *                   - otp
- *                 properties:
- *                   email:
- *                     type: string
- *                     format: email
- *                     description: The user's email address
- *                   otp:
- *                     type: string
- *                     length: 5
- *                     description: The 5-digit OTP sent to the email
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The user's email address
+ *               otp:
+ *                 type: string
+ *                 length: 5
+ *                 description: The 5-digit OTP sent to the email
  *     responses:
  *       200:
  *         description: OTP verified successfully
@@ -135,21 +125,16 @@
  *           schema:
  *             type: object
  *             required:
- *               - data
+ *               - email
+ *               - password
  *             properties:
- *               data:
- *                 type: object
- *                 required:
- *                   - email
- *                   - password
- *                 properties:
- *                   email:
- *                     type: string
- *                     format: email
- *                     description: The user's email address
- *                   password:
- *                     type: string
- *                     description: The user's password
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The user's email address
+ *               password:
+ *                 type: string
+ *                 description: The user's password
  *     responses:
  *       200:
  *         description: Login successful
@@ -193,17 +178,12 @@
  *           schema:
  *             type: object
  *             required:
- *               - data
+ *               - email
  *             properties:
- *               data:
- *                 type: object
- *                 required:
- *                   - email
- *                 properties:
- *                   email:
- *                     type: string
- *                     format: email
- *                     description: The user's email address
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: The user's email address
  *     responses:
  *       200:
  *         description: Reset password link sent successfully

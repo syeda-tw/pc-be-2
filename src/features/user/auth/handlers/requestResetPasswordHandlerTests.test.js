@@ -24,7 +24,7 @@ describe("POST /request-reset-password", () => {
   it("should require a valid email", async () => {
     const res = await request(app)
       .post("/user/auth/request-reset-password")
-      .send({ data: { email: "xyz" } });
+      .send({ email: "xyz"  });
     expect(res.statusCode).toBeGreaterThanOrEqual(400);
   });
 
@@ -32,7 +32,7 @@ describe("POST /request-reset-password", () => {
   it("should return error if user does not exist", async () => {
     const res = await request(app)
       .post("/user/auth/request-reset-password")
-      .send({ data: { email: "nouser@example.com" } });
+      .send({ email: "nouser@example.com"  });
     expect(res.statusCode).toBeGreaterThanOrEqual(400);
   });
 
@@ -43,7 +43,7 @@ describe("POST /request-reset-password", () => {
     }); // Assume pre-save hook hashes password
     const res = await request(app)
       .post("/user/auth/request-reset-password")
-      .send({ data: { email: "test@example.com" } });
+      .send({ email: "test@example.com"  });
     expect(res.statusCode).toBeGreaterThanOrEqual(200);
     expect(res.statusCode).toBeLessThan(300);
   }, 50000);

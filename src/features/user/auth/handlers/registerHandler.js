@@ -42,7 +42,7 @@ const registerService = async (email, password) => {
 
 
 export const registerHandler = async (req, res, next) => {
-    const { email, password } = req.body.data;
+    const { email, password } = req.body;
     try {
         await registerService(email, password);
         return res.status(200).json({

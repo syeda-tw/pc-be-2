@@ -45,7 +45,7 @@ describe("User Login", () => {
       await insertUser(data);
       const res = await request(app)
         .post("/user/auth/login")
-        .send({ data: { email: data.email, password: "WrongPass1!" } });
+        .send({  email: data.email, password: "WrongPass1!"  });
       expect(res.statusCode).toBeGreaterThanOrEqual(400);
     });
 

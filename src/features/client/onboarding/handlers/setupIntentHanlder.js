@@ -56,7 +56,7 @@ const createSetupIntent = async (userId) => {
 
 export default async (req, res) => {
     try {
-        const { setup_intent_id, client_secret, customer_id } = await createSetupIntent(req.body.decodedToken._id);
+        const { setup_intent_id, client_secret, customer_id } = await createSetupIntent(req.id);
         res.json({ setup_intent_id, client_secret, customer_id });
     } catch (error) {
         console.error("Error in getSetupIntent:", error);

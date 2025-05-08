@@ -85,7 +85,7 @@ const messages = {
 
 const getClientsHandler = async (req, res, next) => {
   try {
-    const data = await getUsersClientsByIdDbOp(req.body.decodedToken._id, req.query);
+    const data = await getUsersClientsByIdDbOp(req.id, req.query);
     return res.status(200).json({
       data,
       message: messages.clients.getSuccess

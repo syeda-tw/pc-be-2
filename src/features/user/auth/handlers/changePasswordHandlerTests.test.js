@@ -39,7 +39,7 @@ describe("POST /change-password", () => {
     const res = await request(app)
       .post("/user/auth/change-password")
       .set("Authorization", `Bearer ${token}`)
-      .send({ data: { newPassword: "NewPassword123!" } });
+      .send({ newPassword: "NewPassword123!" });
     expect(res.statusCode).toBeGreaterThanOrEqual(400);
   });
 
@@ -47,7 +47,7 @@ describe("POST /change-password", () => {
     const res = await request(app)
       .post("/user/auth/change-password")
       .set("Authorization", `Bearer ${token}`)
-      .send({ data: { oldPassword: "OldPassword123!" } });
+      .send({ oldPassword: "OldPassword123!" });
     expect(res.statusCode).toBeGreaterThanOrEqual(400);
   });
 
@@ -55,7 +55,7 @@ describe("POST /change-password", () => {
     const res = await request(app)
       .post("/user/auth/change-password")
       .set("Authorization", `Bearer ${token}`)
-      .send({ data: { oldPassword: "OldPassword123!", newPassword: "short" } });
+      .send({ oldPassword: "OldPassword123!", newPassword: "short" });
     expect(res.statusCode).toBeGreaterThanOrEqual(400);
   });
 

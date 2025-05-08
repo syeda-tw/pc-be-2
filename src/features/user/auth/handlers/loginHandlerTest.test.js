@@ -25,28 +25,28 @@ describe("POST /login", () => {
   it("should require email and password", async () => {
     const res = await request(app)
       .post("/user/auth/login")
-      .send({ data: { email: "test@example.com" } });
+      .send({ email: "test@example.com"  });
     expect(res.statusCode).toBeGreaterThanOrEqual(400);
   });
 
   it("should validate email format", async () => {
     const res = await request(app)
       .post("/user/auth/login")
-      .send({ data: { email: "invalid", password: "password123" } });
+      .send({ email: "invalid", password: "password123"  });
     expect(res.statusCode).toBeGreaterThanOrEqual(400);
   });
 
   it("should validate password presence", async () => {
     const res = await request(app)
       .post("/user/auth/login")
-      .send({ data: { email: "test@example.com" } });
+      .send({ email: "test@example.com"  });
     expect(res.statusCode).toBeGreaterThanOrEqual(400);
   });
 
   it("should return error if user does not exist", async () => {
     const res = await request(app)
       .post("/user/auth/login")
-      .send({ data: { email: "nouser@example.com", password: "password123" } });
+      .send({ email: "nouser@example.com", password: "password123"  });
     expect(res.statusCode).toBeGreaterThanOrEqual(401);
   });
 
@@ -56,7 +56,7 @@ describe("POST /login", () => {
     const res = await request(app)
       .post("/user/auth/login")
       .send({
-        data: { email: "test@example.com", password: "Password123!!!" },
+        email: "test@example.com", password: "Password123!!!" },
       });
     expect(res.statusCode).toBeGreaterThanOrEqual(400);
   });
@@ -70,7 +70,7 @@ describe("POST /login", () => {
     }); // Assume pre-save hook hashes password
     const res = await request(app)
       .post("/user/auth/login")
-      .send({ data: { email: "test@example.com", password } });
+      .send({ email: "test@example.com", password  });
     expect(res.statusCode).toBeGreaterThanOrEqual(200);
     expect(res.statusCode).toBeLessThan(300);
     expect(res.body).toHaveProperty("token");

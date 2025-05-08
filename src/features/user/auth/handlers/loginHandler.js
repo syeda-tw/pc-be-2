@@ -33,7 +33,7 @@ const loginService = async (email, password) => {
 };
 
 export const loginHandler = async (req, res, next) => {
-  const { email, password } = req?.body?.data;
+  const { email, password } = req?.body;
   try {
     const { user, token } = await loginService(email, password);
     return res.status(200).json({
