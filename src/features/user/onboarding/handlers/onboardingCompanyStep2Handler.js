@@ -12,6 +12,7 @@ const messages = {
   invalidUserStatus: "It seems the user status isn't set to onboarding-step-2. Let's fix that.",
   memberAlreadyExists: "It looks like some members are already registered. Please review the list.",
   memberIsUser: "A member cannot be the user themselves. Please adjust the member list.",
+  memberIsOtp: "A member cannot be an OTP verification email. Please adjust the member list.",
 };
 
 const onboardingCompanyStep2Service = async (data, id) => {
@@ -21,22 +22,48 @@ const onboardingCompanyStep2Service = async (data, id) => {
     throw({
       status: 400,
       message: messages.userNotFound,
-    })
+    });
   }
+
+  if (user.status !== "onboarding-step-2") {
+    throw({
+      status: 400,
+      message: messages.invalidUserStatus,
+    });
+  }
+
+  // Ensure the user cannot add their own email as a member
+  const filteredMembers = members.filter(member => {
+    if (member === user.email) {
+      throw({
+        status: 400,
+        message: messages.memberIsUser,
+      });
+    }
+    if (member.includes("otp")) {
+      throw({
+        status: 400,
+        message: messages.memberIsOtp,
+      });
+    }
+    return true;
+  });
+
   try {
     const isAddressValid = await googleValidateAddress(address);
     if (isAddressValid.isValid === false) {
       throw({
         status: 400,
         message: isAddressValid.message,
-      })
+      });
     }
   } catch (error) {
     throw({
       status: 400,
       message: messages.invalidAddress,
-    })
+    });
   }
+
   let addressParts;
   try {
     addressParts = await extractAddressPartsFromGoogle(address);
@@ -44,20 +71,20 @@ const onboardingCompanyStep2Service = async (data, id) => {
     throw({
       status: 400,
       message: messages.invalidAddress,
-    })
+    });
   }
 
   let practice;
   try {
     practice = await Practice.create({
-      members: members,
+      members: filteredMembers,
       businessName: businessName,
       website: website,
       addresses: [
         {
-        street: addressParts.street,
-        city: addressParts.city,
-        state: addressParts.state,
+          street: addressParts.street,
+          city: addressParts.city,
+          state: addressParts.state,
           zip: addressParts.zip,
         }
       ],
@@ -67,7 +94,7 @@ const onboardingCompanyStep2Service = async (data, id) => {
     throw({
       status: 400,
       message: messages.practiceCreationFailed,
-    })
+    });
   }
 
   user.practice = practice._id;
@@ -80,7 +107,7 @@ const onboardingCompanyStep2Service = async (data, id) => {
     throw({
       status: 400,
       message: messages.practiceCreationFailed,
-    })
+    });
   }
 };
 
