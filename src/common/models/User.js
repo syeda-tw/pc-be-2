@@ -89,6 +89,12 @@ const UserSchema = new Schema(
     forms: {
       type: [{ _id: String, name: String, createdAt: Date, s3Url: String }],
       default: [],
+      validate: {
+        validator: function (val) {
+          return val.length <= 10;
+        },
+        message: "User can only have up to 10 intake forms",
+      },
     },
     clients: {
       type: [
