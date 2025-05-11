@@ -12,18 +12,18 @@ export const findUserByIdDbOp = async (id) => {
   
 
 export const updateUserPersonalInformation = async (userId, data) => {
-  const { first_name, last_name, middle_name, pronouns, gender, phone, date_of_birth } = data;
+  const { firstName, lastName, middleName, pronouns, gender, phone, dateOfBirth } = data;
   
   const user = await User.findByIdAndUpdate(
     userId,
     {
-      first_name,
-      last_name,
-      middle_name,
+      firstName,
+      lastName,
+      middleName,
       pronouns,
       gender,
       phone,
-      date_of_birth
+      dateOfBirth
     },
     { new: true }
   );

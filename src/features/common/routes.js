@@ -1,6 +1,6 @@
 import express from "express";
 import User from "../../common/models/User.js";
-import Client from "../../common/models/client.js";
+import Client from "../../common/models/Client.js";
 import { secureRequestMiddleware } from "../../common/middlewares/secureRequestMiddleware.js";
 import { sanitizeUserAndAppendType } from "./utils.js";
 

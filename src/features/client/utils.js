@@ -3,24 +3,24 @@ export const sanitizeClient = (user) => {
     try {
       const userObject = user?.toObject({ versionKey: false });
       const {
-        first_name,
-        last_name,
-        middle_name,
+        firstName,
+        lastName,
+        middleName,
         pronouns,
         gender,
-        date_of_birth,
+        dateOfBirth,
         users
       } = userObject;
 
       // Return an object containing only the specified fields
       return {
         type: "client",
-        first_name,
-        last_name,
-        middle_name,
+        firstName,
+        lastName,
+        middleName,
         pronouns,
         gender,
-        date_of_birth,
+        dateOfBirth,
         users
       };
     } catch (err) {

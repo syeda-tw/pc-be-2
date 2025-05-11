@@ -41,7 +41,7 @@ const getUsersHandler = async (req, res) => {
         const populatedUsers = await Promise.all(
             paginatedUsers.map(async (userObj) => {
                 const user = await User.findById(userObj.user.toString())
-                    .select('first_name username last_name title practice')
+                    .select('firstName username lastName title practice')
                     .populate({ path: 'practice', select: 'name' })
                     .lean();
                 return {
@@ -49,8 +49,8 @@ const getUsersHandler = async (req, res) => {
                     userId: userObj.user.toString(),
                     user: user ? {
                         _id: user._id,
-                        first_name: user.first_name,
-                        last_name: user.last_name,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
                         title: user.title,
                         username: user.username,
                         practice: user.practice ? {

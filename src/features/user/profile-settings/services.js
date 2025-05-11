@@ -115,16 +115,16 @@ export const getProfileService = async (username) => {
     throw new CustomError(messages.error.userNotFound, 404);
   }
   const profile = {
-    first_name: user.first_name,
-    last_name: user.last_name,
+    firstName: user.firstName,
+    lastName: user.lastName,
     phone: user.phone,
     gender: user.gender,
     title: user.title,
     timezone: user.timezone,
     pronouns: user.pronouns,
-    weekly_schedule: user.availability.weekly_schedule,
+    weeklySchedule: user.availability.weeklySchedule,
     holidays: user.holidays,
-    daily_lunch: user.availability.daily_lunch,
+    dailyLunch: user.availability.dailyLunch,
     practice: user.practice,
   }
   return profile;

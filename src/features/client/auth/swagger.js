@@ -56,11 +56,11 @@
  *                       type: string
  *                     phone:
  *                       type: string
- *                     first_name:
+ *                     firstName:
  *                       type: string
- *                     last_name:
+ *                     lastName:
  *                       type: string
- *                     middle_name:
+ *                     middleName:
  *                       type: string
  *                     email:
  *                       type: string
@@ -136,11 +136,11 @@
  *                           type: string
  *                         phone:
  *                           type: string
- *                         first_name:
+ *                         firstName:
  *                           type: string
- *                         last_name:
+ *                         lastName:
  *                           type: string
- *                         middle_name:
+ *                         middleName:
  *                           type: string
  *                         email:
  *                           type: string

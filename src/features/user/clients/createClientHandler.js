@@ -23,7 +23,7 @@ const utils = {
     sendRegistrationCode: (user, code) => {
         return `Welcome to Practicare!
       
-      You've been invited by ${user.first_name} ${user.last_name} to join their network.
+      You've been invited by ${user.firstName} ${user.lastName} to join their network.
       
       Your registration code: ${code}
       
@@ -160,15 +160,15 @@ const createClientService = async (clientData, userId) => {
             //client is not invited nor on the platform - then we are inviting client to the platform
             const invitedClientData = {
                 phone: phoneNumber,
-                first_name: clientData.first_name,
-                last_name: clientData.last_name,
+                firstName: clientData.firstName,
+                lastName: clientData.lastName,
                 email: clientData.email,
-                registration_code: utils.generateRegistrationCode(),
-                users_who_have_invited: [userId],
+                registrationCode: utils.generateRegistrationCode(),
+                usersWhoHaveInvited: [userId],
             }
             const invitedClient = await dbOps.createInvitedClientDbOp(invitedClientData);
             // TODO: use message sending
-            console.log(utils.sendRegistrationCode(user, invitedClient.registration_code));
+            console.log(utils.sendRegistrationCode(user, invitedClient.registrationCode));
             await dbOps.updateUserWithInvitedClientDbOp(userId, invitedClient._id);
             return invitedClient;
         }
@@ -180,8 +180,8 @@ export const createClientHandler = async (req, res, next) => {
         const client = await createClientService(req.body.data, req.id);
         return res.status(201).json({
             data: {
-                first_name: client.first_name,
-                last_name: client.last_name,
+                firstName: client.firstName,
+                lastName: client.lastName,
                 email: client.email,
                 phone: client.phone,
                 type: "client",

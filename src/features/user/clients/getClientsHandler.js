@@ -7,7 +7,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
   const page = params.page ? parseInt(params.page, 10) : 1;
   const limit = params.limit ? Math.min(parseInt(params.limit, 10), 100) : 20;
   const skip = (page - 1) * limit;
-  const sortBy = typeof params.sortBy === 'string' ? params.sortBy : 'first_name';
+  const sortBy = typeof params.sortBy === 'string' ? params.sortBy : 'firstName';
   const sortOrder = params.sortOrder === 'desc' ? -1 : 1;
 
   try {
@@ -37,9 +37,9 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
 
     if (search) {
       clientFilter.$or = [
-        { first_name: { $regex: search, $options: 'i' } },
-        { last_name: { $regex: search, $options: 'i' } },
-        { middle_name: { $regex: search, $options: 'i' } },
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } },
+        { middleName: { $regex: search, $options: 'i' } },
         { phone: { $regex: search, $options: 'i' } },
         { email: { $regex: search, $options: 'i' } }
       ];
@@ -50,7 +50,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
         .sort({ [sortBy]: sortOrder })
         .skip(skip)
         .limit(limit)
-        .select('_id first_name last_name middle_name phone email')
+        .select('_id firstName lastName middleName phone email')
         .lean(),
       Client.countDocuments(clientFilter)
     ]);

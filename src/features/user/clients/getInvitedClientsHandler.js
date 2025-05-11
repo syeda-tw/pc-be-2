@@ -7,7 +7,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
   const page = params.page ? parseInt(params.page, 10) : 1;
   const limit = params.limit ? Math.min(parseInt(params.limit, 10), 100) : 20;
   const skip = (page - 1) * limit;
-  const sortBy = typeof params.sortBy === 'string' ? params.sortBy : 'first_name';
+  const sortBy = typeof params.sortBy === 'string' ? params.sortBy : 'firstName';
   const sortOrder = params.sortOrder === 'desc' ? 'desc' : 'asc'; // default to 'asc' unless explicitly 'desc'
 
   try {
@@ -16,14 +16,14 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       path: 'invited_clients',
       match: search ? {
         $or: [
-          { first_name: { $regex: search, $options: 'i' } },
-          { last_name: { $regex: search, $options: 'i' } },
-          { middle_name: { $regex: search, $options: 'i' } },
+          { firstName: { $regex: search, $options: 'i' } },
+          { lastName: { $regex: search, $options: 'i' } },
+          { middleName: { $regex: search, $options: 'i' } },
           { phone: { $regex: search, $options: 'i' } },
           { email: { $regex: search, $options: 'i' } }
         ]
       } : {},
-      select: '_id first_name last_name middle_name is_active phone email',
+      select: '_id firstName lastName middleName isActive phone email',
       options: {
         sort: { [sortBy]: sortOrder === 'desc' ? -1 : 1 },
         skip,
@@ -40,7 +40,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       { $match: { _id: new mongoose.Types.ObjectId(userId) } },
       {
         $lookup: {
-          from: 'invitedclients', // <-- correct
+          from: 'invitedclients',
           localField: 'invited_clients',
           foreignField: '_id',
           as: 'invitedClient'
@@ -50,9 +50,9 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       ...(search ? [{
         $match: {
           $or: [
-            { 'invitedClient.first_name': { $regex: search, $options: 'i' } },
-            { 'invitedClient.last_name': { $regex: search, $options: 'i' } },
-            { 'invitedClient.middle_name': { $regex: search, $options: 'i' } },
+            { 'invitedClient.firstName': { $regex: search, $options: 'i' } },
+            { 'invitedClient.lastName': { $regex: search, $options: 'i' } },
+            { 'invitedClient.middleName': { $regex: search, $options: 'i' } },
             { 'invitedClient.phone': { $regex: search, $options: 'i' } },
             { 'invitedClient.email': { $regex: search, $options: 'i' } }
           ]

@@ -4,11 +4,11 @@ import Joi from 'joi';
 export const createClientValidation = (req, res, next) => {
 
     const createClientSchema = Joi.object({
-        first_name: Joi.string().required().messages({
+        firstName: Joi.string().required().messages({
             'any.required': 'First name is required',
             'string.empty': 'First name is required'
         }),
-        last_name: Joi.string().required().messages({
+        lastName: Joi.string().required().messages({
             'any.required': 'Last name is required',
             'string.empty': 'Last name is required'
         }),

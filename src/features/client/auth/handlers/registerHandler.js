@@ -24,27 +24,27 @@ const createClientFromInvitation = async (phone, code, password) => {
         throw new CustomError(400, messages.error.clientNotFound);
     }
 
-    if (invitedClient.registration_code !== code) {
+    if (invitedClient.registrationCode !== code) {
         throw new CustomError(400, "Invalid registration code");
     }
 
     const clientData = {
         password: await hashPassword(password),
         phone,
-        first_name: invitedClient.first_name,
-        last_name: invitedClient.last_name,
-        middle_name: invitedClient.middle_name,
+        firstName: invitedClient.firstName,
+        lastName: invitedClient.lastName,
+        middleName: invitedClient.middleName,
         email: invitedClient.email,
-        users: invitedClient.users_who_have_invited.map(userId => ({ user: userId, status: "pending" }))
+        users: invitedClient.usersWhoHaveInvited.map(userId => ({ user: userId, status: "pending" }))
     };
 
     const client = new Client(clientData);
     await client.save();
 
-    for (const userId of invitedClient.users_who_have_invited) {
+    for (const userId of invitedClient.usersWhoHaveInvited) {
         const user = await User.findById(userId);
         if (user) {
-            user.invited_clients = user.invited_clients.filter(
+            user.invitedClients = user.invitedClients.filter(
                 invitedClientId => invitedClientId.toString() !== invitedClient._id.toString()
             );
             user.clients = [...user.clients, { client: client._id, status: "pending" }];

@@ -25,7 +25,7 @@ const createClientStripeCustomer = async (email) => {
 };
 
 const updateClientInformation = async (clientData, _id) => {
-    const { first_name, last_name, middle_name, pronouns, gender, email, date_of_birth } = clientData;
+    const { firstName, lastName, middleName, pronouns, gender, email, dateOfBirth } = clientData;
 
     // Find the client by ID
     const client = await Client.findById(_id);
@@ -43,15 +43,15 @@ const updateClientInformation = async (clientData, _id) => {
     const stripeCustomerId = await createClientStripeCustomer(email);
 
     // Update client information
-    client.first_name = first_name;
-    client.last_name = last_name;
-    client.middle_name = middle_name;
+    client.firstName = firstName;
+    client.lastName = lastName;
+    client.middleName = middleName;
     client.pronouns = pronouns;
     client.gender = gender;
     client.email = email;
-    client.date_of_birth = date_of_birth;
+    client.dateOfBirth = dateOfBirth;
     client.status = "onboarding-step-2";
-    client.stripe_customer_id = stripeCustomerId;
+    client.stripeCustomerId = stripeCustomerId;
     await client.save();
 
     return sanitizeClient(client);
