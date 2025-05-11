@@ -132,7 +132,7 @@ export const validateOnboardingCompanyStep2Middleware = (req, res, next) => {
     }),
     members: Joi.array().items(Joi.string().email().messages({
       "string.email": messages["string.email"],
-    })).required().messages({
+    })).required().min(0).messages({
       "array.min": messages["array.min"],
     }),
   });

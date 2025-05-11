@@ -101,7 +101,7 @@ const onboardingCompanyStep2Service = async (data, id) => {
   user.status = "onboarded";
 
   try {
-    const userUpdated = await User.findByIdAndUpdate(id, user);
+    const userUpdated = await User.findByIdAndUpdate(id, user, { new: true });
     return userUpdated.toObject();
   } catch (error) {
     throw({
