@@ -37,7 +37,7 @@ export const sendWelcomeEmail = async (user) => {
   const htmlContent = `
     <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4; border-radius: 8px;">
       <h2 style="text-align: center; color: #333;">Welcome to Practicare!</h2>
-      <p style="color: #333;">Hello ${user.first_name} ${user.last_name},</p>
+      <p style="color: #333;">Hello ${user.firstName} ${user.lastName},</p>
       <p style="color: #333;">We're excited to welcome you to Practicare! Our platform is designed to help you manage your mental health practice efficiently—whether it's scheduling appointments, organizing client records, or streamlining daily tasks.</p>
       <p style="color: #333;">With Practicare, you can focus more on your clients while we handle the rest.</p>
       <p style="color: #333;"><strong>Get started today:</strong></p>
@@ -60,23 +60,25 @@ export const sendWelcomeEmail = async (user) => {
 };
 
 export const sendPasswordResetEmail = async (email, resetLink) => {
-  await sendEmail(
-    email,
-    "Password Reset Request",
-    generateEmailHtml(
-      "Password Reset Request",
-      `Hello,
+  const subject = "Password Reset Request";
+  const htmlContent = `
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4; border-radius: 8px;">
+      <h2 style="text-align: center; color: #333;">Password Reset Request</h2>
+      <p style="color: #333;">Hello,</p>
+      <p style="color: #333;">We received a request to reset your password. Please use the following link to reset your password:</p>
+      <div style="text-align: center;">
+        <a href="${resetLink}" style="color: #007bff; font-size: 18px;">Reset Password</a>
+      </div>
+      <p style="color: #333;">This link is valid for the next 1 hour. If you did not request this, please ignore this email.</p>
+      <p style="color: #333;">Best regards,<br/>The Practicare Team</p>
+    </div>
+  `;
 
-      We received a request to reset your password. Please use the following link to reset your password:
-
-      <a href="${resetLink}">Reset Password</a>
-
-      This link is valid for the next 1 hour. If you did not request this, please ignore this email.
-
-      Best regards,
-      The Practicare Team`
-    )
-  );
+  try {
+    await sendEmail(email, subject, htmlContent);
+  } catch (err) {
+    throw new CustomError(400, "Error sending password reset email.");
+  }
 };
 
 export const generateOtpExpiration = () => {

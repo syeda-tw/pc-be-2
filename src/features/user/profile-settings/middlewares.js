@@ -29,7 +29,7 @@ const validateUpdatePersonalInformationMiddleware = (req, res, next) => {
   });
 
 
-  const { error } = schema.validate(req.body.data);
+  const { error } = schema.validate(req.body);
 
   if (error) {
     return res.status(400).json({
@@ -52,7 +52,7 @@ const validateUpdateTimezoneMiddleware = (req, res, next) => {
     })
   });
 
-  const { error } = schema.validate(req.body.data);
+  const { error } = schema.validate(req.body);
 
   if (error) {
     console.log(error);
@@ -80,7 +80,7 @@ const validateAddHolidayMiddleware = (req, res, next) => {
     })
   });
 
-  const { error } = schema.validate(req.body.data);
+  const { error } = schema.validate(req.body);
 
   if (error) {
     return res.status(400).json({
@@ -111,7 +111,7 @@ const validateUpdateDailyLunchMiddleware = (req, res, next) => {
     'object.empty': 'Daily lunch times are required'
   });
 
-  const { error } = schema.validate(req.body.data);
+  const { error } = schema.validate(req.body);
 
   if (error) {
     return res.status(400).json({

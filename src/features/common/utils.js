@@ -22,11 +22,3 @@ export const sanitizeUserAndAppendType = (user, type) => {
 export const isPasswordCorrect = async (password, correctPassword) => {
   return await bcrypt.compare(password, correctPassword);
 };
-
-export const verifyJWTToken = (token) => {
-  const secret = env.JWT_SECRET;
-  if (!secret) {
-    throw new Error("JWT_SECRET is not defined");
-  }
-  return jwt.verify(token, secret);
-};
