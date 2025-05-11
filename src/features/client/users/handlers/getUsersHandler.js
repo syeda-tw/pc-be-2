@@ -1,4 +1,4 @@
-import Client from "../../../../common/models/client.js";
+import Client from "../../../../common/models/Client.js";
 import User from "../../../../common/models/User.js";
 
 const getUsersHandler = async (req, res) => {

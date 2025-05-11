@@ -1,8 +1,8 @@
 // seed.js
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import Client from '../common/models/client.js';
-import InvitedClient from '../common/models/invitedClient.js';
+import Client from '../common/models/Client.js';
+import InvitedClient from '../common/models/InvitedClient.js';
 import OtpVerification from '../common/models/OtpVerification.js';
 import Practice from '../common/models/Practice.js';
 import User from '../common/models/User.js';

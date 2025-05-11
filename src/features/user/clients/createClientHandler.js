@@ -1,5 +1,5 @@
-import Client from "../../../common/models/client.js";
-import InvitedClient from "../../../common/models/invitedClient.js";
+import Client from "../../../common/models/Client.js";
+import InvitedClient from "../../../common/models/InvitedClient.js";
 import User from "../../../common/models/User.js";
 import CustomError from "../../../common/utils/customError.js";
 import { env } from "../../../common/config/env.js";
@@ -177,7 +177,7 @@ const createClientService = async (clientData, userId) => {
 
 export const createClientHandler = async (req, res, next) => {
     try {
-        const client = await createClientService(req.body.data, req.id);
+        const client = await createClientService(req.body, req.id);
         return res.status(201).json({
             data: {
                 firstName: client.firstName,

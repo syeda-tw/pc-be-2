@@ -1,7 +1,7 @@
 //creare a stripe customer
 
 import Stripe from "stripe";
-import Client from "../../../../common/models/client.js";
+import Client from "../../../../common/models/Client.js";
 import { env } from "../../../../common/config/env.js";
 const messages = {
     error: {

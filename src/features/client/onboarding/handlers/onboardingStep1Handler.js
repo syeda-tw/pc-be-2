@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import Client from "../../../../common/models/client.js";
+import Client from "../../../../common/models/Client.js";
 import { sanitizeClient } from "../../utils.js";
 import { env } from "../../../../common/config/env.js";
 

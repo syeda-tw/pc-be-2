@@ -1,4 +1,4 @@
-import Client from "../../../../common/models/client.js";
+import Client from "../../../../common/models/Client.js";
 import Stripe from "stripe";
 import { env } from "../../../../common/config/env.js";
 

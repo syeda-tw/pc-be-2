@@ -5,7 +5,7 @@ import { sanitizeUser } from "./utils.js";
 const updatePersonalInformation = async (req, res, next) => {
   try {
     const user = await updatePersonalInformationService(
-      req.body.data,
+      req.body,
       req.id
     );
     return res.status(200).json({

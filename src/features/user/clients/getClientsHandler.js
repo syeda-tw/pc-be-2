@@ -1,5 +1,5 @@
 import User from "../../../common/models/User.js";
-import Client from "../../../common/models/client.js";
+import Client from "../../../common/models/Client.js";
 import mongoose from "mongoose";
 
 const getUsersClientsByIdDbOp = async (userId, params = {}) => {
