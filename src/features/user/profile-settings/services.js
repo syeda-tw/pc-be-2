@@ -62,13 +62,13 @@ export const deleteHolidayService = async (holidayId, userId) => {
 export const getDailyLunchService = async (userId) => {
   const lunchTimes = await getUserDailyLunch(userId);
   
-  if (!lunchTimes.daily_lunch_start_time || !lunchTimes.daily_lunch_end_time) {
+  if (!lunchTimes.dailyLunchStartTime || !lunchTimes.dailyLunchEndTime) {
     throw new CustomError(messages.error.lunchNotFound);
   }
 
   return {
-    startTime: lunchTimes.daily_lunch_start_time,
-    endTime: lunchTimes.daily_lunch_end_time
+    startTime: lunchTimes.dailyLunchStartTime,
+    endTime: lunchTimes.dailyLunchEndTime
   };
 };
 
@@ -80,8 +80,8 @@ export const updateDailyLunchService = async (userId, startTime, endTime) => {
   }
 
   return {
-    startTime: updatedLunchTimes.daily_lunch_start_time,
-      endTime: updatedLunchTimes.daily_lunch_end_time
+    startTime: updatedLunchTimes.dailyLunchStartTime,
+    endTime: updatedLunchTimes.dailyLunchEndTime
   };
 };
 

@@ -6,6 +6,14 @@ const { Schema } = mongoose;
 // Email Validation Regex
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+const FormSchema = new mongoose.Schema(
+  {
+    _id: String,
+    name: String,
+  },
+  { timestamps: { createdAt: true, updatedAt: false }, _id: false }
+);
+
 const UserSchema = new Schema(
   {
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
@@ -87,7 +95,7 @@ const UserSchema = new Schema(
       },
     },
     forms: {
-      type: [{ _id: String, name: String, createdAt: Date, s3Url: String }],
+      type: [FormSchema],
       default: [],
       validate: {
         validator: function (val) {
@@ -167,13 +175,11 @@ export const mockUserComplete = {
       _id: "form1",
       name: "Onboarding Form",
       createdAt: "2022-01-01T00:00:00Z",
-      s3Url: "https://s3.amazon.com/example-form1.pdf",
     },
     {
       _id: "form2",
       name: "Privacy Policy Agreement",
       createdAt: "2022-02-01T00:00:00Z",
-      s3Url: "https://s3.amazon.com/example-form2.pdf",
     },
   ],
 };

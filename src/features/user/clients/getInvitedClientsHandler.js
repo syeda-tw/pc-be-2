@@ -11,9 +11,9 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
   const sortOrder = params.sortOrder === 'desc' ? 'desc' : 'asc'; // default to 'asc' unless explicitly 'desc'
 
   try {
-    // Step 1: Fetch user and populate invited_clients
+    // Step 1: Fetch user and populate invitedClients
     const user = await User.findById(userId).populate({
-      path: 'invited_clients',
+      path: 'invitedClients',
       match: search ? {
         $or: [
           { firstName: { $regex: search, $options: 'i' } },
@@ -41,7 +41,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       {
         $lookup: {
           from: 'invitedclients',
-          localField: 'invited_clients',
+          localField: 'invitedClients',
           foreignField: '_id',
           as: 'invitedClient'
         }
@@ -64,7 +64,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
     const total = totalClients.length > 0 ? totalClients[0].total : 0;
 
     return {
-      clients: user.invited_clients || [],
+      clients: user.invitedClients || [],
       total,
       page,
       totalPages: Math.ceil(total / limit)

@@ -89,7 +89,7 @@ const getDailyLunch = async (req, res, next) => {
 
 const updateDailyLunch = async (req, res, next) => {
   try {
-    const { startTime, endTime } = req.body.data;
+    const { startTime, endTime } = req.body;
     const updatedLunchTimes = await updateDailyLunchService(
       req.id,
       startTime,

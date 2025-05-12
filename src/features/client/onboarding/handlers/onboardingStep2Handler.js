@@ -26,7 +26,7 @@ const verifyPaymentMethodAndUpdateClient = async (setupIntentId, clientId) => {
             console.error(messages.error.userNotFound);
             throw new Error(messages.error.userNotFound);
         }
-        const expectedCustomerId = client.stripe_customer_id;
+        const expectedCustomerId = client.stripeCustomerId;
 
         const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
 
@@ -41,7 +41,7 @@ const verifyPaymentMethodAndUpdateClient = async (setupIntentId, clientId) => {
         }
 
         const paymentMethodId = setupIntent.payment_method;
-        client.stripe_payment_method_id = paymentMethodId;
+        client.stripePaymentMethodId = paymentMethodId;
 
         const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
 
@@ -58,8 +58,8 @@ const verifyPaymentMethodAndUpdateClient = async (setupIntentId, clientId) => {
 
 const onboardingStep2Handler = async (req, res) => {
     try {
-        const { decodedToken } = req.body;
-        const client = await verifyPaymentMethodAndUpdateClient(req.body.setupIntentId, decodedToken._id);
+        const id = req.id;
+        const client = await verifyPaymentMethodAndUpdateClient(req.body.setupIntentId, id);
         res.status(200).send({
             message: messages.success.onboardingStep2,
             client: client

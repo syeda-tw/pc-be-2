@@ -1,13 +1,13 @@
-import { GetObjectCommand, S3Client } from '@aws-sdk/client-s3';
-  import { env } from '../../../../common/config/env.js';
-  import User from '../../../../common/models/User.js';
+import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { env } from "../../../../common/config/env.js";
+import User from "../../../../common/models/User.js";
+import { Readable } from "stream";
 
 const messages = {
   userNotFound: "User not found",
   formNotFound: "Form not found",
   failedToFindUserOrForm: "Failed to find user or form",
   failedToRetrieveFileFromS3: "Failed to retrieve file from S3",
-  
 };
 
 const s3Client = new S3Client({
@@ -18,7 +18,6 @@ const s3Client = new S3Client({
   },
 });
 
-
 const getSingleIntakeFormService = async (formId, userId) => {
   try {
     // Try to find the user and form
@@ -27,25 +26,25 @@ const getSingleIntakeFormService = async (formId, userId) => {
     try {
       user = await User.findById(userId).select("forms");
       if (!user) {
-        throw({
+        throw {
           status: 404,
           message: messages.userNotFound,
-        });
+        };
       }
 
       form = user.forms.find((form) => form._id === formId);
       if (!form) {
-        throw({
+        throw {
           status: 404,
           message: messages.formNotFound,
-        });
+        };
       }
     } catch (error) {
       console.error("Error finding user or form:", error);
-      throw({
+      throw {
         status: 500,
         message: messages.failedToFindUserOrForm,
-      });
+      };
     }
 
     // Try to get file from S3
@@ -57,37 +56,35 @@ const getSingleIntakeFormService = async (formId, userId) => {
       };
 
       s3Object = await s3Client.send(new GetObjectCommand(s3Params));
-      console.log(s3Object);
-      console.log(user.firstName);
 
       if (!s3Object.Body) {
-        throw({
+        throw {
           status: 500,
           message: messages.failedToRetrieveFileFromS3,
-        });
+        };
       }
     } catch (error) {
       console.error("Error retrieving file from S3:", error);
-      throw({
+      throw {
         status: 500,
         message: messages.failedToRetrieveFileFromS3,
-      });
+      };
     }
 
     const fileStream = Readable.from(s3Object.Body);
     return { fileStream, form };
   } catch (error) {
     console.error("Error in getSingleIntakeFormService:", error);
-    throw({
+    throw {
       status: 500,
       message: messages.failedToRetrieveFileFromS3,
-    });
+    };
   }
 };
 
 export const getSingleIntakeFormHandler = async (req, res, next) => {
   try {
-    const {fileStream, form} = await getSingleIntakeFormService(
+    const { fileStream, form } = await getSingleIntakeFormService(
       req.params.id,
       req.id
     );

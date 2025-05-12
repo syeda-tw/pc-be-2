@@ -31,18 +31,18 @@ const createSetupIntent = async (userId) => {
         if (!user) {
             throw new Error(messages.error.userNotFound);
         }
-        if (!user.stripe_customer_id) {
+        if (!user.stripeCustomerId) {
             const customer = await createStripeCustomer(user.email);
-            user.stripe_customer_id = customer.id;
+            user.stripeCustomerId = customer.id;
         }
         try {
             const setupIntent = await stripe.setupIntents.create({
-                customer: user.stripe_customer_id,
-                payment_method_types: ['card'],
+                customer: user.stripeCustomerId,
+                paymentMethodTypes: ['card'],
                 description: `Setup intent for ${user._id}`,
             });
 
-            return { setup_intent_id: setupIntent.id, client_secret: setupIntent.client_secret, customer_id: user.stripe_customer_id };
+            return { setupIntentId: setupIntent.id, clientSecret: setupIntent.clientSecret, customerId: user.stripeCustomerId };
         } catch (error) {
             console.error("Error creating setup intent:", error);
             throw new Error(messages.error.stripeError);
@@ -56,8 +56,8 @@ const createSetupIntent = async (userId) => {
 
 export default async (req, res) => {
     try {
-        const { setup_intent_id, client_secret, customer_id } = await createSetupIntent(req.id);
-        res.json({ setup_intent_id, client_secret, customer_id });
+        const { setupIntentId, clientSecret, customerId } = await createSetupIntent(req.id);
+        res.json({ setupIntentId, clientSecret, customerId });
     } catch (error) {
         console.error("Error in getSetupIntent:", error);
         res.status(500).json({ message: error.message || messages.error.internalServerError });

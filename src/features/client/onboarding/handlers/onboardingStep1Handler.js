@@ -59,8 +59,8 @@ const updateClientInformation = async (clientData, _id) => {
 
 const onboardingStep1Handler = async (req, res) => {
     try {
-        const { _id } = req.body.decodedToken;
-        const updatedClient = await updateClientInformation(req.body, _id);
+        const id = req.id;
+        const updatedClient = await updateClientInformation(req.body, id);
         res.status(200).json({ message: messages.success, data: updatedClient });
     } catch (error) {
         console.error("Error in onboardingStep1Handler:", error);

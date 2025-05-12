@@ -1,6 +1,6 @@
 import { hashPassword, isPasswordCorrect } from "../../../common/utils.js";
 import User from "../../../../common/models/User.js";
-
+import jwt from "jsonwebtoken";
 const messages = {
   invalidPasswordChangeUrl: "Invalid password change URL",
   userNotFound: "User not found",
@@ -8,6 +8,14 @@ const messages = {
   passwordResetSuccess: "Password reset successfully",
 };
 
+const verifyJWTToken = (token) => {
+  try {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    return decodedToken;
+  } catch (err) {
+    return null;
+  }
+};
 const resetPasswordService = async (token, password) => {
   const decodedToken = verifyJWTToken(token);
   if (!decodedToken) {

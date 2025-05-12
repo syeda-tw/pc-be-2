@@ -30,8 +30,9 @@ const updateClient = async (clientId, data) => {
 }
 
 const onboardingStep3Handler = async (req, res) => {
-    const { decodedToken, data } = req.body;
-    const client = await updateClient(decodedToken._id, data);
+    const id = req.id;
+    const data = req.body;
+    const client = await updateClient(id, data);
     res.status(200).send({
         message: messages.success.onboardingStep3,
         client: client

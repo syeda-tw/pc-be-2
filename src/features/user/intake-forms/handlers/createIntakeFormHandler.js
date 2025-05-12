@@ -31,32 +31,11 @@ const createIntakeFormService = async (id, file, formName) => {
       });
     }
 
-    // Construct file URL
-    const fileUrl = `https://${env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${formName}`;
-
-    const params = {
-      Bucket: env.AWS_S3_BUCKET_NAME,
-      Key: formName,
-      Body: buffer,
-      ContentType: mimetype || "application/pdf",
-    };
-
-    try {
-      await s3Client.send(new PutObjectCommand(params));
-    } catch (error) {
-      console.error("Error uploading file to S3:", error);
-      throw({
-        status: 500,
-        message: messages.failedToUploadFileToS3,
-      });
-    }
-
     // Update user with new form details
     const formDetails = {
       _id: uuidv4(),
       name: formName,
       created_at: new Date(),
-      s3Url: fileUrl,
     };
 
     try {
@@ -80,6 +59,26 @@ const createIntakeFormService = async (id, file, formName) => {
       await User.findByIdAndUpdate(userId, {
         forms: [...user.forms, formDetails],
       });
+
+         // Construct file URL
+    const fileUrl = `https://${env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${formDetails._id}`;
+
+    const params = {
+      Bucket: env.AWS_S3_BUCKET_NAME,
+      Key: formDetails._id,
+      Body: buffer,
+      ContentType: mimetype || "application/pdf",
+    };
+
+    try {
+      await s3Client.send(new PutObjectCommand(params));
+    } catch (error) {
+      console.error("Error uploading file to S3:", error);
+      throw({
+        status: 500,
+        message: messages.failedToUploadFileToS3,
+      });
+      }
 
       return formDetails;
     } catch (error) {

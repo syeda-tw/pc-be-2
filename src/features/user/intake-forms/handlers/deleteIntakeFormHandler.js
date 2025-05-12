@@ -44,7 +44,7 @@ const deleteIntakeFormService = async (formId, userId) => {
     try {
       const deleteParams = {
         Bucket: env.AWS_S3_BUCKET_NAME || "default-bucket-name",
-        Key: form.s3Url.split("/").pop(),
+        Key: form._id,
       };
 
       const deleteCommand = new DeleteObjectCommand(deleteParams);
