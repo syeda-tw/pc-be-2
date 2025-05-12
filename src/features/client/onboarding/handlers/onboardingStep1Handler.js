@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import Client from "../../../../common/models/Client.js";
-import { sanitizeClient } from "../../utils.js";
+import { sanitizeUserAndAppendType } from "../../../common/utils.js";
 import { env } from "../../../../common/config/env.js";
 
 const messages = {
@@ -54,19 +54,24 @@ const updateClientInformation = async (clientData, _id) => {
     client.stripeCustomerId = stripeCustomerId;
     await client.save();
 
-    return sanitizeClient(client);
+    return client.toObject();
 };
 
 const onboardingStep1Handler = async (req, res) => {
     try {
         const id = req.id;
-        const updatedClient = await updateClientInformation(req.body, id);
-        res.status(200).json({ message: messages.success, data: updatedClient });
-    } catch (error) {
-        console.error("Error in onboardingStep1Handler:", error);
-        const errorMessage = error.message || messages.error.updateFailed;
-        res.status(500).json({ message: errorMessage });
-    }
+    const updatedClient = await updateClientInformation(req.body, id);
+    res
+      .status(200)
+      .json({
+        message: messages.success,
+        data: sanitizeUserAndAppendType(updatedClient, "client"),
+      });
+  } catch (error) {
+    console.error("Error in onboardingStep1Handler:", error);
+    const errorMessage = error.message || messages.error.updateFailed;
+    res.status(500).json({ message: errorMessage });
+  }
 };
 
 export default onboardingStep1Handler;

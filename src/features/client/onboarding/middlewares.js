@@ -36,7 +36,7 @@ export const onboardingStep2Middleware = (req, res, next) => {
 
 export const onboardingStep3Middleware = (req, res, next) => {
     // Logic for onboarding step 3
-    if (!Array.isArray(req.body.data) || !req.body.data.every(item => typeof item === 'string')) {
+    if (!Array.isArray(req.body.userIds) || !req.body.userIds.every(item => typeof item === 'string')) {
         return res.status(400).json({ message: 'You must select at least one therapist' });
     }
     next();
