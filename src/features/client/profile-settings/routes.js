@@ -3,6 +3,7 @@ import { secureRequestMiddleware } from "../../../common/middlewares/secureReque
 import { validateUpdatePersonalInformationMiddleware, validateChangePasswordMiddleware } from './middlewares.js';
 import { updatePersonalInformationHandler } from './handlers/updatePersonalInformationHandler.js';
 import changePasswordHandler from './handlers/changePasswordHandler.js';
+import getPaymentInformationHandler from './handlers/getPaymentInformationHandler.js';
 
 const router = express.Router();
 
@@ -20,6 +21,10 @@ router.put(
   changePasswordHandler
 );
 
-
+router.get(
+  "/payment-information",
+  secureRequestMiddleware,
+  getPaymentInformationHandler
+);
 
 export default router; 
