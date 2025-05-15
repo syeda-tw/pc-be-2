@@ -196,7 +196,7 @@ const createClientService = async (clientData, userId) => {
      // console.log(`[createClientService] Linked new InvitedClient ${newClient._id} to user ${userId}`); // Removed log
 
     // TODO: Implement actual sending mechanism (email/SMS)
-    utils.sendRegistrationCode(user, registrationCode);
+    console.log(utils.sendRegistrationCode(user, registrationCode));
     // console.log(`[createClientService] Registration code generated and message prepared for new client ${newClient._id}.`); // Removed log
 
     return newClient.toObject(); // Return plain object
@@ -273,7 +273,7 @@ const createClientService = async (clientData, userId) => {
 
       // console.log(`[createClientService] Added user ${userId} to inviters for ${invitedClientAlreadyExists._id} and updated registration code.`); // Removed log
       // TODO: Implement actual sending mechanism (email/SMS)
-      utils.sendRegistrationCode(user, registrationCode); // Send the *new* code
+      console.log(utils.sendRegistrationCode(user, registrationCode)); // Send the *new* code
       // console.log(`[createClientService] Registration code refreshed and message prepared for existing invited client ${invitedClientAlreadyExists._id}.`); // Removed log
 
       // Fetch the updated invited client to return the latest state
