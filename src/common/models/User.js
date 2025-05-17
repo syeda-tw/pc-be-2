@@ -104,26 +104,8 @@ const UserSchema = new Schema(
         message: "User can only have up to 10 intake forms",
       },
     },
-    clients: {
-      type: [
-        {
-          client: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Client",
-            required: true,
-          },
-          status: {
-            type: String,
-            enum: ["accepted", "rejected", "pending"],
-            default: "pending",
-          },
-          _id: false,
-        },
-      ],
-      default: [],
-    },
-    invitedClients: {
-      type: [{ type: mongoose.Schema.Types.ObjectId, ref: "InvitedClient" }],
+    relationships: {
+      type: [RelationshipSchema],
       default: [],
     },
   },

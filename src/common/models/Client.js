@@ -10,7 +10,7 @@ const ClientSchema = new Schema({
   lastName: { type: String },
   dateOfBirth: { type: Date },
   pronouns: { type: String },
-  status: { type: String, enum: ['onboarding-step-1', 'onboarding-step-2', 'onboarding-step-3', 'onboarded'], default: 'onboarding-step-1' },
+  status: { type: String, enum: ['onboarding-step-1', 'onboarding-step-2', 'onboarding-step-3', 'onboarding-step-4', 'onboarded'], default: 'onboarding-step-1' },
   email: { type: String, unique: true, sparse: true, index: { unique: true, sparse: true } },
   gender: { type: String },
   stripeCustomerId: { type: String },
@@ -20,11 +20,10 @@ const ClientSchema = new Schema({
   },
   stripeCustomerId: { type: String },
   stripePaymentMethodId: { type: String },
-  users: [{
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-    status: { type: String, enum: ['pending', 'rejected', 'accepted'], default: 'pending' },
-    _id: false,
-  }]
+  relationships: {
+    type: [RelationshipSchema],
+    default: [],
+  },
 }, { timestamps: true });
 
 export default mongoose.model('Client', ClientSchema);
