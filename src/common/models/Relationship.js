@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const relationshipSchema = new mongoose.Schema({
     client: {
         type: mongoose.Schema.Types.ObjectId,
-        refPath: 'clientModel',
+        ref: 'Client',
         required: true
     },
     clientModel: {

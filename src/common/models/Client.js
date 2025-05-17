@@ -20,10 +20,10 @@ const ClientSchema = new Schema({
   },
   stripeCustomerId: { type: String },
   stripePaymentMethodId: { type: String },
-  relationships: {
-    type: [RelationshipSchema],
-    default: [],
-  },
+  relationships: [{
+      type: Schema.Types.ObjectId,
+      ref: "Relationship",
+    }],
 }, { timestamps: true });
 
 export default mongoose.model('Client', ClientSchema);

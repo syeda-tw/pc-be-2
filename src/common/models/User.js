@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { DAYS_OF_WEEK, TIMEZONES } from "../../features/common/constants.js";
-
 const { Schema } = mongoose;
 
 // Email Validation Regex
@@ -104,10 +103,12 @@ const UserSchema = new Schema(
         message: "User can only have up to 10 intake forms",
       },
     },
-    relationships: {
-      type: [RelationshipSchema],
-      default: [],
-    },
+    relationships: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Relationship",
+      },
+    ],
   },
   { timestamps: true }
 );

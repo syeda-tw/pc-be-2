@@ -13,10 +13,7 @@ const requestResetPasswordService = async (email) => {
     throw { status: 404, message: messages.userNotFound };
   }
   const token = generateToken({ _id: user._id.toString(), expiresIn: '1h' });
-  const frontendUrl =
-    env.NODE_ENV === "production"
-      ? env.FRONTEND_URL_PRODUCTION
-      : env.FRONTEND_URL_LOCAL;
+  const frontendUrl = env.FRONTEND_URL;
   const resetLink = `${frontendUrl}/reset-password?token=${token}`;
   await sendPasswordResetEmail(email, resetLink);
   return;
