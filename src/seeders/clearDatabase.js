@@ -1,4 +1,4 @@
-// seed.js
+// clearDatabase.js
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import Client from "../common/models/Client.js";
@@ -22,7 +22,7 @@ async function dropIndexesForModel(model) {
   }
 }
 
-async function seedDatabase() {
+export async function clearDatabase() {
   try {
     await mongoose.connect(env.MONGO_URI_LOCAL || "", {
       useNewUrlParser: true,
@@ -52,14 +52,12 @@ async function seedDatabase() {
     ]);
 
     console.log("🧾 All indexes dropped.");
-
-    // TODO: Add new seed data if needed
   } catch (error) {
-    console.error("❌ Error during seeding:", error);
+    console.error("❌ Error during database clearing:", error);
   } finally {
     await mongoose.disconnect();
     console.log("🔌 Disconnected from MongoDB");
   }
 }
 
-seedDatabase();
+clearDatabase();

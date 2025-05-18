@@ -1,5 +1,6 @@
 import User from "../../../common/models/User.js";
 import Client from "../../../common/models/Client.js";
+import InvitedClient from "../../../common/models/InvitedClient.js";
 import mongoose from "mongoose";
 
 const getUsersClientsByIdDbOp = async (userId, params = {}) => {
@@ -11,54 +12,66 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
   const sortOrder = params.sortOrder === 'desc' ? -1 : 1;
 
   try {
-    // Step 1: Fetch the user first
-    const user = await User.findById(userId).lean();
+    // Step 1: Fetch user and populate relationships
+    const user = await User.findById(userId)
+      .populate({
+        path: 'relationships',
+        select: 'client clientModel status',
+      })
+      .lean();
 
-    if (!user) {
-      throw new Error('User not found');
+    if (!user || !user.relationships) {
+      return { clients: [], total: 0, page, totalPages: 0 };
     }
+    console.log('User relationships:', user.relationships);
 
-    const clientIds = user.clients.map(c => c.client);
-    const clientStatusMap = new Map(user.clients.map(c => [c.client.toString(), c.status]));
+
+    // Step 2: Filter relationships for only InvitedClients
+    const invitedClientRelationships = user.relationships.filter(
+      r => r.clientModel === 'InvitedClient'
+    );
+
+    const clientIds = invitedClientRelationships.map(r => r.client);
+    const clientStatusMap = new Map(invitedClientRelationships.map(r => [r.client.toString(), r.status]));
 
     if (clientIds.length === 0) {
-      return {
-        clients: [],
-        total: 0,
-        page,
-        totalPages: 0
-      };
+      return { clients: [], total: 0, page, totalPages: 0 };
     }
 
-    // Step 2: Query the Client collection
-    const clientFilter = {
-      _id: { $in: clientIds }
-    };
+// Step 3: Query InvitedClient
+console.log('Raw clientIds:', clientIds);
 
-    if (search) {
-      clientFilter.$or = [
-        { firstName: { $regex: search, $options: 'i' } },
-        { lastName: { $regex: search, $options: 'i' } },
-        { middleName: { $regex: search, $options: 'i' } },
-        { phone: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
-      ];
-    }
+const clientFilter = { _id: { $in: clientIds } };
 
-    const [clients, total] = await Promise.all([
-      Client.find(clientFilter)
-        .sort({ [sortBy]: sortOrder })
-        .skip(skip)
-        .limit(limit)
-        .select('_id firstName lastName middleName phone email')
-        .lean(),
-      Client.countDocuments(clientFilter)
-    ]);
+if (search) {
+  clientFilter.$or = [
+    { firstName: { $regex: search, $options: 'i' } },
+    { lastName: { $regex: search, $options: 'i' } },
+    { middleName: { $regex: search, $options: 'i' } },
+    { phone: { $regex: search, $options: 'i' } },
+    { email: { $regex: search, $options: 'i' } }
+  ];
+  console.log('Search applied:', search);
+}
 
-    // Step 3: Map the clients with their status
+console.log('Final clientFilter:', JSON.stringify(clientFilter, null, 2));
+
+const [clients, total] = await Promise.all([
+  InvitedClient.find(clientFilter)
+    .sort({ [sortBy]: sortOrder })
+    .skip(skip)
+    .limit(limit)
+    .lean(),
+  InvitedClient.countDocuments(clientFilter)
+]);
+
+console.log('Fetched clients:', clients);
+console.log('Total matched clients:', total);
+
+    // Step 4: Add status from the relationship
     const clientsWithStatus = clients.map(client => ({
       ...client,
-      status: clientStatusMap.get(client._id.toString()) || 'pending' // default to pending if not found
+      status: clientStatusMap.get(client._id.toString()) || 'pending'
     }));
 
     return {
@@ -72,6 +85,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
     throw error;
   }
 };
+
 
 const messages = {
   clients: {

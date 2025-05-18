@@ -7,12 +7,6 @@ const invitedClientSchema = new mongoose.Schema(
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     email: { type: String, required: false, unique: true, sparse: true },
-    registrationCode: {
-      type: String,
-      required: true,
-      unique: true,
-      sparse: true,
-    },
     relationships: [{
       type: Schema.Types.ObjectId,
         ref: "Relationship",
