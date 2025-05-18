@@ -1,3 +1,4 @@
+//TO-DO: This is outdated, may have to be removed
 import Client from "../../../../common/models/Client.js";
 import InvitedClient from "../../../../common/models/InvitedClient.js";
 import User from "../../../../common/models/User.js";

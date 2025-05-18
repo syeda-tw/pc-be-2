@@ -1,3 +1,5 @@
+//TO-DO: This is outdated, may have to be removed
+
 import Client from '../../../../common/models/Client.js';
 import { sanitizeClient } from '../../utils.js';
 import { isPasswordCorrect, generateToken } from '../../../common/utils.js';
