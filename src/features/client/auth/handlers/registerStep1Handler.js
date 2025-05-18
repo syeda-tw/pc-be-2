@@ -8,8 +8,8 @@ const messages = {
     "We've sent a one-time password to your phone number which will expire in 5 minutes.",
 };
 
-const createOneTimePassword = async (phone) => {
-  const oneTimePassword = Math.floor(100000 + Math.random() * 900000);
+const createOneTimePassword = async () => {
+  const oneTimePassword = Math.floor(10000 + Math.random() * 90000);
   return oneTimePassword;
 };
 
@@ -22,7 +22,7 @@ const registerStep1Service = async (phone) => {
     };
   }
 
-  const oneTimePassword = await createOneTimePassword(phone);
+  const oneTimePassword = await createOneTimePassword();
   invitedClient.oneTimePassword = oneTimePassword;
   invitedClient.oneTimePasswordExpiresAt = new Date(Date.now() + 1000 * 60 * 5);
   await invitedClient.save();
