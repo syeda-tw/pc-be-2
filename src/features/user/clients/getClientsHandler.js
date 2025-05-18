@@ -23,8 +23,6 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
     if (!user || !user.relationships) {
       return { clients: [], total: 0, page, totalPages: 0 };
     }
-    console.log('User relationships:', user.relationships);
-
 
     // Step 2: Filter relationships for only InvitedClients
     const invitedClientRelationships = user.relationships.filter(
@@ -38,35 +36,27 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       return { clients: [], total: 0, page, totalPages: 0 };
     }
 
-// Step 3: Query InvitedClient
-console.log('Raw clientIds:', clientIds);
+    // Step 3: Query InvitedClient
+    const clientFilter = { _id: { $in: clientIds } };
 
-const clientFilter = { _id: { $in: clientIds } };
+    if (search) {
+      clientFilter.$or = [
+        { firstName: { $regex: search, $options: 'i' } },
+        { lastName: { $regex: search, $options: 'i' } },
+        { middleName: { $regex: search, $options: 'i' } },
+        { phone: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } }
+      ];
+    }
 
-if (search) {
-  clientFilter.$or = [
-    { firstName: { $regex: search, $options: 'i' } },
-    { lastName: { $regex: search, $options: 'i' } },
-    { middleName: { $regex: search, $options: 'i' } },
-    { phone: { $regex: search, $options: 'i' } },
-    { email: { $regex: search, $options: 'i' } }
-  ];
-  console.log('Search applied:', search);
-}
-
-console.log('Final clientFilter:', JSON.stringify(clientFilter, null, 2));
-
-const [clients, total] = await Promise.all([
-  InvitedClient.find(clientFilter)
-    .sort({ [sortBy]: sortOrder })
-    .skip(skip)
-    .limit(limit)
-    .lean(),
-  InvitedClient.countDocuments(clientFilter)
-]);
-
-console.log('Fetched clients:', clients);
-console.log('Total matched clients:', total);
+    const [clients, total] = await Promise.all([
+      InvitedClient.find(clientFilter)
+        .sort({ [sortBy]: sortOrder })
+        .skip(skip)
+        .limit(limit)
+        .lean(),
+      InvitedClient.countDocuments(clientFilter)
+    ]);
 
     // Step 4: Add status from the relationship
     const clientsWithStatus = clients.map(client => ({
@@ -81,11 +71,9 @@ console.log('Total matched clients:', total);
       totalPages: Math.ceil(total / limit)
     };
   } catch (error) {
-    console.error("Error in getUsersClientsByIdDbOp:", error);
     throw error;
   }
 };
-
 
 const messages = {
   clients: {
@@ -105,7 +93,6 @@ const getClientsHandler = async (req, res, next) => {
       message: messages.clients.getSuccess
     });
   } catch (err) {
-    console.error("Error in getClientsHandler:", err);
     return res.status(500).json({
       message: messages.error.generalError
     });

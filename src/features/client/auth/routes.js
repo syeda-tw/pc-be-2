@@ -1,14 +1,9 @@
 import express from "express";
-import {
-  validateRegisterMiddleware,
-  validateLoginMiddleware
-} from "./middlewares.js";
-import registerHandler from "./handlers/registerHandler.js";
-import loginHandler from "./handlers/loginHandler.js";
+import registerStep1Handler from "./handlers/registerStep1Handler.js";
+import { validateRegisterStep1Middleware } from "./middlewares.js";
 
 const router = express.Router();
 
-router.post("/register", validateRegisterMiddleware, registerHandler);
-router.post("/login", validateLoginMiddleware, loginHandler);
+router.post("/register-step-1", validateRegisterStep1Middleware, registerStep1Handler);
 
 export default router;

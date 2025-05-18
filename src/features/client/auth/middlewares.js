@@ -1,6 +1,24 @@
 import Joi from 'joi';
 
-const validateRegisterMiddleware = (req, res, next) => {
+export const validateRegisterStep1Middleware = (req, res, next) => {
+    const schema = Joi.object({
+        phone: Joi.string()
+            .pattern(/^\+?1?[2-9]\d{9}$/, 'US phone number')
+            .required()
+            .messages({
+                'string.pattern.name': 'Please enter a valid US phone number',
+                'any.required': 'Phone number is required'
+            })
+    });
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+    }
+    next();
+};
+
+export const validateRegisterMiddleware = (req, res, next) => {
     const schema = Joi.object({
         password: Joi.string()
             .min(8)
@@ -47,7 +65,7 @@ const validateRegisterMiddleware = (req, res, next) => {
     next();
 }
 
-const validateLoginMiddleware = (req, res, next) => {
+export const validateLoginMiddleware = (req, res, next) => {
     const schema = Joi.object({
         phone: Joi.string()
             .pattern(/^\+?[0-9]+$/, 'numbers')
@@ -69,5 +87,3 @@ const validateLoginMiddleware = (req, res, next) => {
     }
     next();
 }
-
-export { validateRegisterMiddleware, validateLoginMiddleware };
