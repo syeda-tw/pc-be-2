@@ -80,6 +80,7 @@ const clearDatabaseAndCreate1User = async () => {
       isEmailVerified: true,
       isPhoneVerified: true,
       isProfileComplete: true,
+      username: "Test",
       isActive: true,
       status: "onboarded",
     });

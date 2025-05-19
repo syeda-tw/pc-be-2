@@ -10,7 +10,7 @@ const ClientSchema = new Schema({
   lastName: { type: String },
   dateOfBirth: { type: Date },
   pronouns: { type: String },
-  status: { type: String, enum: ['onboarding-step-1', 'onboarding-step-2', 'onboarding-step-3', 'onboarding-step-4', 'onboarded'], default: 'onboarding-step-1' },
+  status: { type: String, enum: ['onboarding-step-1', 'onboarding-step-2', 'onboarding-step-3', 'onboarded'], default: 'onboarding-step-1' },
   email: { type: String, unique: true, sparse: true, index: { unique: true, sparse: true } },
   gender: { type: String },
   stripeCustomerId: { type: String },

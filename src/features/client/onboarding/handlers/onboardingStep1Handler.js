@@ -4,12 +4,12 @@ import { sanitizeUserAndAppendType } from "../../../common/utils.js";
 import { env } from "../../../../common/config/env.js";
 
 const messages = {
-    success: "Client information updated successfully",
+    success: "Your information has been updated successfully!",
     error: {
-        clientNotFound: "Client not found",
-        emailExists: "Email already exists",
-        updateFailed: "Failed to update client information",
-        stripeCreateFailed: "Failed to create Stripe customer"
+        clientNotFound: "We couldn't find your account. Please check your details and try again.",
+        emailExists: "This email is already registered with another account. Please use a different email address.",
+        updateFailed: "We encountered an issue while updating your information. Please try again.",
+        stripeCreateFailed: "We're having trouble setting up your payment information. Please try again later."
     }
 };
 
