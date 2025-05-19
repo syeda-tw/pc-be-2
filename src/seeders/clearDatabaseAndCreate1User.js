@@ -83,6 +83,8 @@ const clearDatabaseAndCreate1User = async () => {
       username: "Test",
       isActive: true,
       status: "onboarded",
+      appointmentCost: 200,
+      appointmentDuration: 60,
     });
     console.log("User created successfully:", user);
 

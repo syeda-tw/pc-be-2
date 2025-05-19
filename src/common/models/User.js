@@ -109,6 +109,8 @@ const UserSchema = new Schema(
         ref: "Relationship",
       },
     ],
+    appointmentCost: { type: Number, default: 200 }, 
+    appointmentDuration: { type: Number, default: 60 },
   },
   { timestamps: true }
 );
