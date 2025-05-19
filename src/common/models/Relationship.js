@@ -19,8 +19,16 @@ const relationshipSchema = new mongoose.Schema({
     status: {
         type: String,
         required: true,
-        enum: ['awaiting-platform-onboarding-complete', 'pending', 'rejected', 'active'],
+        enum: ['pending', 'rejected', 'active'],
         default: 'awaiting-platform-onboarding-complete'
+    },
+    appointments: {
+      default: []
+    },
+    intakeFormsFilledStatus: {
+      type: String,
+      enum: ['not-started', 'in-progress', 'completed'],
+      default: 'not-started'
     },
     isOnboardingComplete: {
         type: Boolean,

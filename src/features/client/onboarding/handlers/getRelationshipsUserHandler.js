@@ -1,3 +1,4 @@
+//this api is used when client is on onboarding step 3, and they want a list of the people who invited them
 import Client from "../../../../common/models/Client.js";
 import Relationship from "../../../../common/models/Relationship.js";
 
