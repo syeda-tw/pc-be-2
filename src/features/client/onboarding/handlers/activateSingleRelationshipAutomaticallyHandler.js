@@ -13,42 +13,56 @@ const messages = {
 };
 
 const activateSingleRelationshipAutomaticallyService = async (clientId) => {
-  // Get client and populate relationships
-  const client = await Client.findById(clientId).populate({
-    path: 'relationships',
-  });
+  try {
+    // Get client and populate relationships
+    const client = await Client.findById(clientId).populate({
+      path: 'relationships',
+    });
 
-  if (!client) {
-    throw {
-      message: messages.error.clientNotFound,
-      status: 404
-    };
+    if (!client) {
+      throw {
+        message: messages.error.clientNotFound,
+        status: 404
+      };
+    }
+
+    // Check if client has exactly one relationship
+    if (!client.relationships || client.relationships.length !== 1) {
+      throw {
+        message: messages.error.clientMustHaveExactlyOneRelationship,
+        status: 400
+      };
+    }
+
+    // Get the first (and only) relationship
+    const relationship = client.relationships[0];
+
+    try {
+      // update relationsip status to active
+      relationship.status = "active";
+      await relationship.save();
+      return relationship.user;
+    } catch (saveError) {
+      console.error('Error saving relationship:', saveError);
+      throw {
+        message: messages.error.relationshipNotFound,
+        status: 500
+      };
+    }
+  } catch (error) {
+    console.error('Error in activateSingleRelationshipAutomaticallyService:', error);
+    throw error;
   }
-
-  // Check if client has exactly one relationship
-  if (!client.relationships || client.relationships.length !== 1) {
-    throw {
-      message: messages.error.clientMustHaveExactlyOneRelationship,
-      status: 400
-    };
-  }
-
-  // Get the first (and only) relationship
-  const relationship = client.relationships[0];
-
-  // update relationsip status to active
-  relationship.status = "active";
-  await relationship.save();
-
-  return relationship.user;
 };
 
 const activateSingleRelationshipAutomaticallyHandler = async (req, res) => {
   try {
-    const user = await activateSingleRelationshipAutomaticallyService(req.id);
+    await activateSingleRelationshipAutomaticallyService(req.id);
     res.status(200).json({ message: messages.success });
   } catch (error) {
-    res.status(500).json({ message: messages.error.userNotFound });
+    const status = error.status || 500;
+    const message = error.message || messages.error.userNotFound;
+    res.status(status).json({ message });
   }
 };
 

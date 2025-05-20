@@ -18,7 +18,6 @@ const ClientSchema = new Schema({
     type: mongoose.Schema.Types.Mixed, 
     // We could specify validation, but it is flexible enough to store the complex card data
   },
-  stripeCustomerId: { type: String },
   stripePaymentMethodId: { type: String },
   relationships: [{
       type: Schema.Types.ObjectId,

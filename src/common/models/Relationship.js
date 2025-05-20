@@ -22,9 +22,28 @@ const relationshipSchema = new mongoose.Schema({
         enum: ['pending', 'rejected', 'active'],
         default: 'awaiting-platform-onboarding-complete'
     },
-    appointments: {
-      default: []
-    },
+    appointments: [{
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        auto: true
+      },
+      startTime: {
+        type: Date,
+        required: true
+      },
+      endTime: {
+        type: Date,
+        required: true
+      },
+      paymentIntentId: {
+        type: String,
+      },
+      paymentStatus: {
+        type: String,
+        enum: ['pending', 'paid', 'failed'],
+        default: 'pending'
+      }
+    }],
     intakeFormsFilledStatus: {
       type: String,
       enum: ['not-started', 'in-progress', 'completed'],

@@ -41,3 +41,49 @@ export const onboardingStep3Middleware = (req, res, next) => {
     }
     next();
 };
+
+
+export const bookFirstAppointmentMiddleware = (req, res, next) => {
+  const bookFirstAppointmentSchema = Joi.object({
+    relationshipId: Joi.string()
+      .required()
+      .messages({
+        'string.base': 'Something went wrong. Please try again.',
+        'string.empty': 'Please provide a valid relationship.',
+        'any.required': 'A relationship is required to book your appointment.',
+      }),
+
+    startTime: Joi.date()
+      .required()
+      .min(new Date())
+      .messages({
+        'date.base': 'Please enter a valid start time.',
+        'date.min': 'Start time must be in the future.',
+        'any.required': 'Start time is required to schedule your appointment.',
+      }),
+
+    endTime: Joi.date()
+      .required()
+      .min(Joi.ref('startTime'))
+      .messages({
+        'date.base': 'Please enter a valid end time.',
+        'date.min': 'End time must be after the start time.',
+        'any.required': 'End time is required to schedule your appointment.',
+      }),
+
+    cost: Joi.number()
+      .required()
+      .messages({
+        'number.base': 'Please provide a valid cost amount.',
+        'any.required': 'Cost is required to proceed with payment.',
+      }),
+  });
+
+  const { error } = bookFirstAppointmentSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  next();
+};
