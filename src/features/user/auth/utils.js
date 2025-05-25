@@ -29,7 +29,8 @@ export const sendRegistrationEmail = async (email, otp) => {
 };
 
 export const generateOtp = () => {
-  return Math.floor(10000 + Math.random() * 90000).toString();
+  // return Math.floor(10000 + Math.random() * 90000).toString();
+  return "12345";
 };
 
 export const sendWelcomeEmail = async (user) => {

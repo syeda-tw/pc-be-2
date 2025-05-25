@@ -1,6 +1,5 @@
 // clearDatabase.js
 import mongoose from "mongoose";
-import dotenv from "dotenv";
 import Client from "../common/models/Client.js";
 import InvitedClient from "../common/models/InvitedClient.js";
 import OtpVerification from "../common/models/OtpVerification.js";

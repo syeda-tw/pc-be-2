@@ -59,6 +59,7 @@ const createClientService = async (req, res) => {
         client: existingClient._id,
         clientModel: "Client",
         user: userId,
+        //to-do: figure this out
         status: existingClient.status == "onboarded" ? "awaiting-platform-onboarding-complete" : "pending",
       });
 

@@ -60,7 +60,9 @@ describe("Verify Registration OTP", () => {
     it("rejects missing fields", async () => {
         const res = await request(app)
             .post("/user/auth/verify-registration-otp")
-            .send({ data: { });
+            .send({ data: {
+              
+             });
 
         expect(res.statusCode).toBeGreaterThanOrEqual(400);
     }, 10000);

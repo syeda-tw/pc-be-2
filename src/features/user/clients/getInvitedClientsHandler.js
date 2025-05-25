@@ -1,59 +1,54 @@
 import mongoose from "mongoose";
 import User from '../../../common/models/User.js';
+import Relationship from '../../../common/models/Relationship.js';
 
 const getUsersClientsByIdDbOp = async (userId, params = {}) => {
   console.log('Starting getUsersClientsByIdDbOp with params:', { userId, params });
-  
+
   const search = typeof params.search === 'string' ? params.search.trim() : '';
   const page = params.page ? parseInt(params.page, 10) : 1;
   const limit = params.limit ? Math.min(parseInt(params.limit, 10), 100) : 20;
   const skip = (page - 1) * limit;
-  const sortBy = typeof params.sortBy === 'string' ? params.sortBy : 'firstName';
-  const sortOrder = params.sortOrder === 'desc' ? -1 : 1;
-
-  console.log('Processed parameters:', { search, page, limit, skip, sortBy, sortOrder });
 
   try {
-    console.log('Attempting to find user and populate relationships...');
-    // Step 1: Get filtered relationships for this user
-    const user = await User.findById(userId).populate({
-      path: 'relationships',
-      match: { clientModel: 'InvitedClient' },
-      select: '_id clientModel client',
-      populate: {
-        path: 'client',
-        model: 'InvitedClient',
-        match: search ? {
-          $or: [
-            { firstName: { $regex: search, $options: 'i' } },
-            { middleName: { $regex: search, $options: 'i' } },
-            { lastName: { $regex: search, $options: 'i' } }
-          ]
-        } : {},
-        select: 'firstName middleName lastName email phone'
-      },
-      options: {
-        sort: { [`client.${sortBy}`]: sortOrder },
-      }
+    // Step 1: Find relationships with pending status and matching user
+    const relationships = await Relationship.find({
+      user: userId,
+      status: 'pending',
     }).lean();
 
-    console.log('User query completed:', { userId, userFound: !!user });
+    console.log('Found relationships with pending status:', relationships.length);
 
-    if (!user) {
-      console.log('User not found for ID:', userId);
-      throw new Error('User not found');
+    // Step 2: Fetch client details dynamically
+// Step 2: Fetch client details dynamically with custom filters
+const clients = await Promise.all(
+  relationships.map(async (rel) => {
+    const ClientModel = mongoose.model(rel.clientModel); // 'Client' or 'InvitedClient'
+    const client = await ClientModel.findById(rel.client).lean();
+    if (!client) return null;
+
+    // Conditionally exclude 'Client' if onboarding is complete
+    if (rel.clientModel === 'Client' && client.isOnboardingComplete) {
+      return null;
     }
 
-    // Filter out null clients (those who didn't match search)
-    const allClients = (user.relationships || []).filter(rel => rel.client);
-    console.log('Filtered clients count:', allClients.length);
+    // Apply name search filter
+    const fullName = `${client.firstName || ''} ${client.middleName || ''} ${client.lastName || ''}`.trim().toLowerCase();
+    const matchesSearch = !search || fullName.includes(search.toLowerCase());
 
-    const paginatedClients = allClients.slice(skip, skip + limit);
-    const total = allClients.length;
+    return matchesSearch ? { ...client, relationshipId: rel._id, clientModel: rel.clientModel } : null;
+  })
+);
 
-    console.log('Pagination results:', {
-      totalClients: total,
-      currentPage: page,
+
+    // Step 3: Filter nulls and paginate
+    const filteredClients = clients.filter(Boolean);
+    const total = filteredClients.length;
+    const paginatedClients = filteredClients.slice(skip, skip + limit);
+
+    console.log('Returning clients:', {
+      total,
+      page,
       clientsInPage: paginatedClients.length,
       totalPages: Math.ceil(total / limit)
     });

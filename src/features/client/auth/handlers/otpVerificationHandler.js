@@ -52,7 +52,7 @@ const otpVerificationService = async (phone, otp) => {
     // Update the relationship with the new client
     relationship.client = client._id;
     relationship.clientModel = "Client";
-    relationship.status = "awaiting-platform-onboarding-complete";
+    relationship.status = "pending";
     await relationship.save();
   }
 
