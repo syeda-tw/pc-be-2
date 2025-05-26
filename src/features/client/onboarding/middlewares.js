@@ -34,15 +34,6 @@ export const onboardingStep2Middleware = (req, res, next) => {
     next();
 };
 
-export const onboardingStep3Middleware = (req, res, next) => {
-    // Logic for onboarding step 3
-    if (!Array.isArray(req.body.userIds) || !req.body.userIds.every(item => typeof item === 'string')) {
-        return res.status(400).json({ message: 'You must select at least one therapist' });
-    }
-    next();
-};
-
-
 export const bookFirstAppointmentMiddleware = (req, res, next) => {
   const bookFirstAppointmentSchema = Joi.object({
     relationshipId: Joi.string()
@@ -51,6 +42,15 @@ export const bookFirstAppointmentMiddleware = (req, res, next) => {
         'string.base': 'Something went wrong. Please try again.',
         'string.empty': 'Please provide a valid relationship.',
         'any.required': 'A relationship is required to book your appointment.',
+      }),
+
+    date: Joi.date()
+      .required()
+      .min('now')
+      .messages({
+        'date.base': 'Please enter a valid date.',
+        'date.min': 'Date must be today or in the future.',
+        'any.required': 'Date is required to schedule your appointment.',
       }),
 
     startTime: Joi.date()

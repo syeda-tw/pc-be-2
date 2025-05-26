@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import User from '../../../common/models/User.js';
 import Relationship from '../../../common/models/Relationship.js';
 
 const getUsersClientsByIdDbOp = async (userId, params = {}) => {
@@ -28,7 +27,7 @@ const clients = await Promise.all(
     if (!client) return null;
 
     // Conditionally exclude 'Client' if onboarding is complete
-    if (rel.clientModel === 'Client' && client.isOnboardingComplete) {
+    if (rel.clientModel === 'Client' && client.status === 'onboarded') {
       return null;
     }
 

@@ -57,9 +57,9 @@ const UserSchema = new Schema(
       ],
       default: "onboarding-step-1",
     },
-    firstName: { type: String }, // Camel case for consistency
-    lastName: { type: String }, // Camel case for consistency
-    middleName: { type: String }, // Camel case for consistency
+    firstName: { type: String },
+    lastName: { type: String },
+    middleName: { type: String },
     dateOfBirth: { type: Date },
     timezone: { type: String, default: TIMEZONES[0] },
     availability: {
@@ -109,10 +109,6 @@ const UserSchema = new Schema(
         ref: "Relationship",
       },
     ],
-    bookings: [{
-      type: Schema.Types.ObjectId,
-      ref: "Booking"
-    }],
     appointmentCost: { type: Number, default: 200 }, 
     appointmentDuration: { type: Number, default: 60 },
   },
@@ -171,5 +167,5 @@ export const mockUserComplete = {
       createdAt: "2022-02-01T00:00:00Z",
     },
   ],
-  bookings: ["603d9f3d8d4e4f2f74c2c5f7", "603d9f3d8d4e4f2f74c2c5f6"],
+  
 };

@@ -52,6 +52,7 @@ const getRelationshipsUserHandler = async (req, res) => {
       message: messages.success,
       data: relationships.map((rel) => {
         return {
+          _id: rel.user._id,
           firstName: rel.user.firstName,
           lastName: rel.user.lastName,
           email: rel.user.email,

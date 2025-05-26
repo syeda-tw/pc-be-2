@@ -24,20 +24,23 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       return { clients: [], total: 0, page, totalPages: 0 };
     }
 
-    // Step 2: Filter relationships for only InvitedClients
-    const invitedClientRelationships = user.relationships.filter(
-      r => r.clientModel === 'InvitedClient'
+    // Step 2: Filter relationships for only Clients with onboarded status
+    const clientRelationships = user.relationships.filter(
+      r => r.clientModel === 'Client'
     );
 
-    const clientIds = invitedClientRelationships.map(r => r.client);
-    const clientStatusMap = new Map(invitedClientRelationships.map(r => [r.client.toString(), r.status]));
+    const clientIds = clientRelationships.map(r => r.client);
+    const clientStatusMap = new Map(clientRelationships.map(r => [r.client.toString(), r.status]));
 
     if (clientIds.length === 0) {
       return { clients: [], total: 0, page, totalPages: 0 };
     }
 
-    // Step 3: Query InvitedClient
-    const clientFilter = { _id: { $in: clientIds } };
+    // Step 3: Query Client model for onboarded clients
+    const clientFilter = { 
+      _id: { $in: clientIds },
+      status: 'onboarded'
+    };
 
     if (search) {
       clientFilter.$or = [
@@ -50,12 +53,12 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
     }
 
     const [clients, total] = await Promise.all([
-      InvitedClient.find(clientFilter)
+      Client.find(clientFilter)
         .sort({ [sortBy]: sortOrder })
         .skip(skip)
         .limit(limit)
         .lean(),
-      InvitedClient.countDocuments(clientFilter)
+      Client.countDocuments(clientFilter)
     ]);
 
     // Step 4: Add status from the relationship

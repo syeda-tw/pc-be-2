@@ -31,10 +31,11 @@ const relationshipSchema = new mongoose.Schema({
       enum: ['not-started', 'in-progress', 'completed'],
       default: 'not-started'
     },
-    isOnboardingComplete: {
+    isClientOnboardingComplete: {
         type: Boolean,
         default: false
     }
+    
 }, {
     timestamps: true // Adds createdAt and updatedAt fields automatically
 });

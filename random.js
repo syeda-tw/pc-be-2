@@ -1,7 +1,7 @@
 import { generateToken } from './src/features/common/utils.js';
 
 const createClientTokenAndPrintOnConsole = async () => {
-  const id = "682a023468bcb902aa36435d";
+  const id = "682f40d89a3a608a46e0913f";
 
   const token = generateToken({ _id: id });
   console.log(token);
