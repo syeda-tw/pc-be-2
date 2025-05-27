@@ -1,4 +1,4 @@
-import Session from "../../../../common/models/Sessions.js";
+import Session from "../../../../common/models/Session.js";
 import { addMonths, startOfDay } from "date-fns";
 
 const messages = {

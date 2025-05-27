@@ -3,7 +3,7 @@ import Relationship from "../../../../common/models/Relationship.js";
 import Stripe from "stripe";
 import { env } from "../../../../common/config/env.js";
 import { sanitizeUserAndAppendType } from '../../../common/utils.js';
-import Session from '../../../../common/models/Sessions.js';
+import Session from '../../../../common/models/Session.js';
 
 const messages = {
   notFound: "We couldn't find the relationship you're looking for. Please try again.",
