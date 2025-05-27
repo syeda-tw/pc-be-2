@@ -30,12 +30,18 @@ const getUserSessionsService = async (id, startDate, endDate) => {
         { $or: [{ user: id }, { client: id }] },
         { date: { $gte: startDate, $lte: endDate } },
       ],
-    });
+    })
+      .populate({
+        path: "client",
+        select: "firstName middleName lastName email phone",
+      });
+
     console.log("Found sessions:", sessions);
     if (sessions.length === 0) {
       console.log("No sessions found");
       return [];
     }
+
     return sessions;
   } catch (error) {
     console.error("Error in getUserSessionsService:", error);
@@ -45,6 +51,7 @@ const getUserSessionsService = async (id, startDate, endDate) => {
     };
   }
 };
+
 
 const getUserSessionsHandler = async (req, res) => {
   console.log("getUserSessionsHandler called with params:", req.params);

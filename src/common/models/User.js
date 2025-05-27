@@ -17,9 +17,9 @@ const UserSchema = new Schema(
   {
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     title: { type: String },
-    isAdmin: { type: Boolean, default: false }, // Camel case for consistency
+    isAdmin: { type: Boolean, default: false },
     pronouns: { type: String },
-    hourlyRate: { type: Number }, // Camel case for consistency
+    hourlyRate: { type: Number },
     gender: { type: String },
     qualifications: { type: [{ type: Schema.Types.Mixed }], default: [] },
     practice: { type: Schema.Types.ObjectId, ref: "Practice" },
