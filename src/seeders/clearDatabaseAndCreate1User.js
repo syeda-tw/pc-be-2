@@ -201,6 +201,10 @@ const createRandomSessions = async (
   const sessions = [];
   console.log("🔗 Creating sessions for user", userId, "and client", clientId);
   for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+    // Skip Saturdays (6) and Sundays (0)
+    const dayOfWeek = d.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+
     const chance = Math.random();
     if (chance < 0.3) continue;
 

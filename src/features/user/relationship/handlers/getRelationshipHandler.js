@@ -1,0 +1,78 @@
+import Relationship from "../../../../common/models/Relationship.js";
+
+const messages = {
+  success: {
+    getRelationship: "Here is the relationship you requested!",
+  },
+  error: {
+    notFound: "Sorry, we couldn't find that relationship.",
+    forbidden: "It looks like you don't have permission to view this relationship.",
+    getRelationship: "Oops! We had trouble fetching the relationship. Please try again.",
+  },
+};
+const getRelationshipService = async (id, userId) => {
+  // Populate client (either Client or InvitedClient)
+  const relationship = await Relationship.findById(id)
+    .populate([
+      {
+        path: "client",
+        select: "firstName middleName lastName gender pronouns email phone status dateOfBirth",
+      }
+    ])
+    .lean();
+
+  if (!relationship) {
+    throw {
+      status: 404,
+      message: messages.error.notFound,
+    };
+  }
+
+  // Check if the relationship belongs to the user
+  if (relationship.user.toString() !== userId) {
+    throw {
+      status: 403,
+      message: messages.error.forbidden,
+    };
+  }
+
+  // Compose the response object with only the requested client fields and relationshipId
+  return {
+    relationshipId: relationship._id,
+    status: relationship.status,
+    intakeFormsFilledStatus: relationship.intakeFormsFilledStatus,
+    isClientOnboardingComplete: relationship.isClientOnboardingComplete,
+    client: relationship.client
+      ? {
+          firstName: relationship.client.firstName,
+          middleName: relationship.client.middleName,
+          email: relationship.client.email,
+          lastName: relationship.client.lastName,
+          phone: relationship.client.phone,
+          status: relationship.client.status,
+          relationshipId: relationship._id,
+          dateOfBirth: relationship.client.dateOfBirth,
+          gender: relationship.client.gender,
+          pronouns: relationship.client.pronouns,
+        }
+      : null,
+  };
+};
+
+const getRelationshipHandler = async (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.id;
+  try {
+    // Find the relationship by id and check permissions
+    const relationship = await getRelationshipService(id, userId);
+
+    res.status(200).json({
+      message: messages.success.getRelationship,
+      relationship,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export default getRelationshipHandler;

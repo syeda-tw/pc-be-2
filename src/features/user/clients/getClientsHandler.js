@@ -1,6 +1,5 @@
 import User from "../../../common/models/User.js";
 import Client from "../../../common/models/Client.js";
-import InvitedClient from "../../../common/models/InvitedClient.js";
 import mongoose from "mongoose";
 
 const getUsersClientsByIdDbOp = async (userId, params = {}) => {
@@ -16,7 +15,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
     const user = await User.findById(userId)
       .populate({
         path: 'relationships',
-        select: 'client clientModel status',
+        select: 'client clientModel',
       })
       .lean();
 
@@ -24,13 +23,17 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       return { clients: [], total: 0, page, totalPages: 0 };
     }
 
-    // Step 2: Filter relationships for only Clients with onboarded status
+    // Step 2: Filter relationships for only Clients
     const clientRelationships = user.relationships.filter(
       r => r.clientModel === 'Client'
     );
 
+    // Map: clientId (string) -> relationshipId (string)
+    const clientIdToRelationshipId = new Map(
+      clientRelationships.map(r => [r.client.toString(), r._id.toString()])
+    );
+
     const clientIds = clientRelationships.map(r => r.client);
-    const clientStatusMap = new Map(clientRelationships.map(r => [r.client.toString(), r.status]));
 
     if (clientIds.length === 0) {
       return { clients: [], total: 0, page, totalPages: 0 };
@@ -54,6 +57,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
 
     const [clients, total] = await Promise.all([
       Client.find(clientFilter)
+        .select('firstName lastName middleName email phone pronouns dateOfBirth gender') // Only select required fields
         .sort({ [sortBy]: sortOrder })
         .skip(skip)
         .limit(limit)
@@ -61,14 +65,21 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       Client.countDocuments(clientFilter)
     ]);
 
-    // Step 4: Add status from the relationship
-    const clientsWithStatus = clients.map(client => ({
-      ...client,
-      status: clientStatusMap.get(client._id.toString()) || 'pending'
+    // Step 4: Compose response with only requested fields and relationshipId
+    const clientsWithRelationshipId = clients.map(client => ({
+      firstName: client.firstName,
+      lastName: client.lastName,
+      middleName: client.middleName,
+      email: client.email,
+      phone: client.phone,
+      pronouns: client.pronouns,
+      dateOfBirth: client.dateOfBirth,
+      gender: client.gender,
+      relationshipId: clientIdToRelationshipId.get(client._id.toString()) || null
     }));
 
     return {
-      clients: clientsWithStatus,
+      clients: clientsWithRelationshipId,
       total,
       page,
       totalPages: Math.ceil(total / limit)

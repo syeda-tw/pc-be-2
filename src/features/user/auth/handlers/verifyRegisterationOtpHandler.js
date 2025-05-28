@@ -35,7 +35,15 @@ const verifyRegistrationOtpService = async (email, otp) => {
         throw { status: 400, message: messages.error.invalidOtp };
     }
 
-    const newPractice = await Practice.create({});
+    const newPractice = await Practice.create({
+      businessName: "",
+      isCompany: false,
+      website: "",
+      addresses: [],
+      members: [],
+      phone: "",
+      email: "",
+    });
 
     const user = await User.create({
         email: otpVerification.email,
