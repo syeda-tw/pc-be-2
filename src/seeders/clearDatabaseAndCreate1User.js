@@ -232,7 +232,7 @@ const createRandomSessions = async (
   return sessions;
 };
 
-async function createSessions(user, clients, relationships) {
+const createSessions = async (user, clients, relationships) => {
   const startDate = new Date();
   const endDate = new Date();
   endDate.setMonth(endDate.getMonth() + 2);
@@ -259,12 +259,33 @@ async function createSessions(user, clients, relationships) {
       startDate,
       endDate
     );
+
     allSessions.push(...sessions);
   }
 
-  await Session.insertMany(allSessions);
-  console.log(`📆 Created ${allSessions.length} sessions`);
-}
+  // Insert all sessions in DB
+  const insertedSessions = await Session.insertMany(allSessions);
+  console.log(`📆 Created ${insertedSessions.length} sessions`);
+
+  // Group sessions by relationshipId to update relationships efficiently
+  const sessionsByRelationship = insertedSessions.reduce((acc, session) => {
+    const relId = session.relationship.toString();
+    if (!acc[relId]) acc[relId] = [];
+    acc[relId].push(session._id);
+    return acc;
+  }, {});
+
+  // Update each Relationship to push session IDs into its sessions array
+  for (const [relationshipId, sessionIds] of Object.entries(sessionsByRelationship)) {
+    await Relationship.findByIdAndUpdate(
+      relationshipId,
+      { $push: { sessions: { $each: sessionIds } } },
+      { new: true }
+    );
+    console.log(`✅ Added ${sessionIds.length} sessions to relationship ${relationshipId}`);
+  }
+};
+
 
 async function main() {
   try {

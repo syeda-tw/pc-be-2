@@ -29,6 +29,6 @@ export const validateGetRelationshipSessions = (req, res, next) => {
     return res.status(400).json({ message: error.details[0].message });
   }
 
-  req.query = value;
+  req.query = value; // validated and defaulted query
   next();
 };

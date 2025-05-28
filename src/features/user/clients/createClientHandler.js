@@ -9,10 +9,7 @@ const messages = {
 };
 
 const sendInvitationSMSToExistingClient = async (clientName, userName) => {
-  console.log("[DEBUG] Sending SMS to existing client");
-  console.log(
-    `Hello ${clientName}, ${userName} has invited you to join their network on Practicare. Visit ${env.FRONTEND_URL}/client-login to get started.`
-  );
+
 };
 
 const sendInvitationSMSToExistingInvitedClient = async (

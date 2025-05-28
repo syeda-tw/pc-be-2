@@ -28,31 +28,24 @@ const bookFirstAppointmentService = async (
   cost,
   date
 ) => {
-  console.log('Starting bookFirstAppointmentService with params:', { clientId, relationshipId, startTime, endTime, cost, date });
-  
   try {
     const client = await Client.findById(clientId);
     if (!client) {
-      console.error('Client not found:', { clientId, error: 'Client document not found in database' });
       throw {
         status: 404,
         message: messages.clientNotFound,
       };
     }
-    console.log('Client found successfully:', { clientId: client._id });
 
     const relationship = await Relationship.findById(relationshipId);
     if (!relationship) {
-      console.error('Relationship not found:', { relationshipId, error: 'Relationship document not found in database' });
       throw {
         status: 404,
         message: messages.notFound,
       };
     }
-    console.log('Relationship found successfully:', { relationshipId: relationship._id });
 
     try {
-      console.log('Creating new session with data:', { clientId, userId: relationship.user, date, startTime, endTime });
       const session = {
         client: clientId,
         user: relationship.user,

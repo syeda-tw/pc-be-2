@@ -27,7 +27,6 @@ const registerStep1Service = async (phone) => {
   invitedClient.oneTimePassword = oneTimePassword;
   invitedClient.oneTimePasswordExpiresAt = new Date(Date.now() + 1000 * 60 * 5);
   await invitedClient.save();
-  console.log(oneTimePassword);
   return;
 };
 
