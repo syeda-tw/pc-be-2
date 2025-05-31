@@ -58,6 +58,7 @@ const otpVerificationService = async (phone, otp) => {
 
   // Update the client with the new relationship
   client.relationships.push(relationship._id);
+  client.defaultRelationship = relationship._id;
   await client.save();
 
   // Delete the invited client after successful verification

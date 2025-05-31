@@ -48,7 +48,7 @@ const getUsersHandler = async (req, res) => {
       paginatedUsers.map(async (userObj) => {
         const user = await User.findById(userObj.user.toString())
           .select("firstName username lastName title practice")
-          .populate({ path: "practice", select: "businessName" })
+          .populate({ path: "practice", select: "name" })
           .lean();
         return {
           ...userObj,
@@ -63,7 +63,7 @@ const getUsersHandler = async (req, res) => {
                 practice: user.practice
                   ? {
                       _id: user.practice._id,
-                      name: user.practice.businessName,
+                      name: user.practice.name,
                     }
                   : null,
               }

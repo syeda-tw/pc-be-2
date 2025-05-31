@@ -64,7 +64,7 @@ async function dropAllIndexes() {
 
 async function createPractice() {
   const practice = await Practice.create({
-    businessName: "Test Practice",
+    name: "Test Practice",
     addresses: [
       {
         street: "123 Main St",
@@ -75,6 +75,8 @@ async function createPractice() {
       },
     ],
     website: "https://testpractice.com",
+    members: [],
+    isCompany: false,
   });
   console.log("🏥 Practice created:", practice._id);
   return practice;
@@ -85,16 +87,22 @@ async function createAdminUser(practiceId) {
   const user = await User.create({
     email: "test@test.com",
     password: hashedPassword,
+    username: "TestUser", // Must be at least 3 characters
     firstName: "Test",
     lastName: "User",
-    role: "admin",
-    practice: practiceId,
-    isEmailVerified: true,
-    isPhoneVerified: true,
-    isProfileComplete: true,
-    username: "Test",
-    isActive: true,
+    title: "Dr.",
+    middleName: "Example",
+    dateOfBirth: new Date("1990-01-01"),
+    gender: "Other",
+    pronouns: "they/them",
+  
+    // Account flags
+    isAdmin: true,
     status: "onboarded",
+  
+    // Practice and financial details
+    practice: practiceId,
+    hourlyRate: 120,
     appointmentCost: 200,
     appointmentDuration: 60,
   });
@@ -105,7 +113,7 @@ async function createAdminUser(practiceId) {
 async function createClients() {
   const clients = await Client.create([
     {
-      phone: "555-0001",
+      phone: "+15550000001",
       firstName: "John",
       lastName: "Doe",
       email: "john@example.com",
@@ -114,7 +122,7 @@ async function createClients() {
       status: "onboarded",
     },
     {
-      phone: "555-0002",
+      phone: "+15550000002",
       firstName: "Jane",
       lastName: "Smith",
       email: "jane@example.com",
@@ -123,7 +131,7 @@ async function createClients() {
       status: "onboarded",
     },
     {
-      phone: "555-0003",
+      phone: "+15550000003",
       firstName: "Michael",
       lastName: "Johnson",
       email: "michael@example.com",
@@ -132,7 +140,7 @@ async function createClients() {
       status: "onboarded",
     },
     {
-      phone: "555-0004",
+      phone: "+15550000004",
       firstName: "Sarah",
       lastName: "Williams",
       email: "sarah@example.com",
@@ -141,7 +149,7 @@ async function createClients() {
       status: "onboarded",
     },
     {
-      phone: "555-0005",
+      phone: "+15550000005",
       firstName: "David",
       lastName: "Brown",
       email: "david@example.com",
@@ -176,12 +184,12 @@ async function createRelationships(userId, clients) {
     // Push to client's relationships
     client.relationships = client.relationships || [];
     client.relationships.push(relationship._id);
+    client.defaultRelationship = relationship._id;
     await client.save();
 
     // Push to user's relationships
     user.relationships = user.relationships || [];
     user.relationships.push(relationship._id);
-
     relationships.push(relationship);
   }
 

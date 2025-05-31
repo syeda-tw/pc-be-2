@@ -311,10 +311,10 @@
  *           schema:
  *             type: object
  *             required:
- *               - businessName
+ *               - name
  *               - address
  *             properties:
- *               businessName:
+ *               name:
  *                 type: string
  *                 maxLength: 100
  *               website:
@@ -381,11 +381,11 @@
  *           schema:
  *             type: object
  *             required:
- *               - businessName
+ *               - name
  *               - address
  *               - members
  *             properties:
- *               businessName:
+ *               name:
  *                 type: string
  *                 maxLength: 100
  *               website:

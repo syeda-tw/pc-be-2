@@ -114,7 +114,7 @@ export const findUserByUsernameDbOp = async (username) => {
   try {
     return await User.findOne({ username }).populate({
       path: 'practice',
-      select: '_id businessName isCompany website addresses'
+      select: '_id name isCompany website addresses'
     });
   } catch (error) {
     console.error("Error in findUserByUsernameDbOp:", error);

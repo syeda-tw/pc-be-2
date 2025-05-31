@@ -46,6 +46,7 @@ const loginOtpVerificationService = async (phone, otp) => {
       phone: client.phone,
       relationships: client.relationships,
       status: client.status,
+      defaultRelationship: client.defaultRelationship,
       createdAt: client.createdAt,
       updatedAt: client.updatedAt,
     },

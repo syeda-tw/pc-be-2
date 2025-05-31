@@ -95,7 +95,7 @@ export const validateUsernameMiddleware = (req, res, next) => {
 
 export const validateOnboardingIndividualStep2Middleware = (req, res, next) => {
   const schema = Joi.object({
-    businessName: Joi.string().required().max(100).messages({
+    name: Joi.string().required().max(100).messages({
       "string.required": messages["string.required"],
       "string.max": messages["string.max"],
     }),
@@ -119,7 +119,7 @@ export const validateOnboardingIndividualStep2Middleware = (req, res, next) => {
 
 export const validateOnboardingCompanyStep2Middleware = (req, res, next) => {
   const schema = Joi.object({
-    businessName: Joi.string().required().max(100).messages({
+    name: Joi.string().required().max(100).messages({
       "string.required": messages["string.required"],
       "string.max": messages["string.max"],
     }),

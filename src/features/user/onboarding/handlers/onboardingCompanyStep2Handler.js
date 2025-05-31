@@ -16,7 +16,7 @@ const messages = {
 };
 
 const onboardingCompanyStep2Service = async (data, id) => {
-  const { businessName, website, address, members } = data;
+  const { name, website, address, members } = data;
   const user = await User.findById(id);
   if (!user) {
     throw({
@@ -78,7 +78,7 @@ const onboardingCompanyStep2Service = async (data, id) => {
   try {
     practice = await Practice.create({
       members: filteredMembers,
-      businessName: businessName,
+      name: name,
       website: website,
       addresses: [
         {

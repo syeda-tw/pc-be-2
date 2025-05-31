@@ -28,7 +28,7 @@ const getRelationshipsService = async (clientId) => {
         select: "firstName lastName email username availability practice appointmentCost appointmentDuration",
         populate: {
           path: "practice",
-          select: "businessName", // or add other fields as needed
+          select: "name", // or add other fields as needed
         },
       })
       .lean();
@@ -62,7 +62,7 @@ const getRelationshipsUserHandler = async (req, res) => {
           relationshipStatus: rel.relationshipStatus,
           relationshipId: rel._id,
           practiceId: rel.user.practice?._id,
-          practiceBusinessName: rel.user.practice?.businessName,
+          practicename: rel.user.practice?.name,
           practiceBusinessWebsite: rel.user.practice?.website,
           userAppointmentCost: rel.user.appointmentCost,
           userAppointmentDuration: rel.user.appointmentDuration,

@@ -28,6 +28,7 @@ export const sanitizeUserAndAppendType = (user, type) => {
     title,
     status,
     relationships,
+    defaultRelationship,
     // Destructure other fields that might exist but we don't want to include,
     // especially sensitive ones like password.
     // eslint-disable-next-line no-unused-vars
@@ -49,6 +50,7 @@ export const sanitizeUserAndAppendType = (user, type) => {
     title,
     status,
     relationships,
+    defaultRelationship,
     type: type || "user",
   };
 };

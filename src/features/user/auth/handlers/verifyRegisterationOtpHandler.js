@@ -36,7 +36,7 @@ const verifyRegistrationOtpService = async (email, otp) => {
     }
 
     const newPractice = await Practice.create({
-      businessName: "",
+      name: "",
       isCompany: false,
       website: "",
       addresses: [],
