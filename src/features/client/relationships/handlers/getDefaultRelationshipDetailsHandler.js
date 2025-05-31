@@ -47,7 +47,7 @@ const getDefaultRelationshipDetails = async (req, res) => {
       userDetails,
     });
   } catch (error) {
-    throw error;
+    next(error);
   }
 };
 

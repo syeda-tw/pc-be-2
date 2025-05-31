@@ -1,3 +1,4 @@
+//TODO: Change from appointment to sesion
 import Client from "../../../../common/models/Client.js";
 import Relationship from "../../../../common/models/Relationship.js";
 import Stripe from "stripe";
