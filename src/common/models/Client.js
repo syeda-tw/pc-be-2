@@ -23,6 +23,8 @@ const ClientSchema = new Schema({
       type: Schema.Types.ObjectId,
       ref: "Relationship",
     }],
+  loginOtp: { type: String },
+  loginOtpExpiresAt: { type: Date },
 }, { timestamps: true });
 
 export default mongoose.model('Client', ClientSchema);
