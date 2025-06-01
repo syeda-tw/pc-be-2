@@ -1,6 +1,5 @@
 import nodemailer from "nodemailer";
 import { env } from "../config/env.js";
-import CustomError from "./customError.js";
 
 //THIS IS CREATED SO THAT TEST ACCOUNTS CAN BE CREATED WITH THE SAME EMAIL ADDRESS
 const getEmailForDevelopment = (email) => {
@@ -114,6 +113,9 @@ export const sendEmail = async (to, subject, htmlContent) => {
     await transporter.sendMail(mailOptions);
   } catch (err) {
     console.error("Error sending email:", err);
-    throw new CustomError(400, 'Email sending failed');
+    throw {
+      code: 400,
+      message: 'Email sending failed',
+    };
   }
 };

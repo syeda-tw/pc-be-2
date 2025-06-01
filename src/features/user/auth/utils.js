@@ -2,7 +2,6 @@ import {
   generateEmailHtml,
   sendEmail,
 } from "../../../common/utils/emailService.js";
-import CustomError from "../../../common/utils/customError.js";
 
 // Send OTP Registration Email
 export const sendRegistrationEmail = async (email, otp) => {
@@ -24,7 +23,10 @@ export const sendRegistrationEmail = async (email, otp) => {
   try {
     await sendEmail(email, subject, htmlContent);
   } catch (err) {
-    throw new CustomError(400, "Error sending OTP email.");
+    throw {
+      code: 400,
+      message: "Error sending OTP email.",
+    };
   }
 };
 
@@ -56,7 +58,10 @@ export const sendWelcomeEmail = async (user) => {
   try {
     await sendEmail(user.email, subject, htmlContent);
   } catch (err) {
-    throw new CustomError(400, "Error sending welcome email.");
+    throw {
+      code: 400,
+      message: "Error sending welcome email.",
+    };
   }
 };
 
@@ -78,7 +83,10 @@ export const sendPasswordResetEmail = async (email, resetLink) => {
   try {
     await sendEmail(email, subject, htmlContent);
   } catch (err) {
-    throw new CustomError(400, "Error sending password reset email.");
+    throw {
+      code: 400,
+      message: "Error sending password reset email.",
+    };
   }
 };
 
