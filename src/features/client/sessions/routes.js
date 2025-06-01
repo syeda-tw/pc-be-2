@@ -6,7 +6,9 @@ import {
   validateGetSessions,
   validateGetUserAvailabilityAndSessionDuration,
   validateGetUserFutureSessions,
+  validateBookSession,
 } from "./middlewares.js";
+import bookSessionHandler from "./handlers/bookSessionHandler.js";
 import express from "express";
 const routes = express.Router();
 
@@ -29,6 +31,13 @@ routes.get(
   secureRequestMiddleware,
   validateGetUserFutureSessions,
   getUserFutureSessionsHandler
+);
+
+routes.post(
+  "/book-session",
+  secureRequestMiddleware,
+  validateBookSession,
+  bookSessionHandler
 );
 
 export default routes;

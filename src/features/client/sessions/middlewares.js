@@ -73,3 +73,40 @@ export const validateGetUserFutureSessions = (req, res, next) => {
   req.params = value; // validated and defaulted query
   next();
 };
+
+
+export const validateBookSession = (req, res, next) => {
+  const schema = Joi.object({
+    relationshipId: Joi.string().required().messages({
+      "any.required": "Relationship ID is required.",
+      "string.base": "Relationship ID must be a string.",
+    }),
+    startTime: Joi.date().iso().required().messages({
+      "any.required": "Start time is required.",
+      "date.format": "Invalid date format for start time.",
+      "date.base": "Invalid date format for start time.",
+    }),
+    endTime: Joi.date().iso().required().messages({
+      "any.required": "End time is required.",
+      "date.format": "Invalid date format for end time.",
+      "date.base": "Invalid date format for end time.",
+    }),
+    date: Joi.date().iso().required().messages({
+      "any.required": "Date is required.",
+      "date.format": "Invalid date format for date.",
+      "date.base": "Invalid date format for date.",
+    }),
+  });
+
+  const { error, value } = schema.validate(req.body, { abortEarly: false });
+
+  if (error) {
+    throw {
+      status: 400,
+      message: error.details[0].message,
+    };
+  }
+
+  req.body = value; // validated and defaulted query
+  next();
+};
