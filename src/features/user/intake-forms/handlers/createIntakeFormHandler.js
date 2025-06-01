@@ -4,11 +4,11 @@ import { v4 as uuidv4 } from 'uuid';
 import User from '../../../../common/models/User.js';
 
 const messages = {
-  invalidFileContent: "The file content is invalid. Please provide a valid file.",
-  failedToUploadFileToS3: "There was an error uploading the file to S3. Please try again later.",
-  failedToUpdateUserWithFormDetails: "We couldn't update the user with the form details. Please try again.",
-  userNotFound: "We couldn't find the user. Please check the user ID and try again.",
-  formUploadSuccess: "The form was successfully uploaded and saved.",
+  invalidFileContent: "We couldn't process your file. Please make sure it's not empty and try again.",
+  failedToUploadFileToS3: "We're having trouble saving your file. Please try again in a moment.",
+  failedToUpdateUserWithFormDetails: "We couldn't save your form details. Please try again.",
+  userNotFound: "We couldn't find your account. Please check your login and try again.",
+  formUploadSuccess: "Your form has been successfully uploaded and saved.",
 };
 
 const s3Client = new S3Client({
@@ -25,42 +25,38 @@ const createIntakeFormService = async (id, file, formName) => {
     const { buffer, mimetype } = file;
 
     if (!buffer || buffer.length === 0) {
-      throw({
-        status: 400,
+      throw {
+        code: 400,
         message: messages.invalidFileContent,
-      });
+      };
     }
 
-    // Update user with new form details
     const formDetails = {
       _id: uuidv4(),
       name: formName,
       created_at: new Date(),
     };
 
-    try {
-      const user = await User.findById(userId);
-      if (!user) {
-        throw({
-          status: 404,
-          message: messages.userNotFound,
-        });
-      }
+    const user = await User.findById(userId);
+    if (!user) {
+      throw {
+        code: 404,
+        message: messages.userNotFound,
+      };
+    }
 
-      // Check if the form ID already exists in user's forms
-      const formId = formDetails._id;
-      const formExists = user.forms.some((form) => form._id === formId);
+    // Check if the form ID already exists in user's forms
+    const formId = formDetails._id;
+    const formExists = user.forms.some((form) => form._id === formId);
 
-      if (formExists) {
-        // Generate a new ID if there's a collision
-        formDetails._id = uuidv4();
-      }
+    if (formExists) {
+      formDetails._id = uuidv4();
+    }
 
-      await User.findByIdAndUpdate(userId, {
-        forms: [...user.forms, formDetails],
-      });
+    await User.findByIdAndUpdate(userId, {
+      forms: [...user.forms, formDetails],
+    });
 
-         // Construct file URL
     const fileUrl = `https://${env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${formDetails._id}`;
 
     const params = {
@@ -74,26 +70,19 @@ const createIntakeFormService = async (id, file, formName) => {
       await s3Client.send(new PutObjectCommand(params));
     } catch (error) {
       console.error("Error uploading file to S3:", error);
-      throw({
-        status: 500,
+      throw {
+        code: 500,
         message: messages.failedToUploadFileToS3,
-      });
-      }
-
-      return formDetails;
-    } catch (error) {
-      console.error("Error updating user with form details:", error);
-      throw({
-        status: 500,
-        message: messages.failedToUpdateUserWithFormDetails,
-      });
+      };
     }
+
+    return formDetails;
   } catch (error) {
     console.error("Error in createIntakeFormService:", error);
-    throw({
-      status: 500,
-      message: messages.failedToUpdateUserWithFormDetails,
-    });
+    throw {
+      code: error.code || 500,
+      message: error.message || messages.failedToUpdateUserWithFormDetails,
+    };
   }
 };
 

@@ -43,19 +43,17 @@ export const updateTimezoneService = async (timezone, userId) => {
   }
   user.timezone = timezone;
   await updateUserDbOp(userId, user);
-  return;
 };
 
 export const getHolidaysService = async (userId) => {
-  try {
-    const holidays = await getHolidaysByUserIdDbOp(userId);
-    return holidays || [];
-  } catch (err) {
+  const holidays = await getHolidaysByUserIdDbOp(userId);
+  if (!holidays) {
     throw {
       code: 404,
       message: messages.error.holidayNotFound,
     };
   }
+  return holidays;
 };
 
 export const addHolidayService = async (holiday, userId) => {
@@ -80,22 +78,20 @@ export const deleteHolidayService = async (holidayId, userId) => {
     };
   }
   user.holidays = user.holidays.filter(
-    (holiday) => holiday._id.toString() != holidayId
+    (holiday) => holiday._id.toString() !== holidayId
   );
-  const res = await updateUserDbOp(userId, user);
-  return res;
+  const updatedUser = await updateUserDbOp(userId, user);
+  return updatedUser;
 };
 
 export const getDailyLunchService = async (userId) => {
   const lunchTimes = await getUserDailyLunch(userId);
-
-  if (!lunchTimes.dailyLunchStartTime || !lunchTimes.dailyLunchEndTime) {
+  if (!lunchTimes?.dailyLunchStartTime || !lunchTimes?.dailyLunchEndTime) {
     throw {
       code: 404,
       message: messages.error.lunchNotFound,
     };
   }
-
   return {
     startTime: lunchTimes.dailyLunchStartTime,
     endTime: lunchTimes.dailyLunchEndTime,
@@ -103,19 +99,13 @@ export const getDailyLunchService = async (userId) => {
 };
 
 export const updateDailyLunchService = async (userId, startTime, endTime) => {
-  const updatedLunchTimes = await updateUserDailyLunch(
-    userId,
-    startTime,
-    endTime
-  );
-
+  const updatedLunchTimes = await updateUserDailyLunch(userId, startTime, endTime);
   if (!updatedLunchTimes) {
     throw {
       code: 404,
       message: messages.error.userNotFound,
     };
   }
-
   return {
     startTime: updatedLunchTimes.dailyLunchStartTime,
     endTime: updatedLunchTimes.dailyLunchEndTime,
@@ -123,45 +113,25 @@ export const updateDailyLunchService = async (userId, startTime, endTime) => {
 };
 
 export const getWeeklyScheduleService = async (userId) => {
-  try {
-    const weeklySchedule = await getWeeklyScheduleFromDB(userId);
-    if (!weeklySchedule) {
-      throw {
-        code: 404,
-        message: messages.error.weeklyScheduleNotFound,
-      };
-    }
-    return weeklySchedule;
-  } catch (error) {
+  const weeklySchedule = await getWeeklyScheduleFromDB(userId);
+  if (!weeklySchedule) {
     throw {
       code: 404,
       message: messages.error.weeklyScheduleNotFound,
     };
   }
+  return weeklySchedule;
 };
 
-export const updateWeeklyScheduleService = async (
-  userId,
-  weeklyScheduleData
-) => {
-  try {
-    const updatedWeeklySchedule = await updateWeeklyScheduleInDB(
-      userId,
-      weeklyScheduleData
-    );
-    if (!updatedWeeklySchedule) {
-      throw {
-        code: 400,
-        message: messages.error.failedToUpdateWeeklySchedule,
-      };
-    }
-    return updatedWeeklySchedule;
-  } catch (error) {
+export const updateWeeklyScheduleService = async (userId, weeklyScheduleData) => {
+  const updatedWeeklySchedule = await updateWeeklyScheduleInDB(userId, weeklyScheduleData);
+  if (!updatedWeeklySchedule) {
     throw {
       code: 400,
       message: messages.error.failedToUpdateWeeklySchedule,
     };
   }
+  return updatedWeeklySchedule;
 };
 
 export const getProfileService = async (username) => {
@@ -172,7 +142,7 @@ export const getProfileService = async (username) => {
       message: messages.error.userNotFound,
     };
   }
-  const profile = {
+  return {
     firstName: user.firstName,
     lastName: user.lastName,
     phone: user.phone,
@@ -185,5 +155,4 @@ export const getProfileService = async (username) => {
     dailyLunch: user.availability.dailyLunch,
     practice: user.practice,
   };
-  return profile;
 };

@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { env } from "../../common/config/env.js";
+import nodemailer from "nodemailer";
 
 export const hashPassword = async (password) => {
   return await bcrypt.hash(password, 10);

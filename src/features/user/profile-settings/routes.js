@@ -1,5 +1,17 @@
 import express from "express";
-import { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch, getWeeklySchedule, updateWeeklySchedule, getProfile } from "./controllers.js";
+import { 
+  updatePersonalInformation, 
+  getTimezone, 
+  updateTimezone, 
+  getHolidays, 
+  addHoliday, 
+  deleteHoliday, 
+  getDailyLunch, 
+  updateDailyLunch, 
+  getWeeklySchedule, 
+  updateWeeklySchedule, 
+  getProfile 
+} from "./controllers.js";
 import {
   validateUpdatePersonalInformationMiddleware,
   validateUpdateTimezoneMiddleware,
@@ -32,25 +44,29 @@ router.patch(
 );
 
 router.get(
-  '/holidays',
+  "/holidays",
   secureRequestMiddleware,
   getHolidays
-)
+);
 
 router.post(
-  '/holidays',
+  "/holidays",
   validateAddHolidayMiddleware,
   secureRequestMiddleware,
   addHoliday
-)
+);
 
 router.delete(
-  '/holidays/:holidayId',
+  "/holidays/:holidayId",
   secureRequestMiddleware,
   deleteHoliday
-)
+);
 
-router.get('/daily-lunch', secureRequestMiddleware, getDailyLunch);
+router.get(
+  "/daily-lunch", 
+  secureRequestMiddleware, 
+  getDailyLunch
+);
 
 router.patch(
   "/daily-lunch",
@@ -72,6 +88,9 @@ router.patch(
   updateWeeklySchedule
 );
 
-router.get('/profile/:username', getProfile);
+router.get(
+  "/profile/:username", 
+  getProfile
+);
 
-export default router; 
+export default router;

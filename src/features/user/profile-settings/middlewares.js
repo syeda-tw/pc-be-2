@@ -23,26 +23,17 @@ const validateUpdatePersonalInformationMiddleware = (req, res, next) => {
     dateOfBirth: Joi.date().required().messages({
       'date.empty': 'Date of birth is required'
     }),
-    phone: Joi.string().trim().max(20).allow('').optional().messages({
-      'string.max': 'Phone number cannot exceed 20 characters'
-    })
   });
 
-
   const { error } = schema.validate(req.body);
-
   if (error) {
-    return res.status(400).json({
-      errors: error.details.map(detail => ({
-        message: detail.message,
-        path: detail.path
-      }))
-    });
+    throw {
+      code: 400,
+      message: error.details[0].message
+    };
   }
-
   next();
 };
-
 
 const validateUpdateTimezoneMiddleware = (req, res, next) => {
   const schema = Joi.object({
@@ -53,20 +44,14 @@ const validateUpdateTimezoneMiddleware = (req, res, next) => {
   });
 
   const { error } = schema.validate(req.body);
-
   if (error) {
-    console.log(error);
-    return res.status(400).json({
-      errors: error.details.map(detail => ({
-        message: detail.message,
-        path: detail.path
-      }))
-    });
+    throw {
+      code: 400,
+      message: error.details[0].message
+    };
   }
-
   next();
 };
-
 
 const validateAddHolidayMiddleware = (req, res, next) => {
   const schema = Joi.object({
@@ -81,21 +66,16 @@ const validateAddHolidayMiddleware = (req, res, next) => {
   });
 
   const { error } = schema.validate(req.body);
-
   if (error) {
-    return res.status(400).json({
-      errors: error.details.map(detail => ({
-        message: detail.message,
-        path: detail.path
-      }))
-    });
+    throw {
+      code: 400,
+      message: error.details[0].message
+    };
   }
-
   next();
 };
 
 const validateUpdateDailyLunchMiddleware = (req, res, next) => {
-
   const schema = Joi.object({
     startTime: Joi.string().trim().required(),
     endTime: Joi.string().trim().required()
@@ -112,18 +92,14 @@ const validateUpdateDailyLunchMiddleware = (req, res, next) => {
   });
 
   const { error } = schema.validate(req.body);
-
   if (error) {
-    return res.status(400).json({
-      errors: error.details.map(detail => ({
-        message: detail.message,
-        path: detail.path
-      }))
-    });
+    throw {
+      code: 400,
+      message: error.details[0].message
+    };
   }
-
   next();
-}
+};
 
 const validateWeeklyScheduleMiddleware = (req, res, next) => {
   const schema = Joi.object({
@@ -147,12 +123,18 @@ const validateWeeklyScheduleMiddleware = (req, res, next) => {
 
   const { error } = schema.validate(req.body);
   if (error) {
-    return res.status(400).json({
-      status: "error",
+    throw {
+      code: 400,
       message: error.details[0].message
-    });
+    };
   }
   next();
 };
 
-export { validateUpdatePersonalInformationMiddleware, validateUpdateTimezoneMiddleware, validateAddHolidayMiddleware, validateUpdateDailyLunchMiddleware, validateWeeklyScheduleMiddleware };   
+export { 
+  validateUpdatePersonalInformationMiddleware, 
+  validateUpdateTimezoneMiddleware, 
+  validateAddHolidayMiddleware, 
+  validateUpdateDailyLunchMiddleware, 
+  validateWeeklyScheduleMiddleware 
+};

@@ -4,10 +4,11 @@ import User from "../../../../common/models/User.js";
 import { Readable } from "stream";
 
 const messages = {
-  userNotFound: "User not found",
-  formNotFound: "Form not found",
-  failedToFindUserOrForm: "Failed to find user or form",
-  failedToRetrieveFileFromS3: "Failed to retrieve file from S3",
+  userNotFound: "We couldn't find your account. Please check your login and try again.",
+  formNotFound: "We couldn't find the form you're looking for. Please check the form ID and try again.",
+  failedToFindUserOrForm: "We're having trouble finding your form. Please try again in a moment.",
+  failedToRetrieveFileFromS3: "We're having trouble retrieving your form. Please try again in a moment.",
+  streamError: "We're having trouble sending your form. Please try again in a moment."
 };
 
 const s3Client = new S3Client({
@@ -20,54 +21,34 @@ const s3Client = new S3Client({
 
 const getSingleIntakeFormService = async (formId, userId) => {
   try {
-    // Try to find the user and form
-    let user;
-    let form;
-    try {
-      user = await User.findById(userId).select("forms");
-      if (!user) {
-        throw {
-          status: 404,
-          message: messages.userNotFound,
-        };
-      }
-
-      form = user.forms.find((form) => form._id === formId);
-      if (!form) {
-        throw {
-          status: 404,
-          message: messages.formNotFound,
-        };
-      }
-    } catch (error) {
-      console.error("Error finding user or form:", error);
+    // Find user and form
+    const user = await User.findById(userId).select("forms");
+    if (!user) {
       throw {
-        status: 500,
-        message: messages.failedToFindUserOrForm,
+        code: 404,
+        message: messages.userNotFound
       };
     }
 
-    // Try to get file from S3
-    let s3Object;
-    try {
-      const s3Params = {
-        Bucket: env.AWS_S3_BUCKET_NAME || "default-bucket-name",
-        Key: formId,
-      };
-
-      s3Object = await s3Client.send(new GetObjectCommand(s3Params));
-
-      if (!s3Object.Body) {
-        throw {
-          status: 500,
-          message: messages.failedToRetrieveFileFromS3,
-        };
-      }
-    } catch (error) {
-      console.error("Error retrieving file from S3:", error);
+    const form = user.forms.find((form) => form._id === formId);
+    if (!form) {
       throw {
-        status: 500,
-        message: messages.failedToRetrieveFileFromS3,
+        code: 404,
+        message: messages.formNotFound
+      };
+    }
+
+    // Get file from S3
+    const s3Params = {
+      Bucket: env.AWS_S3_BUCKET_NAME,
+      Key: formId,
+    };
+
+    const s3Object = await s3Client.send(new GetObjectCommand(s3Params));
+    if (!s3Object.Body) {
+      throw {
+        code: 500,
+        message: messages.failedToRetrieveFileFromS3
       };
     }
 
@@ -76,8 +57,8 @@ const getSingleIntakeFormService = async (formId, userId) => {
   } catch (error) {
     console.error("Error in getSingleIntakeFormService:", error);
     throw {
-      status: 500,
-      message: messages.failedToRetrieveFileFromS3,
+      code: error.code || 500,
+      message: error.message || messages.failedToRetrieveFileFromS3
     };
   }
 };
@@ -88,22 +69,21 @@ export const getSingleIntakeFormHandler = async (req, res, next) => {
       req.params.id,
       req.id
     );
-    // Set headers for the PDF file
+
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${form.name || "file"}"`
+      `attachment; filename="${form.name || "form"}.pdf"`
     );
 
-    // Pipe the Readable stream to the response
     fileStream.pipe(res);
 
-    // Handle any errors from the stream
     fileStream.on("error", (err) => {
       console.error("Stream error:", err);
-      res
-        .status(500)
-        .json({ error: "Failed to stream PDF", details: err.message });
+      res.status(500).json({
+        code: 500,
+        message: messages.streamError
+      });
     });
   } catch (err) {
     next(err);

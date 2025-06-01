@@ -1,8 +1,8 @@
 import Joi from "joi";
 
 const messages = {
-  invalidFormIdFormat: "Oops! The form ID doesn't seem right. Could you check it again?",
-  invalidFormFormat: "Hmm, the form format looks off. Let's try fixing it!",
+  invalidFormIdFormat: "Please provide a valid form ID to continue.",
+  invalidFormFormat: "Please provide a valid form name to continue.",
 };
 
 const getSingleIntakeFormSchema = Joi.object({
@@ -14,12 +14,12 @@ const getSingleIntakeFormSchema = Joi.object({
 const validateGetSingleIntakeFormMiddleware = (req, res, next) => {
   const { error } = getSingleIntakeFormSchema.validate(req.params);
   if (error) {
-    return next({
-      status: 400,
+    throw {
+      code: 400,
       message: error.details[0].message,
-    });
+    };
   }
-  next();
+  return next();
 };
 
 const createIntakeFormSchema = Joi.object({
@@ -32,12 +32,12 @@ const createIntakeFormSchema = Joi.object({
 const validateCreateIntakeFormMiddleware = (req, res, next) => {
   const { error } = createIntakeFormSchema.validate(req.body);
   if (error) {
-    return next({
-      status: 400,
+    throw {
+      code: 400,
       message: error.details[0].message,
-    });
+    };
   }
-  next();
+  return next();
 };
 
 const deleteIntakeFormSchema = Joi.object({
@@ -49,12 +49,12 @@ const deleteIntakeFormSchema = Joi.object({
 const validateDeleteIntakeFormMiddleware = (req, res, next) => {
   const { error } = deleteIntakeFormSchema.validate(req.params);
   if (error) {
-    return next({
-      status: 400,
+    throw {
+      code: 400,
       message: error.details[0].message,
-    });
+    };
   }
-  next();
+  return next();
 };
 
 export {

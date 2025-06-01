@@ -1,19 +1,28 @@
+import { sanitizeUserAndAppendType } from '../../common/utils.js';
 import { messages } from "./messages.js";
-import { updatePersonalInformationService, getTimezoneService, updateTimezoneService, getHolidaysService, addHolidayService, deleteHolidayService, getDailyLunchService, updateDailyLunchService, getWeeklyScheduleService, updateWeeklyScheduleService, getProfileService } from "./services.js";
-import { sanitizeUser } from "./utils.js";
+import { 
+  updatePersonalInformationService, 
+  getTimezoneService, 
+  updateTimezoneService, 
+  getHolidaysService, 
+  addHolidayService, 
+  deleteHolidayService, 
+  getDailyLunchService, 
+  updateDailyLunchService, 
+  getWeeklyScheduleService, 
+  updateWeeklyScheduleService, 
+  getProfileService 
+} from "./services.js";
 
 const updatePersonalInformation = async (req, res, next) => {
   try {
-    const user = await updatePersonalInformationService(
-      req.body,
-      req.id
-    );
+    const user = await updatePersonalInformationService(req.body, req.id);
     return res.status(200).json({
-      user: sanitizeUser(user),
+      user: sanitizeUserAndAppendType(user, "user"),
       message: messages.personalInfo.updated
     });
   } catch (err) {
-    next(err);
+    throw { code: err.code || 500, message: err.message };
   }
 };
 
@@ -21,11 +30,11 @@ const getTimezone = async (req, res, next) => {
   try {
     const timezone = await getTimezoneService(req.id);
     return res.status(200).json({
-      timezone: timezone,
+      timezone,
       message: messages.timezone.fetched
     });
   } catch (err) {
-    next(err);
+    throw { code: err.code || 500, message: err.message };
   }
 };
 
@@ -36,7 +45,7 @@ const updateTimezone = async (req, res, next) => {
       message: messages.timezone.updated
     });
   } catch (err) {
-    next(err);
+    throw { code: err.code || 500, message: err.message };
   }
 };
 
@@ -44,25 +53,25 @@ const getHolidays = async (req, res, next) => {
   try {
     const holidays = await getHolidaysService(req.id);
     return res.status(200).json({
-      holidays: holidays,
+      holidays,
       message: messages.holiday.fetched
     });
   } catch (err) {
-    next(err);
+    throw { code: err.code || 500, message: err.message };
   }
-}
+};
 
 const addHoliday = async (req, res, next) => {
   try {
     const holiday = await addHolidayService(req.body.holiday, req.id);
-      return res.status(200).json({
-      holiday: holiday,
+    return res.status(200).json({
+      holiday,
       message: messages.holiday.updated
     });
   } catch (err) {
-    next(err);
+    throw { code: err.code || 500, message: err.message };
   }
-  }
+};
 
 const deleteHoliday = async (req, res, next) => {
   try {
@@ -71,9 +80,9 @@ const deleteHoliday = async (req, res, next) => {
       message: messages.holiday.deleted
     });
   } catch (err) {
-    next(err);
+    throw { code: err.code || 500, message: err.message };
   }
-}
+};
 
 const getDailyLunch = async (req, res, next) => {
   try {
@@ -83,54 +92,44 @@ const getDailyLunch = async (req, res, next) => {
       message: messages.lunch.retrieved
     });
   } catch (err) {
-    next(err);
+    throw { code: err.code || 500, message: err.message };
   }
 };
 
 const updateDailyLunch = async (req, res, next) => {
   try {
     const { startTime, endTime } = req.body;
-    const updatedLunchTimes = await updateDailyLunchService(
-      req.id,
-      startTime,
-      endTime
-    );
-    
+    const updatedLunchTimes = await updateDailyLunchService(req.id, startTime, endTime);
     return res.status(200).json({
       data: updatedLunchTimes,
       message: messages.lunch.updated
     });
   } catch (err) {
-    next(err);
+    throw { code: err.code || 500, message: err.message };
   }
 };
 
 const getWeeklySchedule = async (req, res, next) => {
   try {
-    const userId = req.id;
-    const weeklySchedule = await getWeeklyScheduleService(userId);
-    
+    const weeklySchedule = await getWeeklyScheduleService(req.id);
     return res.status(200).json({
       data: weeklySchedule,
       message: messages.weeklySchedule.retrieved
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    throw { code: err.code || 500, message: err.message };
   }
 };
 
 const updateWeeklySchedule = async (req, res, next) => {
   try {
-    const userId = req.id;
-    const weeklyScheduleData = req.body.data;
-    const updatedWeeklySchedule = await updateWeeklyScheduleService(userId, weeklyScheduleData);
-    
+    const updatedWeeklySchedule = await updateWeeklyScheduleService(req.id, req.body.data);
     return res.status(200).json({
       data: updatedWeeklySchedule,
       message: messages.weeklySchedule.updated
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    throw { code: err.code || 500, message: err.message };
   }
 };
 
@@ -138,13 +137,24 @@ const getProfile = async (req, res, next) => {
   try {
     const profile = await getProfileService(req.params.username);
     return res.status(200).json({ 
-      profile: profile,
+      profile,
       message: messages.profile.retrieved
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    throw { code: err.code || 500, message: err.message };
   }
 };
 
-
-export { updatePersonalInformation, getTimezone, updateTimezone, getHolidays, addHoliday, deleteHoliday, getDailyLunch, updateDailyLunch, getWeeklySchedule, updateWeeklySchedule, getProfile }; 
+export { 
+  updatePersonalInformation, 
+  getTimezone, 
+  updateTimezone, 
+  getHolidays, 
+  addHoliday, 
+  deleteHoliday, 
+  getDailyLunch, 
+  updateDailyLunch, 
+  getWeeklySchedule, 
+  updateWeeklySchedule, 
+  getProfile 
+};
