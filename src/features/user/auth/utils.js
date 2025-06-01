@@ -1,7 +1,4 @@
-import {
-  generateEmailHtml,
-  sendEmail,
-} from "../../../common/utils/emailService.js";
+import { sendEmail } from "../../common/utils.js";
 
 // Send OTP Registration Email
 export const sendRegistrationEmail = async (email, otp) => {

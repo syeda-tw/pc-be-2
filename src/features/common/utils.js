@@ -58,3 +58,31 @@ export const sanitizeUserAndAppendType = (user, type) => {
 export const isPasswordCorrect = async (password, correctPassword) => {
   return await bcrypt.compare(password, correctPassword);
 };
+
+
+export const sendEmail = async (to, subject, htmlContent) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail", // Example; use your actual SMTP configuration here
+      auth: {
+        user: env.NODEMAILER_EMAIL,
+        pass: env.NODEMAILER_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: env.NODEMAILER_EMAIL,
+      to,
+      subject,
+      html: htmlContent,
+    };
+
+    await transporter.sendMail(mailOptions);
+  } catch (err) {
+    console.error("Error sending email:", err);
+    throw {
+      code: 400,
+      message: 'Email sending failed',
+    };
+  }
+};
