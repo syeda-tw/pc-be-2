@@ -1,4 +1,4 @@
-import { generateToken } from './src/features/common/utils.js';
+import { generateToken } from '../features/common/utils.js';
 
 const createClientTokenAndPrintOnConsole = async () => {
   const id = "682f40d89a3a608a46e0913f";

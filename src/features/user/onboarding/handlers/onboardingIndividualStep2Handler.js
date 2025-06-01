@@ -5,52 +5,52 @@ import { sanitizeUserAndAppendType } from '../../../common/utils.js';
 import { googleValidateAddress } from './validateAddressHandler.js';
 
 const messages = {
-  userNotFound: "We couldn't find the user. Please check and try again.",
-  practiceCreationFailed: "We encountered an issue while creating the practice. Please try again.",
-  invalidAddress: "The address provided seems to be incorrect. Could you please double-check?",
-  invalidUserStatus: "It seems the user status isn't set to onboarding-step-2. Let's fix that.",
+  userNotFound: "We're having trouble finding your account. Please try again or contact support if the issue persists.",
+  practiceCreationFailed: "We're having trouble setting up your practice. Please try again or contact our support team for assistance.",
+  invalidAddress: "We couldn't verify your address. Please double-check and make sure it's complete and accurate.",
+  invalidUserStatus: "We need to complete the previous step before proceeding. Please go back and complete step 1 first.",
 };
 
 const onboardingIndividualStep2Service = async (data, id) => {
   const { name, website, address } = data;
   const user = await User.findById(id);
   if (!user) {
-    throw({
-      status: 400,
-      message: messages.userNotFound,
-    });
+    throw {
+      code: 400,
+      message: messages.userNotFound
+    };
   }
 
   if (user.status !== "onboarding-step-2") {
-    throw({
-      status: 400,
-      message: messages.invalidUserStatus,
-    });
+    throw {
+      code: 400,
+      message: messages.invalidUserStatus
+    };
   }
 
   try {
     const isAddressValid = await googleValidateAddress(address);
     if (isAddressValid.isValid === false) {
-      throw({
-        status: 400,
-        message: isAddressValid.message,
-      });
+      throw {
+        code: 400,
+        message: isAddressValid.message
+      };
     }
   } catch (error) {
-    throw({
-      status: 400,
-      message: messages.invalidAddress,
-    });
+    throw {
+      code: 400,
+      message: messages.invalidAddress
+    };
   }
 
   let addressParts;
   try {
     addressParts = await extractAddressPartsFromGoogle(address);
   } catch (error) {
-    throw({
-      status: 400,
-      message: messages.invalidAddress,
-    });
+    throw {
+      code: 400,
+      message: messages.invalidAddress
+    };
   }
 
   let practice;
@@ -70,10 +70,10 @@ const onboardingIndividualStep2Service = async (data, id) => {
       isCompany: false,
     });
   } catch (error) {
-    throw({
-      status: 400,
-      message: messages.practiceCreationFailed,
-    });
+    throw {
+      code: 400,
+      message: messages.practiceCreationFailed
+    };
   }
 
   user.practice = practice._id;
@@ -83,10 +83,10 @@ const onboardingIndividualStep2Service = async (data, id) => {
     const userUpdated = await User.findByIdAndUpdate(id, user, { new: true });
     return userUpdated.toObject();
   } catch (error) {
-    throw({
-      status: 400,
-      message: messages.practiceCreationFailed,
-    });
+    throw {
+      code: 400,
+      message: messages.practiceCreationFailed
+    };
   }
 }; 
 

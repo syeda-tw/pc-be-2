@@ -14,7 +14,6 @@ import { validateUsernameHandler } from "./handlers/validateUsernameHandler.js";
 import { onboardingIndividualStep2Handler } from "./handlers/onboardingIndividualStep2Handler.js";
 import { onboardingCompanyStep2Handler } from "./handlers/onboardingCompanyStep2Handler.js";
 
-
 const router = express.Router();
 
 router.post(

@@ -17,7 +17,11 @@ import { changePasswordHandler } from "./handlers/changePasswordHandler.js";
 
 const router = express.Router();
 
-router.post("/register", validateRegisterMiddleware, registerHandler);
+router.post(
+  "/register",
+  validateRegisterMiddleware,
+  registerHandler
+);
 
 router.post(
   "/verify-registration-otp",
@@ -25,7 +29,11 @@ router.post(
   verifyRegistrationOtpHandler
 );
 
-router.post("/login", validateLoginMiddleware, loginHandler);
+router.post(
+  "/login",
+  validateLoginMiddleware,
+  loginHandler
+);
 
 router.post(
   "/request-reset-password",
@@ -33,7 +41,11 @@ router.post(
   requestResetPasswordHandler
 );
 
-router.post("/reset-password", validateResetPasswordMiddleware, resetPasswordHandler);
+router.post(
+  "/reset-password",
+  validateResetPasswordMiddleware,
+  resetPasswordHandler
+);
 
 router.post(
   "/change-password",

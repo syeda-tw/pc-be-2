@@ -25,20 +25,20 @@ const onboardingStep1Service = async (
     const user = await User.findById(id);
     if (!user) {
       throw {
-        status: 400,
+        error: "USER_NOT_FOUND",
         message: messages.userNotFound,
       };
     }
     if (user.status !== "onboarding-step-1") {
       throw {
-        status: 400,
+        error: "INVALID_USER_STATUS",
         message: messages.invalidUserStatus,
       };
     }
     const usernameExists = await User.findOne({ username });
     if (usernameExists) {
       throw {
-        status: 400,
+        error: "USERNAME_EXISTS",
         message: messages.usernameAlreadyExists,
       };
     }
@@ -57,13 +57,13 @@ const onboardingStep1Service = async (
       return userUpdated.toObject();
     } catch (error) {
       throw {
-        status: 500,
+        error: "UPDATE_FAILED",
         message: messages.errorUpdatingUser,
       };
     }
   } catch (error) {
     throw {
-      status: 500,
+      error: error.error || "INTERNAL_ERROR",
       message: error.message || messages.errorUpdatingUser,
     };
   }

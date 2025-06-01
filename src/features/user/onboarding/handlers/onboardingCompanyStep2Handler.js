@@ -5,46 +5,46 @@ import { sanitizeUserAndAppendType } from '../../../common/utils.js';
 import { googleValidateAddress } from './validateAddressHandler.js';
 
 const messages = {
-  userNotFound: "We couldn't find the user. Please check and try again.",
-  practiceCreationFailed: "We encountered an issue while creating the practice. Please try again.",
-  practiceNotFound: "We couldn't locate the practice. Please verify the details.",
-  invalidAddress: "The address provided seems to be incorrect. Could you please double-check?",
-  invalidUserStatus: "It seems the user status isn't set to onboarding-step-2. Let's fix that.",
-  memberAlreadyExists: "It looks like some members are already registered. Please review the list.",
-  memberIsUser: "A member cannot be the user themselves. Please adjust the member list.",
-  memberIsOtp: "A member cannot be an OTP verification email. Please adjust the member list.",
+  userNotFound: "We couldn't find your account. Please try logging in again.",
+  practiceCreationFailed: "We're having trouble creating your practice profile. Please try again in a moment.",
+  practiceNotFound: "We couldn't find your practice details. Please verify your information and try again.",
+  invalidAddress: "The address you provided needs to be verified. Please check and try again.",
+  invalidUserStatus: "Your account needs to be in the correct state to proceed. Please start the onboarding process again.",
+  memberAlreadyExists: "Some of the members you're trying to add are already registered. Please review the list.",
+  memberIsUser: "You cannot add your own email as a member. Please remove it from the list.",
+  memberIsOtp: "Please use regular email addresses for members, not OTP verification emails.",
 };
 
 const onboardingCompanyStep2Service = async (data, id) => {
   const { name, website, address, members } = data;
   const user = await User.findById(id);
   if (!user) {
-    throw({
-      status: 400,
-      message: messages.userNotFound,
-    });
+    throw {
+      code: 400,
+      message: messages.userNotFound
+    };
   }
 
   if (user.status !== "onboarding-step-2") {
-    throw({
-      status: 400,
-      message: messages.invalidUserStatus,
-    });
+    throw {
+      code: 400,
+      message: messages.invalidUserStatus
+    };
   }
 
   // Ensure the user cannot add their own email as a member
   const filteredMembers = members.filter(member => {
     if (member === user.email) {
-      throw({
-        status: 400,
-        message: messages.memberIsUser,
-      });
+      throw {
+        code: 400,
+        message: messages.memberIsUser
+      };
     }
     if (member.includes("otp")) {
-      throw({
-        status: 400,
-        message: messages.memberIsOtp,
-      });
+      throw {
+        code: 400,
+        message: messages.memberIsOtp
+      };
     }
     return true;
   });
@@ -52,26 +52,26 @@ const onboardingCompanyStep2Service = async (data, id) => {
   try {
     const isAddressValid = await googleValidateAddress(address);
     if (isAddressValid.isValid === false) {
-      throw({
-        status: 400,
-        message: isAddressValid.message,
-      });
+      throw {
+        code: 400,
+        message: isAddressValid.message
+      };
     }
   } catch (error) {
-    throw({
-      status: 400,
-      message: messages.invalidAddress,
-    });
+    throw {
+      code: 400,
+      message: messages.invalidAddress
+    };
   }
 
   let addressParts;
   try {
     addressParts = await extractAddressPartsFromGoogle(address);
   } catch (error) {
-    throw({
-      status: 400,
-      message: messages.invalidAddress,
-    });
+    throw {
+      code: 400,
+      message: messages.invalidAddress
+    };
   }
 
   let practice;
@@ -91,10 +91,10 @@ const onboardingCompanyStep2Service = async (data, id) => {
       isCompany: true,
     });
   } catch (error) {
-    throw({
-      status: 400,
-      message: messages.practiceCreationFailed,
-    });
+    throw {
+      code: 400,
+      message: messages.practiceCreationFailed
+    };
   }
 
   user.practice = practice._id;
@@ -104,10 +104,10 @@ const onboardingCompanyStep2Service = async (data, id) => {
     const userUpdated = await User.findByIdAndUpdate(id, user, { new: true });
     return userUpdated.toObject();
   } catch (error) {
-    throw({
-      status: 400,
-      message: messages.practiceCreationFailed,
-    });
+    throw {
+      code: 400,
+      message: messages.practiceCreationFailed
+    };
   }
 };
 
