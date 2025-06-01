@@ -1,12 +1,12 @@
 import request from "supertest";
 import app from "../../../../common/config/server.js";
 import User from "../../../../common/models/User.js";
-import OtpVerification from "../../../../common/models/OtpVerification.js";
+import UserOtpVerification from "../../../../common/models/UserOtpVerification.js";
 import { faker } from '@faker-js/faker';
 
 // Helper to create an OTP entry
 const createOtp = async ({ email, otp = "12345", expiresAt } = {}) =>
-    OtpVerification.create({
+    UserOtpVerification.create({
         email,
         otp,
         password: "Test1234!",
@@ -15,7 +15,7 @@ const createOtp = async ({ email, otp = "12345", expiresAt } = {}) =>
 
 const clearDb = async () => {
     await User.deleteMany();
-    await OtpVerification.deleteMany();
+    await UserOtpVerification.deleteMany();
 };
 
 describe("Verify Registration OTP", () => {

@@ -7,7 +7,7 @@ const messages = {
   SUCCESS: "Login successful.",
 };
 
-const loginOtpVerificationService = async (phone, otp) => {
+const loginUserOtpVerificationService = async (phone, otp) => {
   const client = await Client.findOne({ phone });
 
   if (!client) {
@@ -53,10 +53,10 @@ const loginOtpVerificationService = async (phone, otp) => {
   };
 };
 
-const loginOtpVerificationHandler = async (req, res, next) => {
+const loginUserOtpVerificationHandler = async (req, res, next) => {
   try {
     const { phone, otp } = req.body;
-    const { token, client } = await loginOtpVerificationService(phone, otp);
+    const { token, client } = await loginUserOtpVerificationService(phone, otp);
 
     res.status(200).json({
       message: messages.SUCCESS,
@@ -68,4 +68,4 @@ const loginOtpVerificationHandler = async (req, res, next) => {
   }
 };
 
-export default loginOtpVerificationHandler;
+export default loginUserOtpVerificationHandler;

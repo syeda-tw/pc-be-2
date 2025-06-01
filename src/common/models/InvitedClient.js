@@ -1,8 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 
-const invitedClientSchema = new mongoose.Schema(
+const invitedClientSchema = new Schema(
   {
-    _id: { type: mongoose.Schema.Types.ObjectId, auto: true },
+    _id: { type: Schema.Types.ObjectId, auto: true },
     phone: { type: String, required: true, unique: true },
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
@@ -11,9 +11,8 @@ const invitedClientSchema = new mongoose.Schema(
     oneTimePasswordExpiresAt: { type: Date, required: false },
     relationships: [{
       type: Schema.Types.ObjectId,
-        ref: "Relationship",
-      },
-    ],
+      ref: "Relationship"
+    }]
   },
   { timestamps: true }
 );

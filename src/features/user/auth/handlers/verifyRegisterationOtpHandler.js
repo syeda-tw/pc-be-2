@@ -1,5 +1,5 @@
 import User from "../../../../common/models/User.js";
-import OtpVerification from "../../../../common/models/OtpVerification.js";
+import UserOtpVerification from "../../../../common/models/UserOtpVerification.js";
 import Practice from "../../../../common/models/Practice.js";
 import { sendWelcomeEmail } from "../utils.js";
 import { generateToken, sanitizeUserAndAppendType } from "../../../common/utils.js";
@@ -20,7 +20,7 @@ const messages = {
 };
 
 const verifyRegistrationOtpService = async (email, otp) => {
-  const otpVerification = await OtpVerification.findOne({ email });
+  const otpVerification = await UserOtpVerification.findOne({ email });
 
   if (!otpVerification) {
     throw { status: 404, message: messages.notFound.resource };
@@ -52,7 +52,7 @@ const verifyRegistrationOtpService = async (email, otp) => {
     practice: newPractice._id,
   });
 
-  await OtpVerification.deleteOne({ email });
+  await UserOtpVerification.deleteOne({ email });
 
   const _id = user._id.toString();
   const token = generateToken({ _id });

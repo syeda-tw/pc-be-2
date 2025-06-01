@@ -2,13 +2,13 @@ import express from "express";
 import registerStep1Handler from "./handlers/registerStep1Handler.js";
 import {
   validateRegisterStep1Middleware,
-  validateOtpVerificationMiddleware,
+  validateUserOtpVerificationMiddleware,
   validateRequestLoginOtpMiddleware,
-  validateLoginOtpVerificationMiddleware,
+  validateLoginUserOtpVerificationMiddleware,
 } from "./middlewares.js";
 import { otpVerificationHandler } from "./handlers/otpVerificationHandler.js";
 import requestLoginOtpHandler from "./handlers/requestLoginOtpHandler.js";
-import loginOtpVerificationHandler from "./handlers/loginOtpVerificationHandler.js";
+import loginUserOtpVerificationHandler from "./handlers/loginUserOtpVerificationHandler.js";
 
 const router = express.Router();
 
@@ -20,7 +20,7 @@ router.post(
 
 router.post(
   "/otp-verification",
-  validateOtpVerificationMiddleware,
+  validateUserOtpVerificationMiddleware,
   otpVerificationHandler
 );
 
@@ -32,8 +32,8 @@ router.post(
 
 router.post(
   "/login-otp-verification",
-  validateLoginOtpVerificationMiddleware,
-  loginOtpVerificationHandler
+  validateLoginUserOtpVerificationMiddleware,
+  loginUserOtpVerificationHandler
 );
 
 export default router;

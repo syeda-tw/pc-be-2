@@ -21,7 +21,7 @@ export const validateRegisterStep1Middleware = (req, res, next) => {
   next();
 };
 
-export const validateOtpVerificationMiddleware = (req, res, next) => {
+export const validateUserOtpVerificationMiddleware = (req, res, next) => {
   const schema = Joi.object({
     phone: Joi.string()
       .pattern(/^\+?1?[2-9]\d{9}$/, "US phone number")
@@ -65,7 +65,7 @@ export const validateRequestLoginOtpMiddleware = (req, res, next) => {
   next();
 };
 
-export const validateLoginOtpVerificationMiddleware = (req, res, next) => {
+export const validateLoginUserOtpVerificationMiddleware = (req, res, next) => {
   const schema = Joi.object({
     phone: Joi.string()
       .pattern(/^\+?1?[2-9]\d{9}$/, "US phone number")

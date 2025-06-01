@@ -113,7 +113,7 @@ const UserSchema = new Schema(
         validator: function (val) {
           return val.length <= 10;
         },
-        message: "User can only have up to 10 intake forms",
+        message: "Practioner can only have up to 10 intake forms",
       },
     },
     relationships: [

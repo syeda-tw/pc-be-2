@@ -5,7 +5,7 @@ import {
   generateOtpExpiration,
 } from "../utils.js";
 import { hashPassword } from "../../../common/utils.js";
-import OtpVerification from "../../../../common/models/OtpVerification.js";
+import UserOtpVerification from "../../../../common/models/UserOtpVerification.js";
 
 const messages = {
   error: {
@@ -30,7 +30,7 @@ const registerService = async (email, password) => {
       };
     }
 
-    const otpVerification = await OtpVerification.findOne({ email });
+    const otpVerification = await UserOtpVerification.findOne({ email });
     const otp = generateOtp();
     const hashedPassword = await hashPassword(password);
 
@@ -43,7 +43,7 @@ const registerService = async (email, password) => {
       });
       await otpVerification.save();
     } else {
-      await OtpVerification.create({
+      await UserOtpVerification.create({
         email,
         password: hashedPassword,
         otp,
