@@ -18,7 +18,9 @@ const messages = {
   clientNotFound: "We couldn't find your client information. Please try again.",
   sessionCreationError: "We couldn't create your session. Please try again.",
   relationshipUpdateError: "We couldn't update your relationship. Please try again.",
-  clientUpdateError: "We couldn't update your client status. Please try again."
+  clientUpdateError: "We couldn't update your client status. Please try again.",
+  sessionUpdateError: "We couldn't update your session. Please try again.",
+  sessionPaymentError: "We couldn't process your payment. Please check your card details and try again."
 };
 
 const bookFirstAppointmentService = async (
@@ -29,8 +31,14 @@ const bookFirstAppointmentService = async (
   cost,
   date
 ) => {
+  let client;
+  let relationship;
+  let createdSession;
+  let stripe;
+
   try {
-    const client = await Client.findById(clientId);
+    // Find client and relationship
+    client = await Client.findById(clientId);
     if (!client) {
       throw {
         status: 404,
@@ -38,7 +46,7 @@ const bookFirstAppointmentService = async (
       };
     }
 
-    const relationship = await Relationship.findById(relationshipId);
+    relationship = await Relationship.findById(relationshipId);
     if (!relationship) {
       throw {
         status: 404,
@@ -46,141 +54,78 @@ const bookFirstAppointmentService = async (
       };
     }
 
-    try {
-      const session = {
-        client: clientId,
-        user: relationship.user,
-        date: date,
-        startTime: startTime,
-        endTime: endTime,
-        notes: "",
-        paymentStatus: "pending",
-        billingInformation: {},
-        relationship: relationshipId,
-      };
+    // Create session
+    const session = {
+      client: clientId,
+      user: relationship.user,
+      date: date,
+      startTime: startTime,
+      endTime: endTime,
+      notes: "",
+      paymentStatus: "pending",
+      billingInformation: {},
+      relationship: relationshipId,
+    };
 
-      const createdSession = await Session.create(session);
-      console.log('Session created successfully:', { sessionId: createdSession._id });
-      
-      relationship.sessions.push(createdSession._id);
-      await relationship.save();
-      console.log('Relationship updated with new session:', { relationshipId: relationship._id, sessionId: createdSession._id });
-    } catch (error) {
-      console.error('Error creating session:', { 
-        error: error.message,
-        stack: error.stack,
-        clientId,
-        relationshipId
-      });
-      throw {
-        status: 500,
-        message: messages.sessionCreationError,
-      };
-    }
+    createdSession = await Session.create(session);
+    console.log('Session created successfully:', { sessionId: createdSession._id });
+    
+    relationship.sessions.push(createdSession._id);
+    await relationship.save();
+    console.log('Relationship updated with new session:', { relationshipId: relationship._id, sessionId: createdSession._id });
 
-    try {
-      console.log('Initializing Stripe payment process:', { clientId, cost });
-      const stripe = new Stripe(env.STRIPE_SECRET_KEY);
-      const paymentMethods = await stripe.paymentMethods.list({
-        customer: client.stripeCustomerId,
-        type: "card",
-      });
-      console.log('Payment methods retrieved:', { 
-        customerId: client.stripeCustomerId,
-        paymentMethodsCount: paymentMethods.data.length 
-      });
+    // Process payment
+    console.log('Initializing Stripe payment process:', { clientId, cost });
+    stripe = new Stripe(env.STRIPE_SECRET_KEY);
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: client.stripeCustomerId,
+      type: "card",
+    });
+    console.log('Payment methods retrieved:', { 
+      customerId: client.stripeCustomerId,
+      paymentMethodsCount: paymentMethods.data.length 
+    });
 
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: cost * 100,
-        currency: "usd",
-        automatic_payment_methods: { enabled: true },
-        customer: client.stripeCustomerId,
-        payment_method: paymentMethods.data[0].id,
-        off_session: true,
-        confirm: true,
-      });
-      console.log('Payment intent created:', { 
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: cost * 100,
+      currency: "usd",
+      automatic_payment_methods: { enabled: true },
+      customer: client.stripeCustomerId,
+      payment_method: paymentMethods.data[0].id,
+      off_session: true,
+      confirm: true,
+    });
+    console.log('Payment intent created:', { 
+      paymentIntentId: paymentIntent.id,
+      status: paymentIntent.status 
+    });
+
+    if (paymentIntent.status !== "succeeded") {
+      console.error('Payment intent not succeeded:', { 
         paymentIntentId: paymentIntent.id,
-        status: paymentIntent.status 
+        status: paymentIntent.status,
+        error: paymentIntent.last_payment_error 
       });
-
-      if (paymentIntent.status !== "succeeded") {
-        console.error('Payment intent not succeeded:', { 
-          paymentIntentId: paymentIntent.id,
-          status: paymentIntent.status,
-          error: paymentIntent.last_payment_error 
-        });
-        throw {
-          status: 402,
-          message: messages.paymentFailed,
-        };
-      }
-
-      try {
-        console.log('Updating relationship with payment information:', { relationshipId: relationship._id });
-        relationship.sessions[0].paymentIntentId = paymentIntent.id;
-        relationship.sessions[0].paymentStatus = "paid";
-        relationship.sessions[0].billingInformation = paymentIntent;
-        relationship.isClientOnboardingComplete = true;
-        await relationship.save();
-        console.log('Relationship updated successfully with payment info');
-      } catch (error) {
-        console.error('Error updating relationship:', { 
-          error: error.message,
-          stack: error.stack,
-          relationshipId: relationship._id
-        });
-        throw {
-          status: 500,
-          message: messages.relationshipUpdateError,
-        };
-      }
-
-      try {
-        console.log('Updating client status to onboarded:', { clientId: client._id });
-        client.status = "onboarded";
-        await client.save();
-        console.log('Client status updated successfully');
-        return client.toObject();
-      } catch (error) {
-        console.error('Error updating client:', { 
-          error: error.message,
-          stack: error.stack,
-          clientId: client._id
-        });
-        throw {
-          status: 500,
-          message: messages.clientUpdateError,
-        };
-      }
-    } catch (err) {
-      console.error('Payment processing error:', { 
-        error: err.message,
-        stack: err.stack,
-        clientId,
-        relationshipId
-      });
-      if (err.raw && err.raw.payment_intent && err.raw.payment_intent.id) {
-        try {
-          const paymentIntent = await stripe.paymentIntents.retrieve(err.raw.payment_intent.id);
-          console.error('Retrieved failed payment intent:', { 
-            paymentIntentId: paymentIntent.id,
-            status: paymentIntent.status,
-            error: paymentIntent.last_payment_error
-          });
-        } catch (retrieveError) {
-          console.error('Error retrieving payment intent:', { 
-            error: retrieveError.message,
-            stack: retrieveError.stack,
-            paymentIntentId: err.raw.payment_intent.id
-          });
-        }
-      }
       throw {
         status: 402,
         message: messages.paymentFailed,
       };
     }
+
+    // Update session with payment info
+    createdSession.paymentIntentId = paymentIntent.id;
+    createdSession.paymentStatus = "paid";
+    createdSession.billingInformation = paymentIntent;
+    await createdSession.save();
+    console.log('Session updated successfully with payment info');
+
+    // Update client status
+    client.status = "onboarded";
+    await client.save();
+    console.log('Client status updated successfully');
+    
+    return client.toObject();
+
   } catch (error) {
     console.error('Error in bookFirstAppointmentService:', { 
       error: error.message,
@@ -188,6 +133,39 @@ const bookFirstAppointmentService = async (
       clientId,
       relationshipId
     });
+
+    // Handle payment intent retrieval if available
+    if (error.raw?.payment_intent?.id && stripe) {
+      try {
+        const paymentIntent = await stripe.paymentIntents.retrieve(error.raw.payment_intent.id);
+        console.error('Retrieved failed payment intent:', { 
+          paymentIntentId: paymentIntent.id,
+          status: paymentIntent.status,
+          error: paymentIntent.last_payment_error
+        });
+      } catch (retrieveError) {
+        console.error('Error retrieving payment intent:', { 
+          error: retrieveError.message,
+          stack: retrieveError.stack,
+          paymentIntentId: error.raw.payment_intent.id
+        });
+      }
+    }
+
+    // Clean up created session if payment failed
+    if (createdSession && error.status === 402) {
+      try {
+        await Session.findByIdAndDelete(createdSession._id);
+        console.log('Cleaned up session after payment failure:', { sessionId: createdSession._id });
+      } catch (cleanupError) {
+        console.error('Error cleaning up session:', {
+          error: cleanupError.message,
+          stack: cleanupError.stack,
+          sessionId: createdSession._id
+        });
+      }
+    }
+
     throw error;
   }
 };

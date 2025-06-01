@@ -62,10 +62,10 @@ const getRelationshipsUserHandler = async (req, res) => {
           relationshipStatus: rel.relationshipStatus,
           relationshipId: rel._id,
           practiceId: rel.user.practice?._id,
-          practicename: rel.user.practice?.name,
+          practiceName: rel.user.practice?.name,
           practiceBusinessWebsite: rel.user.practice?.website,
-          usersessionCost: rel.user.sessionCost,
-          usersessionDuration: rel.user.sessionDuration,
+          userSessionCost: rel.user.sessionCost,
+          userSessionDuration: rel.user.sessionDuration,
           
         };
       }),
