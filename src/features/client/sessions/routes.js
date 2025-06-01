@@ -1,9 +1,11 @@
 import { secureRequestMiddleware } from "../../../common/middlewares/secureRequestMiddleware.js";
 import getSessionsHandler from "./handlers/getSessionsHandler.js";
-import getUserAvailabilityHandler from "./handlers/getUserAvailabilityHandler.js";
+import getUserAvailabilityAndSessionDurationHandler from "./handlers/getUserAvailabilityAndSessionDurationHandler.js";
+import getUserFutureSessionsHandler from "./handlers/getUserFutureSessionsHandler.js";
 import {
   validateGetSessions,
-  validateGetUserAvailability,
+  validateGetUserAvailabilityAndSessionDuration,
+  validateGetUserFutureSessions,
 } from "./middlewares.js";
 import express from "express";
 const routes = express.Router();
@@ -16,10 +18,17 @@ routes.get(
 );
 
 routes.get(
-  "/user-availability/:relationshipId",
+  "/user-availability-and-session-duration/:relationshipId",
   secureRequestMiddleware,
-  validateGetUserAvailability,
-  getUserAvailabilityHandler
+  validateGetUserAvailabilityAndSessionDuration,
+  getUserAvailabilityAndSessionDurationHandler
+);
+
+routes.get(
+  "/user-future-sessions/:relationshipId",
+  secureRequestMiddleware,
+  validateGetUserFutureSessions,
+  getUserFutureSessionsHandler
 );
 
 export default routes;

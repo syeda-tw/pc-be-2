@@ -103,8 +103,8 @@ async function createAdminUser(practiceId) {
     // Practice and financial details
     practice: practiceId,
     hourlyRate: 120,
-    appointmentCost: 200,
-    appointmentDuration: 60,
+    sessionCost: 200,
+    sessionDuration: 60,
   });
   console.log("👤 User created:", user._id);
   return user;

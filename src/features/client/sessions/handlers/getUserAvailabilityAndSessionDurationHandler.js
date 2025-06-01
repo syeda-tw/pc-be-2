@@ -14,7 +14,6 @@ const messages = {
 };
 
 const getUserAvailabilityService = async (id, relationshipId) => {
-
   // Get the client
   const client = await Client.findById(id);
   if (!client) {
@@ -36,7 +35,9 @@ const getUserAvailabilityService = async (id, relationshipId) => {
   }
 
   // Fetch relationship with populated user availability
-  const relationshipWithUserAvailability = await Relationship.findById(relationshipId).populate('user');
+  const relationshipWithUserAvailability = await Relationship.findById(
+    relationshipId
+  ).populate("user");
   if (!relationshipWithUserAvailability) {
     throw {
       status: 404,
@@ -52,25 +53,29 @@ const getUserAvailabilityService = async (id, relationshipId) => {
     };
   }
 
-  return relationshipWithUserAvailability.user.availability;
+  return {
+    availability: relationshipWithUserAvailability.user.availability,
+    sessionDuration: relationshipWithUserAvailability.user.sessionDuration,
+  };
 };
 
-const getUserAvailabilityHandler = async (req, res, next) => {
+const getUserAvailabilityAndSessionDurationHandler = async (req, res, next) => {
   const id = req.id;
   const { relationshipId } = req.params;
 
   try {
-    const availability = await getUserAvailabilityService(
+    const { availability, sessionDuration } = await getUserAvailabilityService(
       id,
-      relationshipId,
+      relationshipId
     );
     res.status(200).json({
       message: messages.success,
-      data: availability,
+      userAvailability: availability,
+      userSessionDuration: sessionDuration,
     });
   } catch (error) {
     next(error);
   }
 };
 
-export default getUserAvailabilityHandler;
+export default getUserAvailabilityAndSessionDurationHandler;

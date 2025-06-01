@@ -49,8 +49,8 @@ const UserSchema = new Schema(
     isAdmin: { type: Boolean, default: false },
     practice: { type: Schema.Types.ObjectId, ref: "Practice" },
     hourlyRate: { type: Number },
-    appointmentCost: { type: Number, default: 200 },
-    appointmentDuration: { type: Number, default: 60 },
+    sessionCost: { type: Number, default: 200 },
+    sessionDuration: { type: Number, default: 60 },
 
     // Account Status
     status: {
@@ -149,8 +149,8 @@ export const mockUserComplete = {
   isAdmin: false,
   practice: "603d9f3d8d4e4f2f74c2c5f9",
   hourlyRate: 50,
-  appointmentCost: 200,
-  appointmentDuration: 60,
+  sessionCost: 200,
+  sessionDuration: 60,
 
   // Account Status
   status: "onboarding-step-2",
