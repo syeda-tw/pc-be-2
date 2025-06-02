@@ -11,6 +11,8 @@ const errorMessages = {
   passwordTooShort: "For your security, please use a password that's at least 8 characters long.",
   invalidOtpFormat: "The verification code should be exactly 5 digits. Please check and try again.",
   tokenNotFound: "We couldn't find your session. Please try logging in again.",
+  invalidOldPassword: "Please provide your current password.",
+  invalidNewPassword: "Please provide a new password that meets our security requirements.",
 };
 
 // Validation schemas
@@ -45,6 +47,7 @@ const verifyRegistrationOtpSchema = Joi.object({
     .required()
     .messages({
       "string.email": errorMessages.invalidEmailFormat,
+      "string.empty": errorMessages.invalidEmailFormat,
       "any.required": errorMessages.invalidEmailFormat,
     }),
   otp: Joi.string()
@@ -52,6 +55,7 @@ const verifyRegistrationOtpSchema = Joi.object({
     .required()
     .messages({
       "string.length": errorMessages.invalidOtpFormat,
+      "string.empty": errorMessages.invalidOtpFormat,
       "any.required": errorMessages.invalidOtpFormat,
     }),
 });
@@ -62,11 +66,13 @@ const loginSchema = Joi.object({
     .required()
     .messages({
       "string.email": errorMessages.invalidEmailFormat,
+      "string.empty": errorMessages.invalidEmailFormat,
       "any.required": errorMessages.invalidEmailFormat,
     }),
   password: Joi.string()
     .required()
     .messages({
+      "string.empty": errorMessages.invalidPasswordFormat,
       "any.required": errorMessages.invalidPasswordFormat,
     }),
 });
@@ -77,6 +83,7 @@ const requestResetPasswordSchema = Joi.object({
     .required()
     .messages({
       "string.email": errorMessages.invalidEmailFormat,
+      "string.empty": errorMessages.invalidEmailFormat,
       "any.required": errorMessages.invalidEmailFormat,
     }),
 });
@@ -85,6 +92,7 @@ const resetPasswordSchema = Joi.object({
   token: Joi.string()
     .required()
     .messages({
+      "string.empty": errorMessages.tokenNotFound,
       "any.required": errorMessages.tokenNotFound,
     }),
   password: Joi.string()
@@ -92,8 +100,9 @@ const resetPasswordSchema = Joi.object({
     .pattern(PASSWORD_REGEX)
     .required()
     .messages({
-      "string.min": errorMessages.invalidPasswordFormat,
+      "string.min": errorMessages.passwordTooShort,
       "string.pattern.base": errorMessages.invalidPasswordFormat,
+      "string.empty": errorMessages.invalidPasswordFormat,
       "any.required": errorMessages.invalidPasswordFormat,
     }),
 });
@@ -102,16 +111,18 @@ const validateChangePasswordSchema = Joi.object({
   oldPassword: Joi.string()
     .required()
     .messages({
-      "any.required": errorMessages.invalidPasswordFormat,
+      "string.empty": errorMessages.invalidOldPassword,
+      "any.required": errorMessages.invalidOldPassword,
     }),
   newPassword: Joi.string()
     .min(8)
     .pattern(PASSWORD_REGEX)
     .required()
     .messages({
-      "string.min": errorMessages.invalidPasswordFormat,
+      "string.min": errorMessages.passwordTooShort,
       "string.pattern.base": errorMessages.invalidPasswordFormat,
-      "any.required": errorMessages.invalidPasswordFormat,
+      "string.empty": errorMessages.invalidNewPassword,
+      "any.required": errorMessages.invalidNewPassword,
     }),
 });
 

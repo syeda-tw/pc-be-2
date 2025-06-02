@@ -12,7 +12,7 @@ const messages = {
 };
 
 const onboardingIndividualStep2Service = async (data, id) => {
-  const { name, website, address } = data;
+  const { name, website, address, sessionDuration, sessionCost } = data;
   const user = await User.findById(id);
   if (!user) {
     throw {
@@ -78,6 +78,8 @@ const onboardingIndividualStep2Service = async (data, id) => {
 
   user.practice = practice._id;
   user.status = "onboarded";
+  user.sessionDuration = sessionDuration;
+  user.sessionCost = sessionCost;
 
   try {
     const userUpdated = await User.findByIdAndUpdate(id, user, { new: true });

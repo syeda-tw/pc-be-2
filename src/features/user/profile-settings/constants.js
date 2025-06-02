@@ -1,11 +1,10 @@
-//TODO: to be moved to the common folder
+// TODO: move to the common folder
 export const timezones = [
-    "HST", // Hawaii Standard Time
-    "HDT", // Hawaii Daylight Time
-    "AKDT", // Alaska Daylight Time
-    "PDT", // Pacific Daylight Time
-    "MST", // Mountain Standard Time
-    "MDT", // Mountain Daylight Time
-    "CDT", // Central Daylight Time
-    "EDT", // Eastern Daylight Time
+  { label: "HST", iana: "Pacific/Honolulu" },       // Hawaii Standard Time (no DST)
+  { label: "AKDT", iana: "America/Anchorage" },     // Alaska Daylight Time
+  { label: "PDT", iana: "America/Los_Angeles" },    // Pacific Daylight Time
+  { label: "MDT", iana: "America/Denver" },         // Mountain Daylight Time
+  { label: "MST", iana: "America/Denver" },         // Mountain Standard Time (fallback to same)
+  { label: "CDT", iana: "America/Chicago" },        // Central Daylight Time
+  { label: "EDT", iana: "America/New_York" },       // Eastern Daylight Time
 ];
