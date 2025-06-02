@@ -3,17 +3,12 @@ import { secureRequestMiddleware } from "../../../common/middlewares/secureReque
 import { createClientValidation } from "./middleware.js";
 import { createClientHandler } from "./createClientHandler.js";
 import { getInvitedClientsHandler } from "./getInvitedClientsHandler.js";
-import { getClientsHandler } from "./getClientsHandler.js"
+import { getClientsHandler } from "./getClientsHandler.js";
 
 const router = express.Router();
 
 router.get("/invited", secureRequestMiddleware, getInvitedClientsHandler);
-
 router.get("/", secureRequestMiddleware, getClientsHandler);
+router.post("/", createClientValidation, secureRequestMiddleware, createClientHandler);
 
-router.post("/",
-    createClientValidation,
-    secureRequestMiddleware,
-    createClientHandler);
-
-export default router; 
+export default router;

@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import Client from "../../../../common/models/Client.js";
+import User from "../../../../common/models/User.js";
 import { sanitizeUserAndAppendType } from "../../../common/utils.js";
 import { env } from "../../../../common/config/env.js";
 
@@ -19,30 +20,38 @@ const createClientStripeCustomer = async (email) => {
         const customer = await stripe.customers.create({ email });
         return customer.id;
     } catch (error) {
-        console.error("Error in createClientStripeCustomer:", error);
-        throw new Error(messages.error.stripeCreateFailed);
+        throw {
+            status: 500,
+            message: messages.error.stripeCreateFailed
+        };
     }
 };
 
 const updateClientInformation = async (clientData, _id) => {
     const { firstName, lastName, middleName, pronouns, gender, email, dateOfBirth } = clientData;
 
-    // Find the client by ID
     const client = await Client.findById(_id);
     if (!client) {
-        throw new Error(messages.error.clientNotFound);
+        throw {
+            status: 404,
+            message: messages.error.clientNotFound
+        };
     }
 
-    // Check if the email is unique
-    const emailExists = await Client.findOne({ email, _id: { $ne: _id } });
-    if (emailExists) {
-        throw new Error(messages.error.emailExists);
+    const [existingClient, existingUser] = await Promise.all([
+        Client.findOne({ email, _id: { $ne: _id } }),
+        User.findOne({ email })
+    ]);
+
+    if (existingClient || existingUser) {
+        throw {
+            status: 400,
+            message: messages.error.emailExists
+        };
     }
 
-    // Create Stripe customer
     const stripeCustomerId = await createClientStripeCustomer(email);
 
-    // Update client information
     client.firstName = firstName;
     client.lastName = lastName;
     client.middleName = middleName;
@@ -60,18 +69,16 @@ const updateClientInformation = async (clientData, _id) => {
 const onboardingStep1Handler = async (req, res) => {
     try {
         const id = req.id;
-    const updatedClient = await updateClientInformation(req.body, id);
-    res
-      .status(200)
-      .json({
-        message: messages.success,
-        data: sanitizeUserAndAppendType(updatedClient, "client"),
-      });
-  } catch (error) {
-    console.error("Error in onboardingStep1Handler:", error);
-    const errorMessage = error.message || messages.error.updateFailed;
-    res.status(500).json({ message: errorMessage });
-  }
+        const updatedClient = await updateClientInformation(req.body, id);
+        res.status(200).json({
+            message: messages.success,
+            data: sanitizeUserAndAppendType(updatedClient, "client"),
+        });
+    } catch (error) {
+        const status = error.status || 500;
+        const message = error.message || messages.error.updateFailed;
+        res.status(status).json({ message });
+    }
 };
 
 export default onboardingStep1Handler;

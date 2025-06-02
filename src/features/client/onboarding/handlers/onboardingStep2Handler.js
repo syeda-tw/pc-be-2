@@ -9,12 +9,12 @@ const messages = {
     onboardingStep2: "Successfully updated client",
   },
   error: {
-    userNotFound: "User not found",
-    stripeError: "Error with Stripe operation",
-    internalServerError: "Internal server error",
-    setupIntentFailed: "SetupIntent not successful",
-    stripeCustomerIdMismatch: "Stripe customer ID mismatch",
-    paymentMethodNotAdded: "Payment method not added",
+    userNotFound: "We couldn't find your account. Please try logging in again.",
+    stripeError: "There was an issue processing your payment. Please try again.",
+    internalServerError: "Something went wrong. Please try again later.",
+    setupIntentFailed: "We couldn't set up your payment method. Please try again.",
+    stripeCustomerIdMismatch: "There was a mismatch in your payment information. Please try again.",
+    paymentMethodNotAdded: "We couldn't add your payment method. Please try again.",
   },
 };
 

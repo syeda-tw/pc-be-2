@@ -2,18 +2,38 @@ import Joi from 'joi';
 
 export const onboardingStep1Middleware = (req, res, next) => {
     const onboardingStep1Schema = Joi.object({
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
+        firstName: Joi.string().required().messages({
+            'any.required': 'Please share your first name',
+            'string.empty': 'Please share your first name'
+        }),
+        lastName: Joi.string().required().messages({
+            'any.required': 'Please share your last name',
+            'string.empty': 'Please share your last name'
+        }),
         middleName: Joi.string().allow('').optional(),
-        gender: Joi.string().valid("Male", "Female", "Non-Binary", "Prefer not to say").required(),
-        pronouns: Joi.string().allow('').required().valid("He/Him", "She/Her", "They/Them", "Prefer not to say"),
-        email: Joi.string().email().required(),
+        gender: Joi.string().valid("Male", "Female", "Non-Binary", "Prefer not to say").required().messages({
+            'any.required': 'Please select your gender',
+            'any.only': 'Please select a valid gender option'
+        }),
+        pronouns: Joi.string().allow('').required().valid("He/Him", "She/Her", "They/Them", "Prefer not to say").messages({
+            'any.required': 'Please select your pronouns',
+            'any.only': 'Please select a valid pronouns option'
+        }),
+        email: Joi.string().email().required().messages({
+            'string.email': 'Please enter a valid email address',
+            'any.required': 'Please share your email address'
+        }),
         dateOfBirth: Joi.date().less('now').greater('1-1-1900').required().custom((value, helpers) => {
             const age = new Date().getFullYear() - new Date(value).getFullYear();
             if (age < 18) {
-                return helpers.message('Date of birth must indicate age above 18');
+                return helpers.message('We require clients to be at least 18 years old');
             }
             return value;
+        }).messages({
+            'date.base': 'Please enter a valid date of birth',
+            'date.less': 'Please enter a valid date of birth',
+            'date.greater': 'Please enter a valid date of birth',
+            'any.required': 'Please share your date of birth'
         })
     });
     const { error } = onboardingStep1Schema.validate(req.body);
@@ -25,7 +45,10 @@ export const onboardingStep1Middleware = (req, res, next) => {
 
 export const onboardingStep2Middleware = (req, res, next) => {
     const onboardingStep2Schema = Joi.object({
-        setupIntentId: Joi.string().required(),
+        setupIntentId: Joi.string().required().messages({
+            'any.required': 'Please complete the payment setup',
+            'string.empty': 'Please complete the payment setup'
+        })
     });
     const { error } = onboardingStep2Schema.validate(req.body);
     if (error) {
@@ -39,43 +62,43 @@ export const bookFirstAppointmentMiddleware = (req, res, next) => {
     relationshipId: Joi.string()
       .required()
       .messages({
-        'string.base': 'Something went wrong. Please try again.',
-        'string.empty': 'Please provide a valid relationship.',
-        'any.required': 'A relationship is required to book your appointment.',
+        'string.base': 'We encountered an issue. Please try again.',
+        'string.empty': 'Please select a practitioner to book with.',
+        'any.required': 'Please select a practitioner to book with.',
       }),
 
     date: Joi.date()
       .required()
       .min('now')
       .messages({
-        'date.base': 'Please enter a valid date.',
-        'date.min': 'Date must be today or in the future.',
-        'any.required': 'Date is required to schedule your appointment.',
+        'date.base': 'Please select a valid date.',
+        'date.min': 'Please select a date today or in the future.',
+        'any.required': 'Please select a date for your appointment.',
       }),
 
     startTime: Joi.date()
       .required()
       .min(new Date())
       .messages({
-        'date.base': 'Please enter a valid start time.',
-        'date.min': 'Start time must be in the future.',
-        'any.required': 'Start time is required to schedule your appointment.',
+        'date.base': 'Please select a valid start time.',
+        'date.min': 'Please select a time in the future.',
+        'any.required': 'Please select a start time for your appointment.',
       }),
 
     endTime: Joi.date()
       .required()
       .min(Joi.ref('startTime'))
       .messages({
-        'date.base': 'Please enter a valid end time.',
-        'date.min': 'End time must be after the start time.',
-        'any.required': 'End time is required to schedule your appointment.',
+        'date.base': 'Please select a valid end time.',
+        'date.min': 'Please select an end time after the start time.',
+        'any.required': 'Please select an end time for your appointment.',
       }),
 
     cost: Joi.number()
       .required()
       .messages({
-        'number.base': 'Please provide a valid cost amount.',
-        'any.required': 'Cost is required to proceed with payment.',
+        'number.base': 'Please enter a valid cost amount.',
+        'any.required': 'Please enter the cost for your appointment.',
       }),
   });
 
