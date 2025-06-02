@@ -57,7 +57,7 @@ const UserSchema = new Schema(
       ],
       default: "onboarding-step-1",
     },
-    timezone: { type: String, default: TIMEZONES[0] },
+    timezone: { type: String, default: TIMEZONES[0].value },
     availability: {
       type: {
         dailyLunchStartTime: { type: String },

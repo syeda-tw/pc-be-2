@@ -11,7 +11,7 @@ import {
   findUserByUsernameDbOp,
 } from "./dbOps.js";
 import { messages } from "./messages.js";
-import { timezones } from "./constants.js";
+import { TIMEZONES } from "../../common/constants.js";
 
 export const updatePersonalInformationService = async (data, userId) => {
   const user = await findUserByIdDbOp(userId);
@@ -28,7 +28,7 @@ export const updatePersonalInformationService = async (data, userId) => {
 export const getTimezoneService = async (userId) => {
   const timezone = await getTimezoneByUserIdDbOp(userId);
   if (!timezone) {
-    return timezones[0];
+    return TIMEZONES[0];
   }
   return timezone;
 };

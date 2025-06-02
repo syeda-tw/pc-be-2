@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { timezones } from './constants.js';
+import { TIMEZONES } from '../../common/constants.js';
 
 const validateUpdatePersonalInformationMiddleware = (req, res, next) => {
   const schema = Joi.object({
@@ -37,7 +37,7 @@ const validateUpdatePersonalInformationMiddleware = (req, res, next) => {
 
 const validateUpdateTimezoneMiddleware = (req, res, next) => {
   const schema = Joi.object({
-    timezone: Joi.string().trim().valid(...timezones).required().messages({
+    timezone: Joi.string().trim().valid(...TIMEZONES.map(tz => tz.value)).required().messages({
       'string.empty': 'Timezone is required',
       'any.only': 'Invalid timezone'
     })
