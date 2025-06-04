@@ -29,8 +29,18 @@ const UserSchema = new Schema(
       unique: true,
       sparse: true,
       validate: {
-        validator: (value) => value === "" || value === null || value.length >= 3,
-        message: "Username must be at least 3 characters long if provided.",
+        validator: (value) => {
+          // Allow empty or null values (optional field)
+          if (value === "" || value === null) return true;
+
+          // Enforce length and allowed characters
+          const isValidLength = value.length >= 4 && value.length <= 20;
+          const isValidFormat = /^[a-zA-Z0-9_]+$/.test(value);
+
+          return isValidLength && isValidFormat;
+        },
+        message:
+          "Username must be 4–20 characters long and only contain letters, numbers, and underscores.",
       },
     },
     password: { type: String },
@@ -44,7 +54,7 @@ const UserSchema = new Schema(
     isAdmin: { type: Boolean, default: false },
     practice: { type: Schema.Types.ObjectId, ref: "Practice" },
     hourlyRate: { type: Number },
-    sessionCost: { type: Number, default: 200 },
+    sessionCost: { type: Number, default: 100 },
     sessionDuration: { type: Number, default: 60 },
     status: {
       type: String,
@@ -116,9 +126,14 @@ const UserSchema = new Schema(
 // Virtual field to compute current holiday
 UserSchema.virtual("currentHoliday").get(function () {
   const todayISO = new Date().toISOString();
-  return this.holidays?.find((h) => {
-    return h.startDate?.toISOString() <= todayISO && h.endDate?.toISOString() >= todayISO;
-  }) || null;
+  return (
+    this.holidays?.find((h) => {
+      return (
+        h.startDate?.toISOString() <= todayISO &&
+        h.endDate?.toISOString() >= todayISO
+      );
+    }) || null
+  );
 });
 
 export default mongoose.model("User", UserSchema);

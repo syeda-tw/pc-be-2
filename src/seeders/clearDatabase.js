@@ -5,6 +5,8 @@ import InvitedClient from "../common/models/InvitedClient.js";
 import UserOtpVerification from "../common/models/UserOtpVerification.js";
 import Practice from "../common/models/Practice.js";
 import User from "../common/models/User.js";
+import Relationship from "../common/models/Relationship.js";
+import Session from "../common/models/Session.js";
 import { env } from "../common/config/env.js";
 
 async function dropIndexesForModel(model) {
@@ -37,6 +39,9 @@ export async function clearDatabase() {
       UserOtpVerification.deleteMany({}),
       Practice.deleteMany({}),
       User.deleteMany({}),
+      Relationship.deleteMany({}),
+      Session.deleteMany({}),
+
     ]);
 
     console.log("🧹 All collections cleared.");
@@ -48,6 +53,8 @@ export async function clearDatabase() {
       dropIndexesForModel(UserOtpVerification),
       dropIndexesForModel(Practice),
       dropIndexesForModel(User),
+      dropIndexesForModel(Relationship),
+      dropIndexesForModel(Session),
     ]);
 
     console.log("🧾 All indexes dropped.");

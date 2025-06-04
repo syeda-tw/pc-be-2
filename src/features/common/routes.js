@@ -29,7 +29,22 @@ router.post(
     const id = req.id;
 
     try {
-      const entity = (await User.findById(id)) || (await Client.findById(id));
+      let userEntity = null;
+      let clientEntity = null;
+
+      try {
+        userEntity = await User.findById(id);
+      } catch (userError) {
+        console.error('Error finding user:', userError);
+      }
+
+      try {
+        clientEntity = await Client.findById(id);
+      } catch (clientError) {
+        console.error('Error finding client:', clientError);
+      }
+
+      const entity = userEntity || clientEntity;
 
       if (entity) {
         const isUser = entity instanceof User;
@@ -48,6 +63,7 @@ router.post(
         message: responseMessages.error.notFound,
       });
     } catch (error) {
+      console.error('Error in verify-token route:', error);
       return next({
         status: 500,
         message: responseMessages.error.serverError,

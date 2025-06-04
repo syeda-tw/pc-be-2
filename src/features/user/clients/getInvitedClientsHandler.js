@@ -8,27 +8,45 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
   const skip = (page - 1) * limit;
 
   try {
+    console.log('🔍 Searching for relationships with userId:', userId);
+    
     // Step 1: Find relationships with pending status and matching user
     const relationships = await Relationship.find({
       user: userId,
       status: 'pending',
     }).lean();
+    
+    console.log('📊 Found relationships:', relationships.length);
+    console.log('🔗 Relationships:', relationships);
 
     // Step 2: Fetch client details dynamically with custom filters
     const clients = await Promise.all(
       relationships.map(async (rel) => {
-        const ClientModel = mongoose.model(rel.clientModel); // 'Client' or 'InvitedClient'
+        console.log('👤 Processing relationship:', rel._id);
+        console.log('📝 Client model:', rel.clientModel);
+        
+        const ClientModel = mongoose.model(rel.clientModel);
         const client = await ClientModel.findById(rel.client).lean();
-        if (!client) return null;
+        
+        if (!client) {
+          console.log('❌ No client found for relationship:', rel._id);
+          return null;
+        }
+        
+        console.log('✅ Found client:', client._id);
 
         // Conditionally exclude 'Client' if onboarding is complete
         if (rel.clientModel === 'Client' && client.status === 'onboarded') {
+          console.log('⏭️ Skipping onboarded client:', client._id);
           return null;
         }
 
         // Apply name search filter
         const fullName = `${client.firstName || ''} ${client.middleName || ''} ${client.lastName || ''}`.trim().toLowerCase();
         const matchesSearch = !search || fullName.includes(search.toLowerCase());
+        
+        console.log('🔍 Search match:', matchesSearch ? 'Yes' : 'No');
+        console.log('📝 Full name:', fullName);
 
         return matchesSearch ? { ...client, relationshipId: rel._id, clientModel: rel.clientModel } : null;
       })
@@ -39,6 +57,12 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
     const total = filteredClients.length;
     const paginatedClients = filteredClients.slice(skip, skip + limit);
 
+    console.log('📊 Final results:');
+    console.log('- Total clients:', total);
+    console.log('- Page:', page);
+    console.log('- Limit:', limit);
+    console.log('- Clients in this page:', paginatedClients.length);
+
     return {
       clients: paginatedClients,
       total,
@@ -47,6 +71,7 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
     };
 
   } catch (error) {
+    console.error('❌ Error in getUsersClientsByIdDbOp:', error);
     throw error;
   }
 };

@@ -99,12 +99,17 @@ async function createAdminUser(practiceId) {
     // Account flags
     isAdmin: true,
     status: "onboarded",
-  
     // Practice and financial details
     practice: practiceId,
     hourlyRate: 120,
     sessionCost: 200,
     sessionDuration: 60,
+    
+    // Timezone and availability
+    pronouns: "he/him",
+    gender: "Male",
+    title: "Dr.",
+    dateOfBirth: new Date("1990-01-01"),
   });
   console.log("👤 User created:", user._id);
   return user;
@@ -243,7 +248,7 @@ const createRandomSessions = async (
 const createSessions = async (user, clients, relationships) => {
   const startDate = new Date();
   const endDate = new Date();
-  endDate.setMonth(endDate.getMonth() + 2);
+  endDate.setMonth(endDate.getMonth() + 1); // Reduced to 1 month instead of 2
 
   const allSessions = [];
 
