@@ -1,4 +1,4 @@
-//TODO: Change from appointment to sesion
+//TODO: Change from session to sesion
 import Client from "../../../../common/models/Client.js";
 import Relationship from "../../../../common/models/Relationship.js";
 import Stripe from "stripe";
@@ -8,9 +8,9 @@ import Session from '../../../../common/models/Session.js';
 
 const messages = {
   notFound: "We couldn't find the relationship you're looking for. Please try again.",
-  appointmentCreated: "Your appointment has been successfully created!",
-  appointmentCharged: "Your appointment has been charged successfully.",
-  appointmentUpdated: "Your appointment has been updated successfully.",
+  sessionCreated: "Your session has been successfully created!",
+  sessionCharged: "Your session has been charged successfully.",
+  sessionUpdated: "Your session has been updated successfully.",
   clientUpdated: "Your client information has been updated successfully.",
   relationshipUpdated: "Your relationship status has been updated successfully.",
   paymentFailed: "We couldn't process your payment. Please check your card details and try again.",
@@ -23,7 +23,7 @@ const messages = {
   sessionPaymentError: "We couldn't process your payment. Please check your card details and try again."
 };
 
-const bookFirstAppointmentService = async (
+const bookFirstSessionService = async (
   clientId,
   relationshipId,
   startTime,
@@ -67,67 +67,74 @@ const bookFirstAppointmentService = async (
       relationship: relationshipId,
     };
 
-    createdSession = await Session.create(session);
-    console.log('Session created successfully:', { sessionId: createdSession._id });
-    
-    relationship.sessions.push(createdSession._id);
-    await relationship.save();
-    console.log('Relationship updated with new session:', { relationshipId: relationship._id, sessionId: createdSession._id });
-
-    // Process payment
-    console.log('Initializing Stripe payment process:', { clientId, cost });
-    stripe = new Stripe(env.STRIPE_SECRET_KEY);
-    const paymentMethods = await stripe.paymentMethods.list({
-      customer: client.stripeCustomerId,
-      type: "card",
-    });
-    console.log('Payment methods retrieved:', { 
-      customerId: client.stripeCustomerId,
-      paymentMethodsCount: paymentMethods.data.length 
-    });
-
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: cost * 100,
-      currency: "usd",
-      automatic_payment_methods: { enabled: true },
-      customer: client.stripeCustomerId,
-      payment_method: paymentMethods.data[0].id,
-      off_session: true,
-      confirm: true,
-    });
-    console.log('Payment intent created:', { 
-      paymentIntentId: paymentIntent.id,
-      status: paymentIntent.status 
-    });
-
-    if (paymentIntent.status !== "succeeded") {
-      console.error('Payment intent not succeeded:', { 
-        paymentIntentId: paymentIntent.id,
-        status: paymentIntent.status,
-        error: paymentIntent.last_payment_error 
-      });
+    try {
+      createdSession = await Session.create(session);
+      console.log('Session created successfully:', { sessionId: createdSession._id });
+      
+      relationship.sessions.push(createdSession._id);
+      await relationship.save();
+      console.log('Relationship updated with new session:', { relationshipId: relationship._id, sessionId: createdSession._id });
+    } catch (error) {
       throw {
-        status: 402,
-        message: messages.paymentFailed,
+        status: 500,
+        message: messages.sessionCreationError,
       };
     }
 
-    // Update session with payment info
-    createdSession.paymentIntentId = paymentIntent.id;
-    createdSession.paymentStatus = "paid";
-    createdSession.billingInformation = paymentIntent;
-    await createdSession.save();
-    console.log('Session updated successfully with payment info');
+    // Process payment
+    try {
+      console.log('Initializing Stripe payment process:', { clientId, cost });
+      stripe = new Stripe(env.STRIPE_SECRET_KEY);
+      const paymentMethods = await stripe.paymentMethods.list({
+        customer: client.stripeCustomerId,
+        type: "card",
+      });
+      console.log('Payment methods retrieved:', { 
+        customerId: client.stripeCustomerId,
+        paymentMethodsCount: paymentMethods.data.length 
+      });
 
-    // Update client status
-    client.status = "onboarded";
-    await client.save();
-    console.log('Client status updated successfully');
-    
-    return client.toObject();
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: cost * 100,
+        currency: "usd",
+        automatic_payment_methods: { enabled: true },
+        customer: client.stripeCustomerId,
+        payment_method: paymentMethods.data[0].id,
+        off_session: true,
+        confirm: true,
+      });
 
+      if (paymentIntent.status !== "succeeded") {
+        throw {
+          status: 402,
+          message: messages.paymentFailed,
+        };
+      }
+
+      // Update session with payment info
+      createdSession.paymentIntentId = paymentIntent.id;
+      createdSession.paymentStatus = "paid";
+      createdSession.billingInformation = paymentIntent;
+      await createdSession.save();
+      console.log('Session updated successfully with payment info');
+
+      // Update client status
+      client.status = "onboarded";
+      await client.save();
+      console.log('Client status updated successfully');
+      
+      return client.toObject();
+    } catch (error) {
+      if (error.status === 402) {
+        throw error;
+      }
+      throw {
+        status: 500,
+        message: messages.sessionPaymentError,
+      };
+    }
   } catch (error) {
-    console.error('Error in bookFirstAppointmentService:', { 
+    console.error('Error in bookFirstSessionService:', { 
       error: error.message,
       stack: error.stack,
       clientId,
@@ -170,10 +177,10 @@ const bookFirstAppointmentService = async (
   }
 };
 
-const bookFirstAppointmentHandler = async (req, res) => {
-  console.log('Starting bookFirstAppointmentHandler with request body:', req.body);
+const bookFirstSessionHandler = async (req, res) => {
+  console.log('Starting bookFirstSessionHandler with request body:', req.body);
   try {
-    const client = await bookFirstAppointmentService(
+    const client = await bookFirstSessionService(
       req.id,
       req.body.relationshipId,
       req.body.startTime,
@@ -181,13 +188,13 @@ const bookFirstAppointmentHandler = async (req, res) => {
       req.body.cost,
       req.body.date
     );
-    console.log('Appointment booked successfully:', { clientId: client._id });
+    console.log('Session booked successfully:', { clientId: client._id });
     res.status(200).json({
-      message: messages.appointmentCreated,
+      message: messages.sessionCreated,
       client: sanitizeUserAndAppendType(client, "client"),
     });
   } catch (err) {
-    console.error('Error in bookFirstAppointmentHandler:', { 
+    console.error('Error in bookFirstSessionHandler:', { 
       error: err.message,
       stack: err.stack,
       status: err.status,
@@ -200,4 +207,4 @@ const bookFirstAppointmentHandler = async (req, res) => {
   }
 };
 
-export default bookFirstAppointmentHandler;
+export default bookFirstSessionHandler;

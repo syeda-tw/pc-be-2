@@ -1,4 +1,4 @@
-// TODO: Change from appointment to session
+// TODO: Change from session to session
 import Client from "../../../../common/models/Client.js";
 import Relationship from "../../../../common/models/Relationship.js";
 import Stripe from "stripe";
@@ -9,9 +9,9 @@ import User from '../../../../common/models/User.js';
 
 const messages = {
   notFound: "We couldn't find the relationship you're looking for. Please try again.",
-  appointmentCreated: "Your appointment has been successfully created!",
-  appointmentCharged: "Your appointment has been charged successfully.",
-  appointmentUpdated: "Your appointment has been updated successfully.",
+  sessionCreated: "Your session has been successfully created!",
+  sessionCharged: "Your session has been charged successfully.",
+  sessionUpdated: "Your session has been updated successfully.",
   clientUpdated: "Your client information has been updated successfully.",
   relationshipUpdated: "Your relationship status has been updated successfully.",
   paymentFailed: "We couldn't process your payment. Please check your card details and try again.",

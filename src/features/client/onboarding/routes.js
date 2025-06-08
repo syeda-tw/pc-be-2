@@ -3,14 +3,14 @@ import { secureRequestMiddleware } from "../../../common/middlewares/secureReque
 import {
   onboardingStep1Middleware,
   onboardingStep2Middleware,
-  bookFirstAppointmentMiddleware,
+  bookFirstSessionMiddleware,
 } from "./middlewares.js";
 import onboardingStep1Handler from "./handlers/onboardingStep1Handler.js";
 import onboardingStep2Handler from "./handlers/onboardingStep2Handler.js";
 import setupIntentHandler from "./handlers/setupIntentHanlder.js";
 import getRelationshipsUserHandler from "./handlers/getRelationshipsUserHandler.js";
 import activateSingleRelationshipAutomaticallyHandler from "./handlers/activateSingleRelationshipAutomaticallyHandler.js";
-import bookFirstAppointmentHandler from "./handlers/bookFirstAppointmentHandler.js";
+import bookFirstSessionHandler from "./handlers/bookFirstSessionHandler.js";
 import getUserFutureSessionsHandler from './handlers/getUserFutureSessionsHandler.js';
 
 const router = express.Router();
@@ -35,10 +35,10 @@ router.get(
   getRelationshipsUserHandler
 );
 
-router.post('/book-first-appointment',
-  bookFirstAppointmentMiddleware,
+router.post('/book-first-session',
+  bookFirstSessionMiddleware,
   secureRequestMiddleware,
-  bookFirstAppointmentHandler
+  bookFirstSessionHandler
 );
 
 router.post(

@@ -38,7 +38,7 @@ export const sendWelcomeEmail = async (user) => {
     <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4; border-radius: 8px;">
       <h2 style="text-align: center; color: #333;">Welcome to Practicare!</h2>
       <p style="color: #333;">Hello ${user.firstName} ${user.lastName},</p>
-      <p style="color: #333;">We're excited to welcome you to Practicare! Our platform is designed to help you manage your mental health practice efficiently—whether it's scheduling appointments, organizing client records, or streamlining daily tasks.</p>
+      <p style="color: #333;">We're excited to welcome you to Practicare! Our platform is designed to help you manage your mental health practice efficiently—whether it's scheduling sessions, organizing client records, or streamlining daily tasks.</p>
       <p style="color: #333;">With Practicare, you can focus more on your clients while we handle the rest.</p>
       <p style="color: #333;"><strong>Get started today:</strong></p>
       <ul style="color: #333;">

@@ -29,44 +29,35 @@ router.post(
     const id = req.id;
 
     try {
-      let userEntity = null;
-      let clientEntity = null;
-
-      try {
-        userEntity = await User.findById(id);
-      } catch (userError) {
-        console.error('Error finding user:', userError);
-      }
-
-      try {
-        clientEntity = await Client.findById(id);
-      } catch (clientError) {
-        console.error('Error finding client:', clientError);
-      }
+      // Use Promise.all to handle both queries concurrently
+      const [userEntity, clientEntity] = await Promise.all([
+        User.findById(id),
+        Client.findById(id)
+      ]);
 
       const entity = userEntity || clientEntity;
 
-      if (entity) {
-        const isUser = entity instanceof User;
-        return res.status(200).json({
-          data: sanitizeUserAndAppendType(
-            entity.toObject(),
-            isUser ? "user" : "client"
-          ),
-          message: isUser
-            ? responseMessages.success.userVerified
-            : responseMessages.success.clientVerified,
+      if (!entity) {
+        return res.status(404).json({
+          message: responseMessages.error.notFound
         });
       }
-      return next({
-        status: 404,
-        message: responseMessages.error.notFound,
+
+      const isUser = entity instanceof User;
+      return res.status(200).json({
+        data: sanitizeUserAndAppendType(
+          entity.toObject(),
+          isUser ? "user" : "client"
+        ),
+        message: isUser
+          ? responseMessages.success.userVerified
+          : responseMessages.success.clientVerified,
       });
+
     } catch (error) {
       console.error('Error in verify-token route:', error);
-      return next({
-        status: 500,
-        message: responseMessages.error.serverError,
+      return res.status(500).json({
+        message: responseMessages.error.serverError
       });
     }
   }

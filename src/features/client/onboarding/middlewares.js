@@ -57,8 +57,8 @@ export const onboardingStep2Middleware = (req, res, next) => {
     next();
 };
 
-export const bookFirstAppointmentMiddleware = (req, res, next) => {
-  const bookFirstAppointmentSchema = Joi.object({
+export const bookFirstSessionMiddleware = (req, res, next) => {
+  const bookFirstSessionSchema = Joi.object({
     relationshipId: Joi.string()
       .required()
       .messages({
@@ -73,7 +73,7 @@ export const bookFirstAppointmentMiddleware = (req, res, next) => {
       .messages({
         'date.base': 'Please select a valid date.',
         'date.min': 'Please select a date today or in the future.',
-        'any.required': 'Please select a date for your appointment.',
+        'any.required': 'Please select a date for your session.',
       }),
 
     startTime: Joi.date()
@@ -82,7 +82,7 @@ export const bookFirstAppointmentMiddleware = (req, res, next) => {
       .messages({
         'date.base': 'Please select a valid start time.',
         'date.min': 'Please select a time in the future.',
-        'any.required': 'Please select a start time for your appointment.',
+        'any.required': 'Please select a start time for your session.',
       }),
 
     endTime: Joi.date()
@@ -91,18 +91,18 @@ export const bookFirstAppointmentMiddleware = (req, res, next) => {
       .messages({
         'date.base': 'Please select a valid end time.',
         'date.min': 'Please select an end time after the start time.',
-        'any.required': 'Please select an end time for your appointment.',
+        'any.required': 'Please select an end time for your session.',
       }),
 
     cost: Joi.number()
       .required()
       .messages({
         'number.base': 'Please enter a valid cost amount.',
-        'any.required': 'Please enter the cost for your appointment.',
+        'any.required': 'Please enter the cost for your session.',
       }),
   });
 
-  const { error } = bookFirstAppointmentSchema.validate(req.body);
+  const { error } = bookFirstSessionSchema.validate(req.body);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
