@@ -7,13 +7,14 @@ import { sanitizeUserAndAppendType } from "./utils.js";
 const router = express.Router();
 
 // Messages for responses
-const responseMessages = {
+const messages = {
   error: {
     tokenNotFound: "Authorization token not found",
     invalidToken: "Invalid token",
     jwtSecretMissing: "JWT_SECRET is not defined",
     notFound: "No user or client found for this token",
     serverError: "Internal server error",
+    sanitizationError: "Error processing user data",
   },
   success: {
     userVerified: "User successfully verified",
@@ -22,45 +23,39 @@ const responseMessages = {
 };
 
 // Route to verify token
-router.post(
-  "/verify-token",
-  secureRequestMiddleware,
-  async (req, res, next) => {
-    const id = req.id;
+router.post("/verify-token", secureRequestMiddleware, async (req, res) => {
+  const id = req.id;
+
+  try {
+    const [userEntity, clientEntity] = await Promise.all([
+      User.findById(id),
+      Client.findById(id)
+    ]);
+
+    const entity = userEntity || clientEntity;
+
+    if (!entity) {
+      return res.status(404).json({ message: messages.error.notFound });
+    }
+
+    const isUser = !!userEntity;
+    let safeData;
 
     try {
-      // Use Promise.all to handle both queries concurrently
-      const [userEntity, clientEntity] = await Promise.all([
-        User.findById(id),
-        Client.findById(id)
-      ]);
-
-      const entity = userEntity || clientEntity;
-
-      if (!entity) {
-        return res.status(404).json({
-          message: responseMessages.error.notFound
-        });
-      }
-
-      const isUser = entity instanceof User;
-      return res.status(200).json({
-        data: sanitizeUserAndAppendType(
-          entity.toObject(),
-          isUser ? "user" : "client"
-        ),
-        message: isUser
-          ? responseMessages.success.userVerified
-          : responseMessages.success.clientVerified,
-      });
-
-    } catch (error) {
-      console.error('Error in verify-token route:', error);
-      return res.status(500).json({
-        message: responseMessages.error.serverError
-      });
+      safeData = sanitizeUserAndAppendType(entity.toObject(), isUser ? "user" : "client");
+    } catch (err) {
+      console.error("Error sanitizing user data:", err);
+      return res.status(500).json({ message: messages.error.sanitizationError });
     }
+
+    return res.status(200).json({
+      data: safeData,
+      message: isUser ? messages.success.userVerified : messages.success.clientVerified,
+    });
+  } catch (error) {
+    console.error("Error in verify-token route:", error);
+    return res.status(500).json({ message: messages.error.serverError });
   }
-);
+});
 
 export { router as commonRouter };
