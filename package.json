@@ -10,7 +10,7 @@
     "test": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles",
     "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles --watch",
     "test:single": "node --experimental-vm-modules node_modules/.bin/jest --runInBand --detectOpenHandles",
-    "clear-db": "node src/seeders.js/clearDatabase.js",
+    "clear-db": "node src/seeders/clearDatabase.js",
     "zip": "zip -r app-deploy.zip . -x '*.git*' '*.env' 'node_modules/*' '*.log'"
   },
   "keywords": [],
