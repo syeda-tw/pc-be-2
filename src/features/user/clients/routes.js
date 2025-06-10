@@ -4,10 +4,12 @@ import { createClientValidation } from "./middleware.js";
 import { createClientHandler } from "./createClientHandler.js";
 import { getInvitedClientsHandler } from "./getInvitedClientsHandler.js";
 import { getClientsHandler } from "./getClientsHandler.js";
+import { getArchivedClientsHandler } from "./getArchivedClientsHandler.js";
 
 const router = express.Router();
 
 router.get("/invited", secureRequestMiddleware, getInvitedClientsHandler);
+router.get("/archived", secureRequestMiddleware, getArchivedClientsHandler);
 router.get("/", secureRequestMiddleware, getClientsHandler);
 router.post("/", createClientValidation, secureRequestMiddleware, createClientHandler);
 

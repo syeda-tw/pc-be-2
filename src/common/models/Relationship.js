@@ -19,7 +19,7 @@ const relationshipSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-    enum: ['pending', 'rejected', 'active'],
+    enum: ['pending', 'archived', 'active'],
     default: 'pending'
   },
   sessions: [{

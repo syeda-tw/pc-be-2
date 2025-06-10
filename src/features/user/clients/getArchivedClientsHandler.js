@@ -2,7 +2,7 @@ import User from "../../../common/models/User.js";
 import Client from "../../../common/models/Client.js";
 import mongoose from "mongoose";
 
-const getUsersClientsByIdDbOp = async (userId, params = {}) => {
+const getUsersArchivedClientsByIdDbOp = async (userId, params = {}) => {
   const search = typeof params.search === 'string' ? params.search : '';
   const page = params.page ? parseInt(params.page, 10) : 1;
   const limit = params.limit ? Math.min(parseInt(params.limit, 10), 100) : 20;
@@ -23,9 +23,9 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       return { clients: [], total: 0, page, totalPages: 0 };
     }
 
-    // Step 2: Filter relationships for only Clients
+    // Step 2: Filter relationships for only archived Clients
     const clientRelationships = user.relationships.filter(
-      r => r.clientModel === 'Client' && r.status === 'active'
+      r => r.clientModel === 'Client' && r.status === 'archived'
     );
 
     // Map: clientId (string) -> relationshipId (string)
@@ -39,10 +39,9 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
       return { clients: [], total: 0, page, totalPages: 0 };
     }
 
-    // Step 3: Query Client model for onboarded clients
+    // Step 3: Query Client model for archived clients
     const clientFilter = { 
-      _id: { $in: clientIds },
-      status: 'onboarded'
+      _id: { $in: clientIds }
     };
 
     if (search) {
@@ -91,17 +90,17 @@ const getUsersClientsByIdDbOp = async (userId, params = {}) => {
 
 const messages = {
   clients: {
-    getSuccess: "Successfully fetched the clients.",
-    getError: "There was an error fetching the clients."
+    getSuccess: "Successfully fetched the archived clients.",
+    getError: "There was an error fetching the archived clients."
   },
   error: {
     generalError: "An error occurred. Please try again later."
   }
 };
 
-const getClientsHandler = async (req, res, next) => {
+const getArchivedClientsHandler = async (req, res, next) => {
   try {
-    const data = await getUsersClientsByIdDbOp(req.id, req.query);
+    const data = await getUsersArchivedClientsByIdDbOp(req.id, req.query);
     return res.status(200).json({
       data,
       message: messages.clients.getSuccess
@@ -113,4 +112,4 @@ const getClientsHandler = async (req, res, next) => {
   }
 };
 
-export { getClientsHandler };
+export { getArchivedClientsHandler };
