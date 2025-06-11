@@ -28,10 +28,6 @@ const sessionSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  notes: {
-    type: String,
-    default: ''
-  },
   paymentStatus: {
     type: String,
     enum: ['pending', 'paid', 'failed'],

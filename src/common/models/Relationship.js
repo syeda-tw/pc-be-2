@@ -34,7 +34,21 @@ const relationshipSchema = new mongoose.Schema({
   isClientOnboardingComplete: {
     type: Boolean,
     default: false
-  }
+  },
+  notes: [{
+    content: {
+      type: String,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
 }, {
   timestamps: true // Adds createdAt and updatedAt fields automatically
 });

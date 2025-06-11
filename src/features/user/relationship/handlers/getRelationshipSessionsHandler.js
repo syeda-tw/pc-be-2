@@ -25,7 +25,7 @@ const getRelationshipSessionsService = async (
     const relationship = await Relationship.findById(relationshipId)
       .populate({
         path: "sessions",
-        select: "startTime endTime status type notes createdAt updatedAt",
+        select: "startTime endTime paymentStatus createdAt updatedAt",
       })
       .lean();
 
