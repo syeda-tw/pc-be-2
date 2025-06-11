@@ -53,13 +53,10 @@ const getRelationshipSessionsService = async (
     }
 
     const allSessions = relationship.sessions || [];
-    console.log(`[DB] Total sessions fetched from DB: ${allSessions.length}`);
-
     const filteredSessions = allSessions.filter((session) => {
       const sessionStart = new Date(session.startTime);
       return sessionStart >= start && sessionStart <= end;
     });
-    console.log(`[Filter] Sessions within date range: ${filteredSessions.length}`);
 
     const limit = 20;
     const currentPage = parseInt(page, 10) || 1;
@@ -69,8 +66,6 @@ const getRelationshipSessionsService = async (
     const paginatedSessions = filteredSessions
       .sort((a, b) => new Date(b.startTime) - new Date(a.startTime))
       .slice((currentPage - 1) * limit, currentPage * limit);
-
-    console.log(`[Pagination] Sessions returned in page ${currentPage}: ${paginatedSessions.length}`);
 
     return {
       total,

@@ -15,7 +15,6 @@ const requestResetPasswordService = async (email) => {
   const token = generateToken({ _id: user._id.toString(), expiresIn: '1h' });
   const frontendUrl = env.FRONTEND_URL;
   const resetLink = `${frontendUrl}/reset-password?token=${token}`;
-  console.log(resetLink);
   await sendPasswordResetEmail(email, resetLink);
   return;
 };

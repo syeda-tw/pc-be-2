@@ -38,15 +38,6 @@ const processSingleSession = async (
   cost,
   date
 ) => {
-  console.log("Starting processSingleSession with params:", {
-    clientId,
-    relationshipId,
-    startTime,
-    endTime,
-    cost,
-    date,
-  });
-
   let client;
   let relationship;
   let createdSession;
@@ -54,31 +45,18 @@ const processSingleSession = async (
 
   try {
     // Step 1: Find client
-    console.log("Step 1: Finding client with ID:", clientId);
     client = await Client.findById(clientId);
     if (!client) {
-      console.log("Client not found:", clientId);
       throw { status: 404, message: messages.clientNotFound };
     }
-    console.log("Client found:", {
-      clientId: client._id,
-      status: client.status,
-    });
 
     // Step 2: Find relationship
-    console.log("Step 2: Finding relationship with ID:", relationshipId);
     relationship = await Relationship.findById(relationshipId);
     if (!relationship) {
-      console.log("Relationship not found:", relationshipId);
       throw { status: 404, message: messages.notFound };
     }
-    console.log("Relationship found:", {
-      relationshipId: relationship._id,
-      status: relationship.status,
-    });
 
     // Step 3: Create session object
-    console.log("Step 3: Creating session object");
     const session = {
       client: clientId,
       user: relationship.user,
@@ -90,53 +68,25 @@ const processSingleSession = async (
       billingInformation: {},
       relationship: relationshipId,
     };
-    console.log("Session object created:", session);
 
     try {
       // Step 3a: Save session in DB
-      console.log("Step 3a: Saving session to database");
       createdSession = await Session.create(session);
-      console.log("Session created successfully:", {
-        sessionId: createdSession._id,
-        status: createdSession.paymentStatus,
-      });
 
       relationship.sessions.push(createdSession._id);
       await relationship.save();
-      console.log("Relationship updated with new session:", {
-        relationshipId: relationship._id,
-        sessionId: createdSession._id,
-        totalSessions: relationship.sessions.length,
-      });
     } catch (error) {
-      console.error("Error creating session:", {
-        error: error.message,
-        stack: error.stack,
-        session: session,
-      });
       throw { status: 500, message: messages.sessionCreationError };
     }
 
     // Step 4: Handle Stripe payment
     try {
-      console.log("Step 4: Initializing Stripe payment process:", {
-        clientId,
-        cost,
-        stripeCustomerId: client.stripeCustomerId,
-      });
-
       stripe = new Stripe(env.STRIPE_SECRET_KEY);
       const paymentMethods = await stripe.paymentMethods.list({
         customer: client.stripeCustomerId,
         type: "card",
       });
-      console.log("Payment methods retrieved:", {
-        customerId: client.stripeCustomerId,
-        paymentMethodsCount: paymentMethods.data.length,
-        firstPaymentMethodId: paymentMethods.data[0]?.id,
-      });
 
-      console.log("Creating payment intent");
       const paymentIntent = await stripe.paymentIntents.create({
         amount: cost * 100,
         currency: "usd",
@@ -146,30 +96,16 @@ const processSingleSession = async (
         off_session: true,
         confirm: true,
       });
-      console.log("Payment intent created:", {
-        paymentIntentId: paymentIntent.id,
-        status: paymentIntent.status,
-      });
 
       if (paymentIntent.status !== "succeeded") {
-        console.log("Payment failed:", {
-          paymentIntentId: paymentIntent.id,
-          status: paymentIntent.status,
-        });
         throw { status: 402, message: messages.paymentFailed };
       }
 
       // Step 5: Update session with payment details
-      console.log("Step 5: Updating session with payment details");
       createdSession.paymentIntentId = paymentIntent.id;
       createdSession.paymentStatus = "paid";
       createdSession.billingInformation = paymentIntent;
       await createdSession.save();
-      console.log("Session updated successfully with payment info:", {
-        sessionId: createdSession._id,
-        paymentIntentId: paymentIntent.id,
-        status: createdSession.paymentStatus,
-      });
 
       return {
         success: true,
@@ -178,43 +114,18 @@ const processSingleSession = async (
         client: client,
       };
     } catch (error) {
-      console.error("Error processing payment:", {
-        error: error.message,
-        stack: error.stack,
-        clientId,
-        relationshipId,
-        sessionId: createdSession?._id,
-      });
-
       if (error.status === 402) {
         throw error;
       }
       throw { status: 500, message: messages.sessionPaymentError };
     }
   } catch (error) {
-    console.error("Error in processSingleSession:", {
-      error: error.message,
-      stack: error.stack,
-      clientId,
-      relationshipId,
-      sessionId: createdSession?._id,
-    });
-
     // Clean up created session if payment failed
     if (createdSession && error.status === 402) {
       try {
-        console.log("Cleaning up session after payment failure:", {
-          sessionId: createdSession._id,
-          errorStatus: error.status,
-        });
         await Session.findByIdAndDelete(createdSession._id);
-        console.log("Session cleaned up successfully");
       } catch (cleanupError) {
-        console.error("Error cleaning up session:", {
-          error: cleanupError.message,
-          stack: cleanupError.stack,
-          sessionId: createdSession._id,
-        });
+        // Ignore cleanup errors
       }
     }
 
@@ -226,11 +137,6 @@ const processSingleSession = async (
 };
 
 const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
-  console.log(
-    "Starting bookFirstSessionForMultipleUserInvitedHandler with request body:",
-    req.body
-  );
-
   const sessions = req.body;
   const results = [];
   let successfulSessions = 0;
@@ -259,19 +165,7 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
           return relationship.save();
         })
       );
-      console.log(`Archived ${relationshipsToArchive.length} relationships that weren't in the payload`);
     }
-
-    console.log("Processing sessions in parallel:", {
-      totalSessions: sessions.length,
-      sessionDetails: sessions.map((s) => ({
-        relationshipId: s.relationshipId,
-        date: s.date,
-        startTime: s.startTime,
-        endTime: s.endTime,
-        cost: s.cost,
-      })),
-    });
 
     // Process all sessions in parallel
     const sessionPromises = sessions.map((session) =>
@@ -286,10 +180,6 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
     );
 
     const sessionResults = await Promise.all(sessionPromises);
-    console.log("All sessions processed:", {
-      totalResults: sessionResults.length,
-      successfulCount: sessionResults.filter((r) => r.success).length,
-    });
 
     // Process results
     sessionResults.forEach((result, index) => {
@@ -309,18 +199,9 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
         });
       }
     });
-    console.log("Results processed:", {
-      successfulSessions,
-      successfulPayments,
-      totalResults: results.length,
-    });
 
     // 🚨 IMPORTANT: Only onboard client if payment + session booked
     if (successfulSessions === 0 || successfulPayments === 0) {
-      console.log("No successful sessions or payments:", {
-        successfulSessions,
-        successfulPayments,
-      });
       return res.status(400).json({
         message: messages.noSuccessfulSessions,
         results: results,
@@ -358,13 +239,6 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
 
     res.status(200).json(response);
   } catch (err) {
-    console.error("Error in bookFirstSessionForMultipleUserInvitedHandler:", {
-      error: err.message,
-      stack: err.stack,
-      status: err.status,
-      details: err.details,
-    });
-
     res.status(err.status || 500).json({
       message: err.message || messages.generalError,
       error: err.details || null,

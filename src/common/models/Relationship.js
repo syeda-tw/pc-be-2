@@ -34,15 +34,25 @@ const relationshipSchema = new mongoose.Schema({
     formId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User.forms',
-      required: true
+      required: false
     },
     formName: {
       type: String,
       required: true
     },
-    uploadedFiles: [{
-      type: String,
-      required: true
+    formsUploadedByClient: [{
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+      },
+      name: {
+        type: String,
+        required: true
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now
+      }
     }],
     isMarkedComplete: {
       type: Boolean,

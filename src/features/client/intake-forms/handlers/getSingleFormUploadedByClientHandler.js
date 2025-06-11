@@ -20,8 +20,8 @@ const s3Client = new S3Client({
   },
 });
 
-const getSingleIntakeFormService = async (formId, clientId) => {
-  if (!formId || !clientId) {
+const getSingleFormUploadedByClientService = async (formId, clientId, relationshipId, formUploadedByClientId) => {
+  if (!formId || !clientId || !relationshipId || !formUploadedByClientId) {
     throw {
       code: 400,
       message: messages.invalidParams
@@ -29,11 +29,12 @@ const getSingleIntakeFormService = async (formId, clientId) => {
   }
 
   try {
-    const relationship = await Relationship.findOne({ client: clientId })
-      .populate({
-        path: 'user',
-        select: 'forms'
-      });
+    const relationship = await Relationship.findOne({
+      _id: relationshipId.toString()
+    }).populate({
+      path: "client",
+      select: "forms"
+    });
 
     if (!relationship) {
       throw {
@@ -42,8 +43,27 @@ const getSingleIntakeFormService = async (formId, clientId) => {
       };
     }
 
-    const form = relationship.user.forms.find((form) => form._id.toString() === formId);
-    if (!form) {
+    if (relationship.client._id.toString() !== clientId.toString()) {
+      throw {
+        code: 404,
+        message: messages.relationshipNotFound
+      };
+    }
+
+    if (!relationship.intakeForms.some(form => form.formId.toString() === formId.toString())) {
+      throw {
+        code: 404,
+        message: messages.formNotFound
+      };
+    }
+
+    const uploadedForm = relationship.intakeForms
+        .find(form => form.formId.toString() === formId.toString())
+      ?.formsUploadedByClient.find(
+        uploadedForm => uploadedForm._id.toString() === formUploadedByClientId.toString()
+      );
+
+    if (!uploadedForm) {
       throw {
         code: 404,
         message: messages.formNotFound
@@ -52,7 +72,7 @@ const getSingleIntakeFormService = async (formId, clientId) => {
 
     const s3Params = {
       Bucket: env.AWS_S3_BUCKET_NAME,
-      Key: formId,
+      Key: uploadedForm._id.toString()
     };
 
     const s3Object = await s3Client.send(new GetObjectCommand(s3Params));
@@ -64,7 +84,7 @@ const getSingleIntakeFormService = async (formId, clientId) => {
     }
 
     const fileStream = Readable.from(s3Object.Body);
-    return { fileStream, form };
+    return { fileStream, uploadedForm };
   } catch (error) {
     throw {
       code: error.code || 500,
@@ -73,19 +93,22 @@ const getSingleIntakeFormService = async (formId, clientId) => {
   }
 };
 
-export const getSingleIntakeFormHandler = async (req, res, next) => {
-  const { formId } = req.params;
+export const getSingleFormUploadedByClientHandler = async (req, res, next) => {
+  const { formId, relationshipId, formUploadedByClientId } = req.params;
   const clientId = req.id;
+
   try {
-    const { fileStream, form } = await getSingleIntakeFormService(
+    const { fileStream, uploadedForm } = await getSingleFormUploadedByClientService(
       formId,
-      clientId
+      clientId,
+      relationshipId,
+      formUploadedByClientId
     );
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${form.name || "form"}.pdf"`
+      `attachment; filename="${uploadedForm.name || "form"}.pdf"`
     );
 
     fileStream.pipe(res);
@@ -96,8 +119,6 @@ export const getSingleIntakeFormHandler = async (req, res, next) => {
         message: messages.streamError
       });
     });
-
-    fileStream.on("end", () => {});
   } catch (err) {
     next(err);
   }

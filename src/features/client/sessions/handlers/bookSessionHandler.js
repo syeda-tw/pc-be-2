@@ -1,4 +1,4 @@
-// TODO: Change from session to session
+
 import Client from "../../../../common/models/Client.js";
 import Relationship from "../../../../common/models/Relationship.js";
 import Stripe from "stripe";
@@ -60,18 +60,7 @@ const bookSessionService = async (
       createdSession = await Session.create(session);
       relationship.sessions.push(createdSession._id);
       await relationship.save();
-
-      console.log("Session created and added to relationship:", {
-        relationshipId: relationship._id,
-        sessionId: createdSession._id,
-      });
     } catch (error) {
-      console.error("Error creating session:", {
-        message: error?.message || String(error),
-        stack: error?.stack,
-        clientId,
-        relationshipId,
-      });
       throw { status: 500, message: messages.sessionCreationError };
     }
 
@@ -84,11 +73,6 @@ const bookSessionService = async (
         type: "card",
       });
 
-      console.log("Payment methods retrieved:", {
-        customerId: client.stripeCustomerId,
-        count: paymentMethods.data.length,
-      });
-
       const paymentIntent = await stripe.paymentIntents.create({
         amount: cost * 100,
         currency: "usd",
@@ -99,16 +83,7 @@ const bookSessionService = async (
         confirm: true,
       });
 
-      console.log("Payment intent created:", {
-        paymentIntentId: paymentIntent.id,
-        status: paymentIntent.status,
-      });
-
       if (paymentIntent.status !== "succeeded") {
-        console.error("Payment intent failed:", {
-          id: paymentIntent.id,
-          error: paymentIntent.last_payment_error,
-        });
         throw { status: 402, message: messages.paymentFailed };
       }
 
@@ -117,67 +92,31 @@ const bookSessionService = async (
         createdSession.paymentStatus = "paid";
         createdSession.billingInformation = paymentIntent;
         await createdSession.save();
-
-        console.log("Session updated with payment info");
       } catch (error) {
-        console.error("Error updating session:", {
-          message: error?.message || String(error),
-          stack: error?.stack,
-          sessionId: createdSession._id,
-        });
         throw { status: 500, message: messages.sessionUpdateError };
       }
 
       try {
         client.status = "onboarded";
         await client.save();
-        console.log("Client status updated to onboarded");
         return client.toObject();
       } catch (error) {
-        console.error("Error updating client:", {
-          message: error?.message || String(error),
-          stack: error?.stack,
-          clientId: client._id,
-        });
         throw { status: 500, message: messages.clientUpdateError };
       }
     } catch (stripeError) {
-      console.error("Stripe payment error:", {
-        message: stripeError?.message || String(stripeError),
-        stack: stripeError?.stack,
-        clientId,
-        relationshipId,
-      });
-
-      if (
-        stripeError.raw?.payment_intent?.id
-      ) {
+      if (stripeError.raw?.payment_intent?.id) {
         try {
-          const paymentIntent = await stripe.paymentIntents.retrieve(
+          await stripe.paymentIntents.retrieve(
             stripeError.raw.payment_intent.id
           );
-          console.error("Retrieved failed payment intent:", {
-            paymentIntentId: paymentIntent.id,
-            status: paymentIntent.status,
-            error: paymentIntent.last_payment_error,
-          });
         } catch (retrieveError) {
-          console.error("Error retrieving payment intent:", {
-            message: retrieveError?.message || String(retrieveError),
-            stack: retrieveError?.stack,
-          });
+          // Ignore retrieve error
         }
       }
 
       throw { status: 402, message: messages.paymentFailed };
     }
   } catch (error) {
-    console.error("Error in bookSessionService:", {
-      message: error?.message || String(error),
-      stack: error?.stack,
-      clientId,
-      relationshipId,
-    });
     throw error;
   }
 };
@@ -196,11 +135,6 @@ const bookSessionHandler = async (req, res) => {
       client: sanitizeUserAndAppendType(client, "client"),
     });
   } catch (err) {
-    console.error("Error in bookSessionHandler:", {
-      message: err?.message || String(err),
-      stack: err?.stack,
-      status: err?.status,
-    });
     res.status(err.status || 500).json({
       message: err.message || messages.generalError,
     });

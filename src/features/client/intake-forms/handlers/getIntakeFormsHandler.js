@@ -22,8 +22,6 @@ const getIntakeFormsService = async (relationshipId, userId) => {
 const getIntakeFormsHandler = async (req, res, next) => {
   const { relationshipId } = req.params;
   const userId = req.id;
-  console.log(userId);
-  console.log(relationshipId);
   try {
     const intakeForms = await getIntakeFormsService(relationshipId, userId);
     res.status(200).json(intakeForms);

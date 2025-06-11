@@ -14,6 +14,8 @@ const FormSchema = new mongoose.Schema(
   { timestamps: { createdAt: true, updatedAt: false }, _id: false }
 );
 
+export { FormSchema };
+
 // Main User Schema
 const UserSchema = new Schema(
   {
