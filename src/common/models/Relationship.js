@@ -26,11 +26,29 @@ const relationshipSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Session'
   }],
-  intakeFormsFilledStatus: {
-    type: String,
-    enum: ['not-started', 'in-progress', 'completed'],
-    default: 'not-started'
+  areIntakeFormsFilled: {
+    type: Boolean,
+    default: false
   },
+  intakeForms: [{
+    formId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User.forms',
+      required: true
+    },
+    formName: {
+      type: String,
+      required: true
+    },
+    uploadedFiles: [{
+      type: String,
+      required: true
+    }],
+    isMarkedComplete: {
+      type: Boolean,
+      default: false
+    }
+  }],
   isClientOnboardingComplete: {
     type: Boolean,
     default: false

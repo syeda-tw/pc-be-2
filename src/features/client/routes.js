@@ -5,6 +5,7 @@ import onboardingRoutes from "./onboarding/routes.js";
 import profileSettingsRoutes from "./profile-settings/routes.js";
 import relationshipRoutes from "./relationships/routes.js";
 import sessionRoutes from "./sessions/routes.js";
+import intakeFormsRoutes from "./intake-forms/routes.js";
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use("/onboarding", onboardingRoutes);
 router.use("/profile-settings", profileSettingsRoutes);
 router.use("/relationships", relationshipRoutes);
 router.use("/sessions", sessionRoutes);
+router.use("/intake-forms", intakeFormsRoutes);
 
 export { router as clientRouter };

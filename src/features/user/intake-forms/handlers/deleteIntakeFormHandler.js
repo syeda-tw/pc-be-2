@@ -1,6 +1,7 @@
 import { env } from '../../../../common/config/env.js';
 import { S3Client, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import User from '../../../../common/models/User.js';
+import Relationship from '../../../../common/models/Relationship.js';
 
 const messages = {
   formNotFound: "We couldn't find the form you're looking for. Please check the form ID and try again.",
@@ -52,6 +53,28 @@ const deleteIntakeFormService = async (formId, userId) => {
       await User.findByIdAndUpdate(userId, {
         $pull: { forms: { _id: formId } },
       });
+
+      // Find and update all relationships for this user
+      const relationships = await Relationship.find({ user: userId });
+      
+      for (const relationship of relationships) {
+        // Remove the form from intakeForms array
+        relationship.intakeForms = relationship.intakeForms.filter(
+          intakeForm => intakeForm.formId.toString() !== formId
+        );
+        
+        // Check if all remaining forms are marked as complete
+        const allFormsComplete = relationship.intakeForms.every(
+          form => form.isMarkedComplete
+        );
+        
+        // Update areIntakeFormsFilled based on remaining forms' completion status
+        // If there are no forms left, set to true
+        relationship.areIntakeFormsFilled = relationship.intakeForms.length === 0 || 
+          (relationship.intakeForms.length > 0 && allFormsComplete);
+        
+        await relationship.save();
+      }
     } catch (error) {
       console.error("Error removing form from user document:", error);
       throw {

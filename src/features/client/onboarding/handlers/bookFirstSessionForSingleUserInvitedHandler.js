@@ -69,7 +69,8 @@ const bookFirstSessionForSingleUserInvitedService = async (
     originalClientStatus = client.status;
 
     // Step 2: Validate and fetch relationship
-    relationship = await Relationship.findById(relationshipId);
+    relationship = await Relationship.findById(relationshipId)
+      .populate('user.forms');
     if (!relationship) {
       throw { status: 404, message: messages.notFound };
     }
@@ -91,7 +92,15 @@ const bookFirstSessionForSingleUserInvitedService = async (
     try {
       createdSession = await Session.create(session);
       relationship.sessions.push(createdSession._id);
+      relationship.areIntakeFormsFilled = false;
+      relationship.intakeForms = relationship.user.forms.map(form => ({
+        formId: form._id,
+        formName: form.name,
+        uploadedFiles: [],
+        isMarkedComplete: false
+      }));
       await relationship.save();
+
     } catch (error) {
       throw { status: 500, message: messages.sessionCreationError };
     }

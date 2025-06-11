@@ -182,7 +182,7 @@ async function createRelationships(userId, clients) {
       clientModel: "Client",
       user: userId,
       status: "active",
-      intakeFormsFilledStatus: "completed",
+      areIntakeFormsFilled: true,
       isClientOnboardingComplete: true,
     });
 

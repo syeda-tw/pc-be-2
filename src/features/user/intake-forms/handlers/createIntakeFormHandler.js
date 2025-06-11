@@ -2,6 +2,8 @@ import { env } from '../../../../common/config/env.js';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 import User from '../../../../common/models/User.js';
+import Relationship from '../../../../common/models/Relationship.js';
+import mongoose from 'mongoose';
 
 const messages = {
   invalidFileContent: "We couldn't process your file. Please make sure it's not empty and try again.",
@@ -32,7 +34,7 @@ const createIntakeFormService = async (id, file, formName) => {
     }
 
     const formDetails = {
-      _id: uuidv4(),
+      _id: new mongoose.Types.ObjectId(),
       name: formName,
       created_at: new Date(),
     };
@@ -47,21 +49,35 @@ const createIntakeFormService = async (id, file, formName) => {
 
     // Check if the form ID already exists in user's forms
     const formId = formDetails._id;
-    const formExists = user.forms.some((form) => form._id === formId);
+    const formExists = user.forms.some((form) => form._id.toString() === formId.toString());
 
     if (formExists) {
-      formDetails._id = uuidv4();
+      formDetails._id = new mongoose.Types.ObjectId();
     }
 
+    // Update user with new form
     await User.findByIdAndUpdate(userId, {
       forms: [...user.forms, formDetails],
     });
+
+    // Find all relationships for this user and update their intakeForms
+    const relationships = await Relationship.find({ user: userId });
+    for (const relationship of relationships) {
+      relationship.intakeForms.push({
+        formId: formDetails._id,
+        uploadedFiles: [],
+        isMarkedComplete: false,
+        formName: formName,
+      });
+      relationship.areIntakeFormsFilled = false;
+      await relationship.save();
+    }
 
     const fileUrl = `https://${env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${formDetails._id}`;
 
     const params = {
       Bucket: env.AWS_S3_BUCKET_NAME,
-      Key: formDetails._id,
+      Key: formDetails._id.toString(),
       Body: buffer,
       ContentType: mimetype || "application/pdf",
     };

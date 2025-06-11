@@ -39,7 +39,7 @@ const getRelationshipService = async (id, userId) => {
     return {
       relationshipId: relationship._id,
       status: relationship.status,
-      intakeFormsFilledStatus: relationship.intakeFormsFilledStatus,
+      areIntakeFormsFilled: relationship.areIntakeFormsFilled,
       isClientOnboardingComplete: relationship.isClientOnboardingComplete,
       client: relationship.client
         ? {
