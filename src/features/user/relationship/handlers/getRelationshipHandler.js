@@ -2,23 +2,28 @@ import Relationship from "../../../../common/models/Relationship.js";
 
 const messages = {
   success: {
-    getRelationship: "Here is the relationship you requested!",
+    getRelationship:
+      "We've found the relationship details you were looking for!",
   },
   error: {
-    notFound: "Sorry, we couldn't find that relationship.",
-    forbidden: "It looks like you don't have permission to view this relationship.",
-    getRelationship: "Oops! We had trouble fetching the relationship. Please try again.",
+    notFound:
+      "We couldn't find the relationship you're looking for. Please check the ID and try again.",
+    forbidden:
+      "You don't have access to view this relationship. Please contact support if you believe this is an error.",
+    getRelationship:
+      "We're having trouble retrieving the relationship information. Please try again in a moment.",
   },
 };
 
-const getRelationshipService = async (id, userId) => {
+const getRelationshipService = async (relationshipId, id) => {
   try {
-    const relationship = await Relationship.findById(id)
+    const relationship = await Relationship.findById(relationshipId)
       .populate([
         {
           path: "client",
-          select: "firstName middleName lastName gender pronouns email phone status dateOfBirth",
-        }
+          select:
+            "firstName middleName lastName gender pronouns email phone status dateOfBirth",
+        },
       ])
       .lean();
 
@@ -29,7 +34,7 @@ const getRelationshipService = async (id, userId) => {
       };
     }
 
-    if (relationship.user.toString() !== userId) {
+    if (relationship.user.toString() !== id) {
       throw {
         status: 403,
         message: messages.error.forbidden,
@@ -68,11 +73,14 @@ const getRelationshipService = async (id, userId) => {
 };
 
 const getRelationshipHandler = async (req, res, next) => {
-  const { id } = req.params;
-  const userId = req.id;
+  const { relationshipId } = req.params;
+  const id = req.id;
+
+  console.log("relationshipId", relationshipId);
+  console.log("id", id);
 
   try {
-    const relationship = await getRelationshipService(id, userId);
+    const relationship = await getRelationshipService(relationshipId, id);
     res.status(200).json({
       message: messages.success.getRelationship,
       relationship,

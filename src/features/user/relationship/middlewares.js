@@ -32,3 +32,39 @@ export const validateGetRelationshipSessions = (req, res, next) => {
   req.query = value; // validated and defaulted query
   next();
 };
+
+const messages = {
+  relationshipIdRequired: "Relationship ID is required.",
+  formIdRequired: "Form ID is required.",
+  formUploadedByClientIdRequired: "Form uploaded by client ID is required.",
+  invalidParams: "Invalid parameters provided."
+};
+
+const getSingleFormUploadedByClientSchema = Joi.object({
+  relationshipId: Joi.string().required().messages({
+    "any.required": messages.relationshipIdRequired,
+    "string.base": messages.relationshipIdRequired,
+  }),
+  formId: Joi.string().required().messages({
+    "any.required": messages.formIdRequired,
+    "string.base": messages.formIdRequired,
+  }),
+  formUploadedByClientId: Joi.string().required().messages({
+    "any.required": messages.formUploadedByClientIdRequired,
+    "string.base": messages.formUploadedByClientIdRequired,
+  }),
+});
+
+export const validateGetSingleFormUploadedByClient = (req, res, next) => {
+  const { error, value } = getSingleFormUploadedByClientSchema.validate(req.params, { abortEarly: false });
+
+  if (error) {
+    throw {
+      status: 400,
+      message: error.details[0].message,
+    };
+  }
+
+  req.params = value; // validated and defaulted params
+  next();
+};
