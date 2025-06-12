@@ -3,12 +3,13 @@ import { secureRequestMiddleware } from "../../../common/middlewares/secureReque
 import {
   validateGetRelationshipSessions,
   validateGetSingleFormUploadedByClient,
+  validateApproveClientUploadedForm,
 } from "./middlewares.js";
 import getRelationshipHandler from "./handlers/getRelationshipHandler.js";
 import getRelationshipSessionsHandler from "./handlers/getRelationshipSessionsHandler.js";
 import getIntakeFormsHandler from "./handlers/getIntakeFormsHandler.js";
 import { getSingleFormsUploadedByClientHandler } from "./handlers/getSingleFormsUploadedByClientHandler.js";
-
+import { approveClientUploadedFormHandler } from "./handlers/approveClientUploadedFormHandler.js";
 const router = Router();
 
 router.get(
@@ -24,6 +25,12 @@ router.get(
   secureRequestMiddleware,
   validateGetSingleFormUploadedByClient,
   getSingleFormsUploadedByClientHandler
+);
+router.put(
+  "/approve-client-uploaded-form/:relationshipId/:formId",
+  secureRequestMiddleware,
+  validateApproveClientUploadedForm,
+  approveClientUploadedFormHandler
 );
 
 export default router;
