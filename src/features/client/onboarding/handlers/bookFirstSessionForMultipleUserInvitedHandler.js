@@ -63,7 +63,6 @@ const processSingleSession = async (
       date: date,
       startTime: startTime,
       endTime: endTime,
-      notes: "",
       paymentStatus: "pending",
       billingInformation: {},
       relationship: relationshipId,

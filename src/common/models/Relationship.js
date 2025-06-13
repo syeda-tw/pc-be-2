@@ -64,6 +64,10 @@ const relationshipSchema = new mongoose.Schema({
     default: false
   },
   notes: [{
+    _id: {
+      type: mongoose.Schema.Types.ObjectId,
+      auto: true
+    },
     content: {
       type: String,
       required: true

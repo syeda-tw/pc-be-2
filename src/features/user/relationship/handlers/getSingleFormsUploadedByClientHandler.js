@@ -94,7 +94,7 @@ const getSingleFormsUploadedByClientService = async (
   }
 };
 
-export const getSingleFormsUploadedByClientHandler = async (req, res, next) => {
+const getSingleFormsUploadedByClientHandler = async (req, res, next) => {
   const { relationshipId, formId, formUploadedByClientId } = req.params;
   const userId = req.id;
 
@@ -125,3 +125,5 @@ export const getSingleFormsUploadedByClientHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+export default getSingleFormsUploadedByClientHandler;

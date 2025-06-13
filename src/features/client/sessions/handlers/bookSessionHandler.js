@@ -51,7 +51,6 @@ const bookSessionService = async (
         date,
         startTime,
         endTime,
-        notes: "",
         paymentStatus: "pending",
         billingInformation: {},
         relationship: relationshipId,

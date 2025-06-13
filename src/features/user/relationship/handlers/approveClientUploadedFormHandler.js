@@ -62,7 +62,7 @@ const approveClientUploadedFormService = async (
   };
 };
 
-export const approveClientUploadedFormHandler = async (req, res, next) => {
+const approveClientUploadedFormHandler = async (req, res, next) => {
   const { relationshipId, formId } = req.params;
   const userId = req.id;
 
@@ -80,3 +80,5 @@ export const approveClientUploadedFormHandler = async (req, res, next) => {
     next(err);
   }
 };
+
+export default approveClientUploadedFormHandler;

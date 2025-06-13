@@ -43,7 +43,6 @@ async function seedSessions() {
         date: new Date(d),
         startTime: new Date(start),
         endTime: new Date(end),
-        notes: "",
         paymentStatus: "pending",
         createdAt: new Date(),
         updatedAt: new Date(),

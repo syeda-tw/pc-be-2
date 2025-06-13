@@ -38,6 +38,9 @@ const messages = {
   formIdRequired: "Form ID is required.",
   formUploadedByClientIdRequired: "Form uploaded by client ID is required.",
   invalidParams: "Invalid parameters provided.",
+  noteIdRequired: "Note ID is required.",
+  noteContentRequired: "Note content is required.",
+  invalidPagination: "Invalid pagination parameters.",
 };
 
 const getSingleFormUploadedByClientSchema = Joi.object({
@@ -97,5 +100,123 @@ export const validateApproveClientUploadedForm = (req, res, next) => {
   }
 
   req.params = value; // validated and defaulted params
+  next();
+};
+
+// Notes validation schemas
+const getNotesSchema = Joi.object({
+  relationshipId: Joi.string().required().messages({
+    "any.required": messages.relationshipIdRequired,
+    "string.base": messages.relationshipIdRequired,
+  }),
+  page: Joi.number().integer().min(1).default(1).messages({
+    "number.base": "Page must be a positive integer.",
+    "number.integer": "Page must be a positive integer.",
+    "number.min": "Page must be a positive integer.",
+  }),
+  pageSize: Joi.number().integer().min(1).max(50).default(10).messages({
+    "number.base": "Page size must be a positive integer.",
+    "number.integer": "Page size must be a positive integer.",
+    "number.min": "Page size must be at least 1.",
+    "number.max": "Page size cannot exceed 50.",
+  }),
+});
+
+const createNoteSchema = Joi.object({
+  relationshipId: Joi.string().required().messages({
+    "any.required": messages.relationshipIdRequired,
+    "string.base": messages.relationshipIdRequired,
+  }),
+  content: Joi.string().required().trim().min(1).messages({
+    "any.required": messages.noteContentRequired,
+    "string.empty": messages.noteContentRequired,
+    "string.base": messages.noteContentRequired,
+  }),
+});
+
+const updateNoteSchema = Joi.object({
+  relationshipId: Joi.string().required().messages({
+    "any.required": messages.relationshipIdRequired,
+    "string.base": messages.relationshipIdRequired,
+  }),
+  noteId: Joi.string().required().messages({
+    "any.required": messages.noteIdRequired,
+    "string.base": messages.noteIdRequired,
+  }),
+  content: Joi.string().required().trim().min(1).messages({
+    "any.required": messages.noteContentRequired,
+    "string.empty": messages.noteContentRequired,
+    "string.base": messages.noteContentRequired,
+  }),
+});
+
+const deleteNoteSchema = Joi.object({
+  relationshipId: Joi.string().required().messages({
+    "any.required": messages.relationshipIdRequired,
+    "string.base": messages.relationshipIdRequired,
+  }),
+  noteId: Joi.string().required().messages({
+    "any.required": messages.noteIdRequired,
+    "string.base": messages.noteIdRequired,
+  }),
+});
+
+// Notes validation middleware
+export const validateGetNotes = (req, res, next) => {
+  const { error, value } = getNotesSchema.validate(
+    { ...req.params, ...req.query },
+    { abortEarly: false }
+  );
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  req.params = value;
+  req.query = value;
+  next();
+};
+
+export const validateCreateNote = (req, res, next) => {
+  const { error, value } = createNoteSchema.validate(
+    { ...req.params, ...req.body },
+    { abortEarly: false }
+  );
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  req.params = value;
+  req.body = value;
+  next();
+};
+
+export const validateUpdateNote = (req, res, next) => {
+  const { error, value } = updateNoteSchema.validate(
+    { ...req.params, ...req.body },
+    { abortEarly: false }
+  );
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  req.params = value;
+  req.body = value;
+  next();
+};
+
+export const validateDeleteNote = (req, res, next) => {
+  const { error, value } = deleteNoteSchema.validate(
+    req.params,
+    { abortEarly: false }
+  );
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  req.params = value;
   next();
 };
