@@ -9,7 +9,7 @@ const AddressSchema = new Schema({
   zip:       { type: String },
   country:   { type: String, default: "USA" },
   isPrimary: { type: Boolean, default: false },
-});
+}, { _id: false }); // Disable _id for subdocuments
 
 const PracticeSchema = new Schema(
   {

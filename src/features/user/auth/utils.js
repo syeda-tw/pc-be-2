@@ -64,8 +64,6 @@ export const sendPasswordResetEmail = async (email, resetLink) => {
       <a href="${resetLink}" style="background-color: #0f9790; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">Reset My Password</a>
     </div>
     <p style="color: #333;">For your security, this link will expire in 1 hour. If you didn't request this password reset, you can safely ignore this email - your account is still secure.</p>
-    <p style="color: #333;">Need help? Our support team is always here for you.</p>
-    <p style="color: #333;">Best regards,<br/>The Practicare Team</p>
   `;
 
   try {

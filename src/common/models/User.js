@@ -4,6 +4,7 @@ import {
   GENDER_OPTIONS,
   PRONOUNS_OPTIONS,
   TIMEZONES,
+  USER_STATUS_OPTIONS,
 } from "../../features/common/constants.js";
 const { Schema } = mongoose;
 
@@ -64,7 +65,7 @@ const UserSchema = new Schema(
     sessionDuration: { type: Number, default: 60 },
     status: {
       type: String,
-      enum: ["onboarding-step-1", "onboarding-step-2", "onboarded", "verified", "disabled"],
+      enum: USER_STATUS_OPTIONS,
       default: "onboarding-step-1",
     },
     timezone: { type: String, default: TIMEZONES[0].value },

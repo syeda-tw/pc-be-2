@@ -23,18 +23,21 @@ const onboardingStep1Service = async (
 ) => {
   try {
     const user = await User.findById(id);
+    
     if (!user) {
       throw {
         error: "USER_NOT_FOUND",
         message: messages.userNotFound,
       };
     }
+
     if (user.status !== "onboarding-step-1") {
       throw {
         error: "INVALID_USER_STATUS",
         message: messages.invalidUserStatus,
       };
     }
+
     const usernameExists = await User.findOne({ username });
     if (usernameExists) {
       throw {
@@ -52,6 +55,7 @@ const onboardingStep1Service = async (
     user.middleName = middleName;
     user.status = "onboarding-step-2";
     user.username = username;
+
     try {
       const userUpdated = await user.save();
       return userUpdated.toObject();
