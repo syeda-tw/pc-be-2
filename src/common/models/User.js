@@ -1,5 +1,10 @@
 import mongoose from "mongoose";
-import { DAYS_OF_WEEK, TIMEZONES } from "../../features/common/constants.js";
+import {
+  DAYS_OF_WEEK,
+  GENDER_OPTIONS,
+  PRONOUNS_OPTIONS,
+  TIMEZONES,
+} from "../../features/common/constants.js";
 const { Schema } = mongoose;
 
 // Email Validation Regex
@@ -19,6 +24,7 @@ export { FormSchema };
 // Main User Schema
 const UserSchema = new Schema(
   {
+    // Core identification fields
     _id: { type: Schema.Types.ObjectId, required: true, auto: true },
     email: {
       type: String,
@@ -32,44 +38,38 @@ const UserSchema = new Schema(
       sparse: true,
       validate: {
         validator: (value) => {
-          // Allow empty or null values (optional field)
           if (value === "" || value === null) return true;
-
-          // Enforce length and allowed characters
           const isValidLength = value.length >= 4 && value.length <= 20;
           const isValidFormat = /^[a-zA-Z0-9_]+$/.test(value);
-
           return isValidLength && isValidFormat;
         },
-        message:
-          "Username must be 4–20 characters long and only contain letters, numbers, and underscores.",
+        message: "Username must be 4–20 characters long and only contain letters, numbers, and underscores.",
       },
     },
     password: { type: String },
+
+    // Personal information
     title: { type: String },
     firstName: { type: String },
     lastName: { type: String },
     middleName: { type: String },
     dateOfBirth: { type: Date },
-    gender: { type: String },
-    pronouns: { type: String },
+    gender: { type: String, enum: GENDER_OPTIONS },
+    pronouns: { type: String, enum: PRONOUNS_OPTIONS },
+
+    // Professional settings
     isAdmin: { type: Boolean, default: false },
     practice: { type: Schema.Types.ObjectId, ref: "Practice" },
-    hourlyRate: { type: Number },
     sessionCost: { type: Number, default: 100 },
     sessionDuration: { type: Number, default: 60 },
     status: {
       type: String,
-      enum: [
-        "onboarding-step-1",
-        "onboarding-step-2",
-        "onboarded",
-        "verified",
-        "disabled",
-      ],
+      enum: ["onboarding-step-1", "onboarding-step-2", "onboarded", "verified", "disabled"],
       default: "onboarding-step-1",
     },
     timezone: { type: String, default: TIMEZONES[0].value },
+
+    // Availability settings
     availability: {
       type: {
         dailyLunchStartTime: { type: String },
@@ -101,10 +101,8 @@ const UserSchema = new Schema(
         })),
       },
     },
-    holidays: {
-      type: [{ name: String, startDate: Date, endDate: Date }],
-      default: [],
-    },
+
+    // Professional documents and relationships
     forms: {
       type: [FormSchema],
       default: [],
@@ -122,75 +120,7 @@ const UserSchema = new Schema(
       },
     ],
   },
-  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+  { timestamps: true }
 );
 
-// Virtual field to compute current holiday
-UserSchema.virtual("currentHoliday").get(function () {
-  const todayISO = new Date().toISOString();
-  return (
-    this.holidays?.find((h) => {
-      return (
-        h.startDate?.toISOString() <= todayISO &&
-        h.endDate?.toISOString() >= todayISO
-      );
-    }) || null
-  );
-});
-
 export default mongoose.model("User", UserSchema);
-
-// Example mock user object for testing
-export const mockUserComplete = {
-  _id: "603d9f3d8d4e4f2f74c2c5f8",
-  email: "user@example.com",
-  username: "johndoe",
-  password: "hashed_password_here",
-  title: "Mr.",
-  firstName: "John",
-  lastName: "Doe",
-  middleName: "Michael",
-  dateOfBirth: "1990-01-01T00:00:00Z",
-  gender: "Male",
-  pronouns: "he/him",
-  isAdmin: false,
-  practice: "603d9f3d8d4e4f2f74c2c5f9",
-  hourlyRate: 50,
-  sessionCost: 200,
-  sessionDuration: 60,
-  status: "onboarding-step-2",
-  timezone: "EDT",
-  availability: {
-    dailyLunchStartTime: "12:00",
-    dailyLunchEndTime: "13:00",
-    weeklySchedule: [
-      { day: "Monday", startTime: "09:00", endTime: "17:00", isOpen: true },
-      { day: "Tuesday", startTime: "09:00", endTime: "17:00", isOpen: true },
-      { day: "Wednesday", startTime: "09:00", endTime: "17:00", isOpen: true },
-      { day: "Thursday", startTime: "09:00", endTime: "17:00", isOpen: true },
-      { day: "Friday", startTime: "09:00", endTime: "17:00", isOpen: true },
-      { day: "Saturday", startTime: "09:00", endTime: "17:00", isOpen: false },
-      { day: "Sunday", startTime: "09:00", endTime: "17:00", isOpen: false },
-    ],
-  },
-  holidays: [
-    {
-      name: "Christmas Break",
-      startDate: "2023-12-24T00:00:00Z",
-      endDate: "2023-12-26T00:00:00Z",
-    },
-  ],
-  forms: [
-    {
-      _id: "form1",
-      name: "Onboarding Form",
-      createdAt: "2022-01-01T00:00:00Z",
-    },
-    {
-      _id: "form2",
-      name: "Privacy Policy Agreement",
-      createdAt: "2022-02-01T00:00:00Z",
-    },
-  ],
-  relationships: ["603d9f3d8d4e4f2f74c2c5f7"],
-};

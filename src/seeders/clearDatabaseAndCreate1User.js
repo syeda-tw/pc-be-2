@@ -101,7 +101,6 @@ async function createAdminUser(practiceId) {
     status: "onboarded",
     // Practice and financial details
     practice: practiceId,
-    hourlyRate: 120,
     sessionCost: 200,
     sessionDuration: 60,
     

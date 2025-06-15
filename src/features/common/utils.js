@@ -63,7 +63,35 @@ export const isPasswordCorrect = async (password, correctPassword) => {
 };
 
 
-export const sendEmail = async (to, subject, htmlContent) => {
+const generateEmailTemplate = ({ heading, content }) => {
+  return `
+    <div style="background-color: rgb(249, 252, 255); padding: 40px 0; font-family: Arial, sans-serif;">
+      <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
+        <tr>
+          <td style="padding: 40px; color: #333; text-align: center;">
+            <img src="https://app.practicare.com/logo/practicare-logo.svg" alt="Practicare Logo" style="max-width: 140px; margin-bottom: 24px;" />
+            <h1 style="margin: 0 0 24px; font-size: 20px; color: hsl(208, 68%, 39%);">
+              ${heading}
+            </h1>
+            <div style="font-size: 15px; line-height: 1.6; text-align: left; color: #444;">
+              ${content}
+            </div>
+            <div style="margin-top: 40px; font-size: 14px; color: #555; text-align: left;">
+              <p style="margin-bottom: 4px;">Sincerely,</p>
+              <p style="margin: 0; font-weight: 500; color: #0f9790;">The Practicare Team</p>
+              <p style="margin: 4px 0 0;">
+                <a href="https://www.practicare.com" style="color: hsl(208, 68%, 39%); text-decoration: none;">www.practicare.co</a>
+              </p>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
+};
+
+
+export const sendEmail = async (to, subject, heading, content) => {
   try {
     const transporter = nodemailer.createTransport({
       service: "gmail", // Example; use your actual SMTP configuration here
@@ -77,7 +105,7 @@ export const sendEmail = async (to, subject, htmlContent) => {
       from: env.NODEMAILER_EMAIL,
       to,
       subject,
-      html: htmlContent,
+      html: generateEmailTemplate({ heading, content }),
     };
 
     await transporter.sendMail(mailOptions);

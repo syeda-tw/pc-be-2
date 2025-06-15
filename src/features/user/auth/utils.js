@@ -3,22 +3,18 @@ import { sendEmail } from "../../common/utils.js";
 // Send OTP Registration Email
 export const sendRegistrationEmail = async (email, otp) => {
   const subject = "Your OTP Code for Secure Verification on Practicare";
-  const htmlContent = `
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4; border-radius: 8px;">
-      <h2 style="text-align: center; color: #333;">Secure OTP Code for Practicare</h2>
-      <p style="color: #333;">Hello, we received a request to verify your email address with Practicare. Please use the following OTP code:</p>
-      <div style="text-align: center;">
-        <h1 style="font-size: 24px; font-weight: bold; color: #000;">${otp}</h1>
+  const heading = "Verify Your Email Address";
+  const content = `
+      <p style="color: #333;">Hi there! To complete your email verification, please enter this code:</p>
+      <div style="text-align: center; margin: 20px 0;">
+        <h1 style="font-size: 32px; font-weight: bold; color: #000; letter-spacing: 4px;">${otp}</h1>
       </div>
-      <p style="color: #333;">This code is valid for the next 10 minutes. If you did not request this verification, please ignore this email.</p>
-      <p style="color: #333;">If you need further assistance, feel free to contact our support team.</p>
-      <p style="color: #333;">Thank you for choosing Practicare!</p>
-      <p style="color: #333;">Best regards,<br/>The Practicare Team</p>
-    </div>
+      <p style="color: #333;">This code will expire in 10 minutes for your security.</p>
+      <p style="color: #333;">If you didn't request this verification, you can safely ignore this email.</p>
   `;
 
   try {
-    await sendEmail(email, subject, htmlContent);
+    await sendEmail(email, subject, heading, content);
   } catch (err) {
     throw {
       code: 400,
@@ -34,55 +30,51 @@ export const generateOtp = () => {
 
 export const sendWelcomeEmail = async (user) => {
   const subject = "Welcome to Practicare!";
-  const htmlContent = `
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4; border-radius: 8px;">
-      <h2 style="text-align: center; color: #333;">Welcome to Practicare!</h2>
-      <p style="color: #333;">Hello ${user.firstName} ${user.lastName},</p>
-      <p style="color: #333;">We're excited to welcome you to Practicare! Our platform is designed to help you manage your mental health practice efficiently—whether it's scheduling sessions, organizing client records, or streamlining daily tasks.</p>
-      <p style="color: #333;">With Practicare, you can focus more on your clients while we handle the rest.</p>
-      <p style="color: #333;"><strong>Get started today:</strong></p>
-      <ul style="color: #333;">
-        <li><a href="https://www.practicare.co" style="color: #007bff;">Log in to your account</a></li>
-        <li>Explore the features built for you</li>
-        <li>Reach out to our support team if you need any help</li>
-      </ul>
-      <p style="color: #333;">We're here to support you on this journey. Welcome aboard!</p>
-      <p style="color: #333;">Best regards,<br/>The Practicare Team</p>
-      <p style="color: #333;"><a href="https://www.practicare.co" style="color: #007bff;">www.practicare.co</a></p>
-    </div>
+  const heading = `Hello ${user.firstName} ${user.lastName}, Welcome to Practicare!`;
+  const content = `
+    <p style="color: #333;">We're thrilled to have you join our community of mental health professionals.</p>
+    <p style="color: #333;">Here's what you can do with Practicare:</p>
+    <ul style="color: #333; list-style-type: none; padding-left: 0;">
+      <li style="margin-bottom: 10px;">📅 Manage your availability and calendar</li>
+      <li style="margin-bottom: 10px;">📝 Create and customize intake forms</li>
+      <li style="margin-bottom: 10px;">👥 Organize your client information</li>
+      <li style="margin-bottom: 10px;">💼 Streamline your practice management</li>
+    </ul>
+    <p style="color: #333;">We're here to help you focus on what matters most - your clients. If you need any assistance getting started, our support team is just a message away.</p>
+    <p style="color: #333;">Best wishes,<br/>The Practicare Team</p>
   `;
-
   try {
-    await sendEmail(user.email, subject, htmlContent);
+    await sendEmail(user.email, subject, heading, content);
   } catch (err) {
     throw {
       code: 400,
-      message: "Error sending welcome email.",
+      message: "We couldn't send your welcome email. Please try again later.",
     };
   }
 };
 
 export const sendPasswordResetEmail = async (email, resetLink) => {
-  const subject = "Password Reset Request";
-  const htmlContent = `
-    <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; background-color: #f4f4f4; border-radius: 8px;">
-      <h2 style="text-align: center; color: #333;">Password Reset Request</h2>
-      <p style="color: #333;">Hello,</p>
-      <p style="color: #333;">We received a request to reset your password. Please use the following link to reset your password:</p>
-      <div style="text-align: center;">
-        <a href="${resetLink}" style="color: #007bff; font-size: 18px;">Reset Password</a>
-      </div>
-      <p style="color: #333;">This link is valid for the next 1 hour. If you did not request this, please ignore this email.</p>
-      <p style="color: #333;">Best regards,<br/>The Practicare Team</p>
+  const subject = "Reset Your Practicare Password";
+  const heading = "Let's Get You Back In";
+  const content = `
+    <p style="color: #333;">Hi there,</p>
+    <p style="color: #333;">We noticed you requested to reset your password. No worries - we're here to help you get back into your account!</p>
+    <p style="color: #333;">Click the button below to create a new password:</p>
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${resetLink}" style="background-color: #0f9790; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">Reset My Password</a>
     </div>
+    <p style="color: #333;">For your security, this link will expire in 1 hour. If you didn't request this password reset, you can safely ignore this email - your account is still secure.</p>
+    <p style="color: #333;">Need help? Our support team is always here for you.</p>
+    <p style="color: #333;">Best regards,<br/>The Practicare Team</p>
   `;
 
   try {
-    await sendEmail(email, subject, htmlContent);
+    await sendEmail(email, subject, heading, content);
   } catch (err) {
     throw {
       code: 400,
-      message: "Error sending password reset email.",
+      message:
+        "We couldn't send your password reset email. Please try again in a few minutes.",
     };
   }
 };
