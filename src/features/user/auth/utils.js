@@ -30,7 +30,7 @@ export const generateOtp = () => {
 
 export const sendWelcomeEmail = async (user) => {
   const subject = "Welcome to Practicare!";
-  const heading = `Hello ${user.firstName} ${user.lastName}, Welcome to Practicare!`;
+  const heading = `Hello Practitioner, Welcome to Practicare!`;
   const content = `
     <p style="color: #333;">We're thrilled to have you join our community of mental health professionals.</p>
     <p style="color: #333;">Here's what you can do with Practicare:</p>
@@ -77,8 +77,4 @@ export const sendPasswordResetEmail = async (email, resetLink) => {
         "We couldn't send your password reset email. Please try again in a few minutes.",
     };
   }
-};
-
-export const generateOtpExpiration = () => {
-  return new Date(Date.now() + 10 * 60 * 1000);
 };

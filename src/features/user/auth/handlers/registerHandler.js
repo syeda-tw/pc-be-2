@@ -2,10 +2,15 @@ import User from "../../../../common/models/User.js";
 import {
   generateOtp,
   sendRegistrationEmail,
-  generateOtpExpiration,
 } from "../utils.js";
 import { hashPassword } from "../../../common/utils.js";
 import UserOtpVerification from "../../../../common/models/UserOtpVerification.js";
+
+// this will expire in 10 minutes
+export const generateOtpExpiration = () => {
+  return new Date(Date.now() + 10 * 60 * 1000);
+};
+
 
 const messages = {
   error: {

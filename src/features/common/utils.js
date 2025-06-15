@@ -62,14 +62,13 @@ export const isPasswordCorrect = async (password, correctPassword) => {
   return await bcrypt.compare(password, correctPassword);
 };
 
-
 const generateEmailTemplate = ({ heading, content }) => {
   return `
     <div style="background-color: rgb(249, 252, 255); padding: 40px 0; font-family: Arial, sans-serif;">
       <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.04);">
         <tr>
           <td style="padding: 40px; color: #333; text-align: center;">
-            <img src="https://app.practicare.com/logo/practicare-logo.svg" alt="Practicare Logo" style="max-width: 140px; margin-bottom: 24px;" />
+            <img src="cid:practicare-logo" alt="Practicare Logo" style="max-width: 140px; margin-bottom: 24px;" />
             <h1 style="margin: 0 0 24px; font-size: 20px; color: hsl(208, 68%, 39%);">
               ${heading}
             </h1>
@@ -90,7 +89,6 @@ const generateEmailTemplate = ({ heading, content }) => {
   `;
 };
 
-
 export const sendEmail = async (to, subject, heading, content) => {
   try {
     const transporter = nodemailer.createTransport({
@@ -106,6 +104,13 @@ export const sendEmail = async (to, subject, heading, content) => {
       to,
       subject,
       html: generateEmailTemplate({ heading, content }),
+      attachments: [
+        {
+          filename: 'practicare-logo.png',
+          path: 'practicare-logo.png',
+          cid: 'practicare-logo',
+        },
+      ],
     };
 
     await transporter.sendMail(mailOptions);
