@@ -1,81 +1,108 @@
-import mongoose from "mongoose";
-import Relationship from '../../../common/models/Relationship.js';
+import User from "../../../common/models/User.js";
+import Client from "../../../common/models/Client.js";
+import InvitedClient from "../../../common/models/InvitedClient.js";
 
-const getUsersClientsByIdDbOp = async (userId, params = {}) => {
-  const search = typeof params.search === 'string' ? params.search.trim() : '';
+const messages = {
+  success: {
+    clientsFetched: "Successfully fetched your invited clients."
+  },
+  error: {
+    userNotFound: "We couldn't find your account",
+    fetchError: "We couldn't fetch your invited clients. Please try again."
+  }
+};
+
+const getInvitedClientsService = async (userId, params = {}) => {
+  const search = typeof params.search === 'string' ? params.search : '';
   const page = params.page ? parseInt(params.page, 10) : 1;
   const limit = params.limit ? Math.min(parseInt(params.limit, 10), 100) : 20;
   const skip = (page - 1) * limit;
+  const sortBy = typeof params.sortBy === 'string' ? params.sortBy : 'firstName';
+  const sortOrder = params.sortOrder === 'desc' ? -1 : 1;
 
+  const user = await User.findById(userId)
+    .populate({
+      path: 'relationships',
+      select: 'client clientModel status',
+    })
+    .lean();
+
+  if (!user) {
+    throw { status: 404, message: messages.error.userNotFound };
+  }
+
+  if (!user.relationships) {
+    return { clients: [], total: 0, page, totalPages: 0 };
+  }
+
+  const clientRelationships = user.relationships.filter(
+    r => r.clientModel === 'InvitedClient' && r.status === 'pending'
+  );
+
+  const clientIdToRelationshipId = new Map(
+    clientRelationships.map(r => [r.client.toString(), r._id.toString()])
+  );
+
+  const clientIds = clientRelationships.map(r => r.client);
+
+  if (clientIds.length === 0) {
+    return { clients: [], total: 0, page, totalPages: 0 };
+  }
+
+  const clientFilter = { 
+    _id: { $in: clientIds }
+  };
+
+  if (search) {
+    clientFilter.$or = [
+      { firstName: { $regex: search, $options: 'i' } },
+      { lastName: { $regex: search, $options: 'i' } },
+      { middleName: { $regex: search, $options: 'i' } },
+      { phone: { $regex: search, $options: 'i' } },
+      { email: { $regex: search, $options: 'i' } }
+    ];
+  }
+
+  const [clients, total] = await Promise.all([
+    InvitedClient.find(clientFilter)
+      .select('firstName lastName middleName email phone pronouns dateOfBirth gender')
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    InvitedClient.countDocuments(clientFilter)
+  ]);
+
+  const clientsWithRelationshipId = clients.map(client => ({
+    firstName: client.firstName,
+    lastName: client.lastName,
+    middleName: client.middleName,
+    email: client.email,
+    phone: client.phone,
+    pronouns: client.pronouns,
+    dateOfBirth: client.dateOfBirth,
+    gender: client.gender,
+    relationshipId: clientIdToRelationshipId.get(client._id.toString()) || null
+  }));
+
+  return {
+    clients: clientsWithRelationshipId,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit)
+  };
+};
+
+const getInvitedClientsHandler = async (req, res) => {
   try {
-    // Step 1: Find relationships with pending status and matching user
-    const relationships = await Relationship.find({
-      user: userId,
-      status: 'pending',
-    }).lean();
-
-    // Step 2: Fetch client details dynamically with custom filters
-    const clients = await Promise.all(
-      relationships.map(async (rel) => {
-        const ClientModel = mongoose.model(rel.clientModel);
-        const client = await ClientModel.findById(rel.client).lean();
-        
-        if (!client) {
-          return null;
-        }
-
-        // Conditionally exclude 'Client' if onboarding is complete
-        if (rel.clientModel === 'Client' && client.status === 'onboarded') {
-          return null;
-        }
-
-        // Apply name search filter
-        const fullName = `${client.firstName || ''} ${client.middleName || ''} ${client.lastName || ''}`.trim().toLowerCase();
-        const matchesSearch = !search || fullName.includes(search.toLowerCase());
-
-        return matchesSearch ? { ...client, relationshipId: rel._id, clientModel: rel.clientModel } : null;
-      })
-    );
-
-    // Step 3: Filter nulls and paginate
-    const filteredClients = clients.filter(Boolean);
-    const total = filteredClients.length;
-    const paginatedClients = filteredClients.slice(skip, skip + limit);
-
-    return {
-      clients: paginatedClients,
-      total,
-      page,
-      totalPages: Math.ceil(total / limit)
-    };
-
+    const data = await getInvitedClientsService(req.id, req.query);
+    res.status(200).json({
+      message: messages.success.clientsFetched,
+      data
+    });
   } catch (error) {
-    throw error;
+    res.status(error.status || 500).json({ message: error.message });
   }
 };
 
-const messages = {
-  clients: {
-    getInvitedSuccess: "Successfully fetched the invited clients.",
-    getInvitedError: "There was an error fetching the invited clients."
-  },
-  error: {
-    generalError: "An error occurred. Please try again later."
-  }
-};
-
-const getInvitedClientsHandler = async (req, res, next) => {
-  try {
-    const data = await getUsersClientsByIdDbOp(req.id, req.query);
-    return res.status(200).json({
-      data,
-      message: messages.clients.getInvitedSuccess
-    });
-  } catch (err) {
-    return res.status(500).json({
-      message: messages.error.generalError
-    });
-  }
-};
-
-export { getInvitedClientsHandler };
+export default getInvitedClientsHandler;

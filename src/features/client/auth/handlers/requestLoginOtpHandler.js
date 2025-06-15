@@ -14,14 +14,17 @@ const requestLoginOtpService = async (phone) => {
   try {
     const client = await Client.findOne({ phone });
     if (!client) {
-      throw new Error(messages.CLIENT_NOT_FOUND);
+      throw {
+        code: 404,
+        message: messages.CLIENT_NOT_FOUND,
+      };
     }
     const otp = generateOtp();
     client.loginOtp = otp;
     client.loginOtpExpiresAt = new Date(Date.now() + 1000 * 60 * 5);
     await client.save();
   } catch (error) {
-    throw error;
+    res.status(err.code || 500).json({ message: err.message });
   }
 };
 

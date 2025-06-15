@@ -14,10 +14,10 @@ const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 // Nested Schema for Forms
 const FormSchema = new mongoose.Schema(
   {
-    _id: String,
+    _id: { type: Schema.Types.ObjectId, auto: true },
     name: String,
   },
-  { timestamps: { createdAt: true, updatedAt: false }, _id: false }
+  { timestamps: { createdAt: true, updatedAt: false } }
 );
 
 export { FormSchema };
@@ -111,7 +111,7 @@ const UserSchema = new Schema(
         validator: function (val) {
           return val.length <= 10;
         },
-        message: "Practioner can only have up to 10 intake forms",
+        message: "Practitioner can only have up to 10 intake forms",
       },
     },
     relationships: [

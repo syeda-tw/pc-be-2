@@ -7,7 +7,7 @@ alwaysApply: true
 - Use a service-handler pattern.
 - Define messages in a `messages` object.
 - Service handles all logic and throws errors as objects with `status` and `message`.
-- Handler only calls the service and sends back a response or calls `next(err)`.
+- Handler only calls the service and sends back a response or calls `res.status(error.code || 500).json({ message: error.message })`.
 - All error messages must be kind and clear.
 - Never do database logic in the handler.
 - Group related files like:

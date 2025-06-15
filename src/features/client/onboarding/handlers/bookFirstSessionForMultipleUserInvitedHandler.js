@@ -114,7 +114,7 @@ const processSingleSession = async (
       };
     } catch (error) {
       if (error.status === 402) {
-        throw error;
+        throw { status: 402, message: messages.sessionPaymentError };
       }
       throw { status: 500, message: messages.sessionPaymentError };
     }

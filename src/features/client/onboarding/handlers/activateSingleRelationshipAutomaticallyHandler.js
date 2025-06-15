@@ -51,7 +51,7 @@ const activateSingleRelationshipAutomaticallyService = async (clientId) => {
     }
   } catch (error) {
     console.error('Error in activateSingleRelationshipAutomaticallyService:', error);
-    throw error;
+    res.status(error.code || 500).json({ message: error.message });
   }
 };
 

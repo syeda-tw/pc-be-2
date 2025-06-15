@@ -3,25 +3,36 @@ import { sanitizeUserAndAppendType } from "../../../common/utils.js";
 
 const messages = {
   success: {
-    personalInformationUpdated: "Personal information updated successfully",
+    personalInformationUpdated: "Your personal information has been updated successfully",
   },
   error: {
-    personalInformationUpdateFailed: "Failed to update personal information",
+    clientNotFound: "We couldn't find your account",
+    personalInformationUpdateFailed: "We couldn't update your personal information. Please try again",
   },
 };
+
 const updatePersonalInformationService = async (data, userId) => {
+  const client = await Client.findById(userId);
+  
+  if (!client) {
+    throw {
+      message: messages.error.clientNotFound,
+      status: 404
+    };
+  }
+
   try {
-    const client = await Client.findByIdAndUpdate(userId, data, { new: true });
-    return client.toObject();
+    const updatedClient = await Client.findByIdAndUpdate(userId, data, { new: true });
+    return updatedClient.toObject();
   } catch (error) {
     throw {
       message: messages.error.personalInformationUpdateFailed,
-      status: 500,
+      status: 500
     };
   }
 };
 
-export const updatePersonalInformationHandler = async (req, res) => {
+const updatePersonalInformationHandler = async (req, res) => {
   try {
     const client = await updatePersonalInformationService(req.body, req.id);
     res.status(200).json({
@@ -29,6 +40,8 @@ export const updatePersonalInformationHandler = async (req, res) => {
       client: sanitizeUserAndAppendType(client, "client"),
     });
   } catch (error) {
-    throw error;
+    res.status(error.status || 500).json({ message: error.message });
   }
 };
+
+export default updatePersonalInformationHandler;

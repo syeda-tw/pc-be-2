@@ -2,7 +2,6 @@ import Client from "../../../../common/models/Client.js";
 import Stripe from "stripe";
 import { env } from "../../../../common/config/env.js";
 import { sanitizeUserAndAppendType } from "../../../common/utils.js";
-const stripe = new Stripe(env.STRIPE_SECRET_KEY);
 
 const messages = {
   success: {
@@ -18,59 +17,46 @@ const messages = {
   },
 };
 
-const verifyPaymentMethodAndUpdateClient = async (setupIntentId, clientId) => {
-  try {
-    const client = await Client.findById(clientId);
-    if (!client) {
-      console.error(messages.error.userNotFound);
-      throw new Error(messages.error.userNotFound);
-    }
-    const expectedCustomerId = client.stripeCustomerId;
-
-    const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
-
-    if (setupIntent.customer !== expectedCustomerId) {
-      console.error(messages.error.stripeCustomerIdMismatch);
-      throw new Error(messages.error.stripeCustomerIdMismatch);
-    }
-
-    if (setupIntent.status !== "succeeded") {
-      console.error(messages.error.setupIntentFailed);
-      throw new Error(messages.error.setupIntentFailed);
-    }
-
-    const paymentMethodId = setupIntent.payment_method;
-    client.stripePaymentMethodId = paymentMethodId;
-
-    const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
-
-    client.defaultPaymentMethod = paymentMethod;
-    client.status = "onboarding-step-3";
-    await client.save();
-
-    return client.toObject();
-  } catch (error) {
-    console.error("Error in verifyPaymentMethod:", error);
-    throw error;
+const onboardingStep2Service = async (setupIntentId, clientId) => {
+  const stripe = new Stripe(env.STRIPE_SECRET_KEY);
+  
+  const client = await Client.findById(clientId);
+  if (!client) {
+    throw { status: 404, message: messages.error.userNotFound };
   }
+  
+  const expectedCustomerId = client.stripeCustomerId;
+  const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
+
+  if (setupIntent.customer !== expectedCustomerId) {
+    throw { status: 400, message: messages.error.stripeCustomerIdMismatch };
+  }
+
+  if (setupIntent.status !== "succeeded") {
+    throw { status: 400, message: messages.error.setupIntentFailed };
+  }
+
+  const paymentMethodId = setupIntent.payment_method;
+  client.stripePaymentMethodId = paymentMethodId;
+
+  const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+  client.defaultPaymentMethod = paymentMethod;
+  client.status = "onboarding-step-3";
+  await client.save();
+
+  return client.toObject();
 };
 
 const onboardingStep2Handler = async (req, res) => {
   try {
-    const id = req.id;
-    const client = await verifyPaymentMethodAndUpdateClient(
-      req.body.setupIntentId,
-      id
-    );
-    res.status(200).send({
+    const client = await onboardingStep2Service(req.body.setupIntentId, req.id);
+    res.status(200).json({
       message: messages.success.onboardingStep2,
       client: sanitizeUserAndAppendType(client, "client"),
     });
   } catch (error) {
-    console.error("Error in onboardingStep2Handler:", error);
-    res.status(500).send({
-      message: messages.error.internalServerError,
-      error: error.message,
+    res.status(error.status || 500).json({ 
+      message: error.message || messages.error.internalServerError 
     });
   }
 };

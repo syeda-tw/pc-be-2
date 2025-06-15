@@ -74,6 +74,6 @@ export const registerHandler = async (req, res, next) => {
       message: messages.success.otpSent,
     });
   } catch (error) {
-    next(error);
+    res.status(error.code || 500).json({ message: error.message });
   }
 };

@@ -2,28 +2,35 @@ import Client from "../../../../common/models/Client.js";
 import Relationship from "../../../../common/models/Relationship.js";
 import Stripe from "stripe";
 import { env } from "../../../../common/config/env.js";
-import { sanitizeUserAndAppendType } from '../../../common/utils.js';
-import Session from '../../../../common/models/Session.js';
+import { sanitizeUserAndAppendType } from "../../../common/utils.js";
+import Session from "../../../../common/models/Session.js";
 
 // User-friendly error messages for different scenarios
 const messages = {
-  notFound: "We couldn't find the relationship you're looking for. Please try again.",
+  notFound:
+    "We couldn't find the relationship you're looking for. Please try again.",
   sessionCreated: "Your session has been successfully created!",
   sessionCharged: "Your session has been charged successfully.",
   sessionUpdated: "Your session has been updated successfully.",
   clientUpdated: "Your client information has been updated successfully.",
-  relationshipUpdated: "Your relationship status has been updated successfully.",
-  paymentFailed: "We couldn't process your payment. Please check your card details and try again.",
+  relationshipUpdated:
+    "Your relationship status has been updated successfully.",
+  paymentFailed:
+    "We couldn't process your payment. Please check your card details and try again.",
   generalError: "Something went wrong. Please try again later.",
   clientNotFound: "We couldn't find your client information. Please try again.",
   sessionCreationError: "We couldn't create your session. Please try again.",
-  relationshipUpdateError: "We couldn't update your relationship. Please try again.",
+  relationshipUpdateError:
+    "We couldn't update your relationship. Please try again.",
   clientUpdateError: "We couldn't update your client status. Please try again.",
   sessionUpdateError: "We couldn't update your session. Please try again.",
-  sessionPaymentError: "We couldn't process your payment. Please check your card details and try again.",
-  noPaymentMethod: "No payment method found for this customer. Please add a payment method first.",
+  sessionPaymentError:
+    "We couldn't process your payment. Please check your card details and try again.",
+  noPaymentMethod:
+    "No payment method found for this customer. Please add a payment method first.",
   invalidAmount: "Invalid payment amount. Please check the cost value.",
-  stripeError: "There was an error processing your payment. Please try again later."
+  stripeError:
+    "There was an error processing your payment. Please try again later.",
 };
 
 /**
@@ -53,7 +60,14 @@ const bookFirstSessionForSingleUserInvitedService = async (
 
   try {
     // Input validation
-    if (!clientId || !relationshipId || !startTime || !endTime || !cost || !date) {
+    if (
+      !clientId ||
+      !relationshipId ||
+      !startTime ||
+      !endTime ||
+      !cost ||
+      !date
+    ) {
       throw { status: 400, message: "Missing required parameters" };
     }
 
@@ -69,8 +83,9 @@ const bookFirstSessionForSingleUserInvitedService = async (
     originalClientStatus = client.status;
 
     // Step 2: Validate and fetch relationship
-    relationship = await Relationship.findById(relationshipId)
-      .populate('user.forms');
+    relationship = await Relationship.findById(relationshipId).populate(
+      "user.forms"
+    );
     if (!relationship) {
       throw { status: 404, message: messages.notFound };
     }
@@ -92,14 +107,13 @@ const bookFirstSessionForSingleUserInvitedService = async (
       createdSession = await Session.create(session);
       relationship.sessions.push(createdSession._id);
       relationship.areIntakeFormsFilled = false;
-      relationship.intakeForms = relationship.user.forms.map(form => ({
+      relationship.intakeForms = relationship.user.forms.map((form) => ({
         formId: form._id,
         formName: form.name,
         uploadedFiles: [],
-        isMarkedComplete: false
+        isMarkedComplete: false,
       }));
       await relationship.save();
-
     } catch (error) {
       throw { status: 500, message: messages.sessionCreationError };
     }
@@ -107,7 +121,7 @@ const bookFirstSessionForSingleUserInvitedService = async (
     // Step 4: Process payment through Stripe
     try {
       stripe = new Stripe(env.STRIPE_SECRET_KEY);
-      
+
       // Fetch customer's payment methods
       const paymentMethods = await stripe.paymentMethods.list({
         customer: client.stripeCustomerId,
@@ -135,16 +149,26 @@ const bookFirstSessionForSingleUserInvitedService = async (
       }
 
       // Step 5: Update records with payment information
-      await updateRecordsAfterSuccessfulPayment(createdSession, client, paymentIntent);
+      await updateRecordsAfterSuccessfulPayment(
+        createdSession,
+        client,
+        paymentIntent
+      );
       return client.toObject();
-
     } catch (error) {
-      await handlePaymentError(error, createdSession, relationship, client, originalRelationshipSessions, originalClientStatus);
-      throw error;
+      await handlePaymentError(
+        error,
+        createdSession,
+        relationship,
+        client,
+        originalRelationshipSessions,
+        originalClientStatus
+      );
+      throw { status: 402, message: messages.sessionPaymentError };
     }
   } catch (error) {
     await handleServiceError(error, stripe);
-    throw error;
+    throw { status: 500, message: messages.sessionPaymentError };
   }
 };
 
@@ -156,7 +180,11 @@ async function handleFailedPayment(client, session) {
   await session.save();
 }
 
-async function updateRecordsAfterSuccessfulPayment(session, client, paymentIntent) {
+async function updateRecordsAfterSuccessfulPayment(
+  session,
+  client,
+  paymentIntent
+) {
   session.paymentStatus = "paid";
   session.billingInformation = paymentIntent;
   await session.save();
@@ -164,12 +192,19 @@ async function updateRecordsAfterSuccessfulPayment(session, client, paymentInten
   await client.save();
 }
 
-async function handlePaymentError(error, session, relationship, client, originalRelationshipSessions, originalClientStatus) {
+async function handlePaymentError(
+  error,
+  session,
+  relationship,
+  client,
+  originalRelationshipSessions,
+  originalClientStatus
+) {
   if (session) {
     try {
       await Session.findByIdAndDelete(session._id);
     } catch (cleanupError) {
-      console.error('Error rolling back session:', cleanupError);
+      console.error("Error rolling back session:", cleanupError);
     }
   }
 
@@ -178,7 +213,7 @@ async function handlePaymentError(error, session, relationship, client, original
       relationship.sessions = originalRelationshipSessions;
       await relationship.save();
     } catch (cleanupError) {
-      console.error('Error rolling back relationship:', cleanupError);
+      console.error("Error rolling back relationship:", cleanupError);
     }
   }
 
@@ -187,29 +222,31 @@ async function handlePaymentError(error, session, relationship, client, original
       client.status = originalClientStatus;
       await client.save();
     } catch (cleanupError) {
-      console.error('Error rolling back client status:', cleanupError);
+      console.error("Error rolling back client status:", cleanupError);
     }
   }
 
   if (error.status === 402) {
-    throw error;
+    throw { status: 402, message: messages.sessionPaymentError };
   }
   throw { status: 500, message: messages.sessionPaymentError };
 }
 
 async function handleServiceError(error, stripe) {
-  console.error('Error in bookFirstSessionService:', error);
+  console.error("Error in bookFirstSessionService:", error);
 
   if (error.raw?.payment_intent?.id && stripe) {
     try {
-      const paymentIntent = await stripe.paymentIntents.retrieve(error.raw.payment_intent.id);
-      console.error('Payment intent details:', {
+      const paymentIntent = await stripe.paymentIntents.retrieve(
+        error.raw.payment_intent.id
+      );
+      console.error("Payment intent details:", {
         id: paymentIntent.id,
         status: paymentIntent.status,
-        error: paymentIntent.last_payment_error
+        error: paymentIntent.last_payment_error,
       });
     } catch (retrieveError) {
-      console.error('Error retrieving payment intent:', retrieveError);
+      console.error("Error retrieving payment intent:", retrieveError);
     }
   }
 }
@@ -228,7 +265,7 @@ const bookFirstSessionForSingleUserInvitedHandler = async (req, res) => {
       req.body.cost,
       req.body.date
     );
-    
+
     res.status(200).json({
       message: messages.sessionCreated,
       client: sanitizeUserAndAppendType(client, "client"),
@@ -236,7 +273,7 @@ const bookFirstSessionForSingleUserInvitedHandler = async (req, res) => {
   } catch (err) {
     const status = err.status || 500;
     const message = err.message || messages.generalError;
-    
+
     res.status(status).json({
       message,
       error: err.details || null,

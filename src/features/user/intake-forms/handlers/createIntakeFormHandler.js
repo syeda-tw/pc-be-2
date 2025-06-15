@@ -11,6 +11,7 @@ const messages = {
   failedToUpdateUserWithFormDetails: "We couldn't save your form details. Please try again.",
   userNotFound: "We couldn't find your account. Please check your login and try again.",
   formUploadSuccess: "Your form has been successfully uploaded and saved.",
+  maxFormsReached: "You've reached the maximum limit of 10 intake forms. Please delete an existing form before creating a new one.",
 };
 
 const s3Client = new S3Client({
@@ -34,9 +35,7 @@ const createIntakeFormService = async (id, file, formName) => {
     }
 
     const formDetails = {
-      _id: new mongoose.Types.ObjectId(),
       name: formName,
-      created_at: new Date(),
     };
 
     const user = await User.findById(userId);
@@ -47,24 +46,29 @@ const createIntakeFormService = async (id, file, formName) => {
       };
     }
 
-    // Check if the form ID already exists in user's forms
-    const formId = formDetails._id;
-    const formExists = user.forms.some((form) => form._id.toString() === formId.toString());
-
-    if (formExists) {
-      formDetails._id = new mongoose.Types.ObjectId();
+    // Check if user already has 10 forms (maximum limit)
+    if (user.forms && user.forms.length >= 10) {
+      throw {
+        code: 400,
+        message: messages.maxFormsReached,
+      };
     }
 
-    // Update user with new form
-    await User.findByIdAndUpdate(userId, {
-      forms: [...user.forms, formDetails],
-    });
+    // Update user with new form (ID will be auto-generated)
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $push: { forms: formDetails } },
+      { new: true }
+    );
+
+    // Get the newly created form with auto-generated ID
+    const newForm = updatedUser.forms[updatedUser.forms.length - 1];
 
     // Find all relationships for this user and update their intakeForms
     const relationships = await Relationship.find({ user: userId });
     for (const relationship of relationships) {
       relationship.intakeForms.push({
-        formId: formDetails._id,
+        formId: newForm._id,
         uploadedFiles: [],
         isMarkedComplete: false,
         formName: formName,
@@ -73,11 +77,11 @@ const createIntakeFormService = async (id, file, formName) => {
       await relationship.save();
     }
 
-    const fileUrl = `https://${env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${formDetails._id}`;
+    const fileUrl = `https://${env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${newForm._id}`;
 
     const params = {
       Bucket: env.AWS_S3_BUCKET_NAME,
-      Key: formDetails._id.toString(),
+      Key: newForm._id.toString(),
       Body: buffer,
       ContentType: mimetype || "application/pdf",
     };
@@ -92,7 +96,7 @@ const createIntakeFormService = async (id, file, formName) => {
       };
     }
 
-    return formDetails;
+    return newForm;
   } catch (error) {
     console.error("Error in createIntakeFormService:", error);
     throw {
@@ -114,6 +118,6 @@ export const createIntakeFormHandler = async (req, res, next) => {
       form,
     });
   } catch (err) {
-    next(err);
+    res.status(err.code || 500).json({ message: err.message });
   }
 };
