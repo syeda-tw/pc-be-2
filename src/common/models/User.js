@@ -44,7 +44,8 @@ const UserSchema = new Schema(
           const isValidFormat = /^[a-zA-Z0-9_]+$/.test(value);
           return isValidLength && isValidFormat;
         },
-        message: "Username must be 4–20 characters long and only contain letters, numbers, and underscores.",
+        message:
+          "Username must be 4–20 characters long and only contain letters, numbers, and underscores.",
       },
     },
     password: { type: String },
@@ -102,7 +103,26 @@ const UserSchema = new Schema(
         })),
       },
     },
-
+    holidays: {
+      recurringHolidays: {
+        type: [{
+          name: { type: String, required: true },
+          startMonth: { type: Number, min: 1, max: 12, required: true },
+          startDay: { type: Number, min: 1, max: 31, required: true },
+          endMonth: { type: Number, min: 1, max: 12 },
+          endDay: { type: Number, min: 1, max: 31 },
+        }],
+        default: []
+      },
+      oneTimeHolidays: {
+        type: [{
+          name: { type: String, required: true },
+          startDate: { type: Date, required: true },
+          endDate: { type: Date },
+        }],
+        default: []
+      },
+    },
     // Professional documents and relationships
     forms: {
       type: [FormSchema],

@@ -49,7 +49,10 @@ export const getHolidaysByUserIdDbOp = async (userId) => {
   try {
     const user = await User.findById(userId);
     if (!user) throw { code: 404, message: 'User not found' };
-    return user.holidays || [];
+    return user.holidays || {
+      recurringHolidays: [],
+      oneTimeHolidays: [],
+    };
   } catch (error) {
     throw { code: 500, message: 'Error getting user holidays' };
   }

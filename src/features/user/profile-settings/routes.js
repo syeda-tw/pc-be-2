@@ -1,25 +1,24 @@
 import express from "express";
-import { 
-  updatePersonalInformation, 
-  getTimezone, 
-  updateTimezone, 
-  getHolidays, 
-  addHoliday, 
-  deleteHoliday, 
-  getDailyLunch, 
-  updateDailyLunch, 
-  getWeeklySchedule, 
-  updateWeeklySchedule, 
-  getProfile 
+import {
+  updatePersonalInformation,
+  getTimezone,
+  updateTimezone,
+  getHolidays,
+  getDailyLunch,
+  updateDailyLunch,
+  getWeeklySchedule,
+  updateWeeklySchedule,
+  getProfile,
 } from "./controllers.js";
 import {
   validateUpdatePersonalInformationMiddleware,
   validateUpdateTimezoneMiddleware,
-  validateAddHolidayMiddleware,
+  validateAddRecurringHolidayMiddleware,
   validateUpdateDailyLunchMiddleware,
   validateWeeklyScheduleMiddleware,
 } from "./middlewares.js";
 import { secureRequestMiddleware } from "../../../common/middlewares/secureRequestMiddleware.js";
+import addRecurringHolidayHandler from "./handlers-new/addRecurringHolidayHanlder.js";
 
 const router = express.Router();
 
@@ -30,11 +29,7 @@ router.put(
   updatePersonalInformation
 );
 
-router.get(
-  "/timezone",
-  secureRequestMiddleware,
-  getTimezone
-);
+router.get("/timezone", secureRequestMiddleware, getTimezone);
 
 router.patch(
   "/timezone",
@@ -43,30 +38,16 @@ router.patch(
   updateTimezone
 );
 
-router.get(
-  "/holidays",
+router.get("/holidays", secureRequestMiddleware, getHolidays);
+
+router.put(
+  "/recurring-holiday",
+  validateAddRecurringHolidayMiddleware,
   secureRequestMiddleware,
-  getHolidays
+  addRecurringHolidayHandler
 );
 
-router.post(
-  "/holidays",
-  validateAddHolidayMiddleware,
-  secureRequestMiddleware,
-  addHoliday
-);
-
-router.delete(
-  "/holidays/:holidayId",
-  secureRequestMiddleware,
-  deleteHoliday
-);
-
-router.get(
-  "/daily-lunch", 
-  secureRequestMiddleware, 
-  getDailyLunch
-);
+router.get("/daily-lunch", secureRequestMiddleware, getDailyLunch);
 
 router.patch(
   "/daily-lunch",
@@ -75,22 +56,15 @@ router.patch(
   updateDailyLunch
 );
 
-router.get(
-  "/weekly-schedule",
-  secureRequestMiddleware,
-  getWeeklySchedule
-);
+router.get("/weekly-schedule", secureRequestMiddleware, getWeeklySchedule);
 
 router.patch(
-  "/weekly-schedule",  
+  "/weekly-schedule",
   validateWeeklyScheduleMiddleware,
   secureRequestMiddleware,
   updateWeeklySchedule
 );
 
-router.get(
-  "/profile/:username", 
-  getProfile
-);
+router.get("/profile/:username", getProfile);
 
 export default router;

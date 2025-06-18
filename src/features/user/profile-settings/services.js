@@ -56,34 +56,6 @@ export const getHolidaysService = async (userId) => {
   return holidays;
 };
 
-export const addHolidayService = async (holiday, userId) => {
-  const user = await findUserByIdDbOp(userId);
-  if (!user) {
-    throw {
-      code: 404,
-      message: messages.error.userNotFound,
-    };
-  }
-  user.holidays = [...user.holidays, holiday];
-  const updatedUser = await updateUserDbOp(userId, user);
-  return updatedUser.holidays[updatedUser.holidays.length - 1];
-};
-
-export const deleteHolidayService = async (holidayId, userId) => {
-  const user = await findUserByIdDbOp(userId);
-  if (!user) {
-    throw {
-      code: 404,
-      message: messages.error.userNotFound,
-    };
-  }
-  user.holidays = user.holidays.filter(
-    (holiday) => holiday._id.toString() !== holidayId
-  );
-  const updatedUser = await updateUserDbOp(userId, user);
-  return updatedUser;
-};
-
 export const getDailyLunchService = async (userId) => {
   const lunchTimes = await getUserDailyLunch(userId);
   if (!lunchTimes?.dailyLunchStartTime || !lunchTimes?.dailyLunchEndTime) {

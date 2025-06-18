@@ -5,8 +5,6 @@ import {
   getTimezoneService, 
   updateTimezoneService, 
   getHolidaysService, 
-  addHolidayService, 
-  deleteHolidayService, 
   getDailyLunchService, 
   updateDailyLunchService, 
   getWeeklyScheduleService, 
@@ -55,29 +53,6 @@ const getHolidays = async (req, res, next) => {
     return res.status(200).json({
       holidays,
       message: messages.holiday.fetched
-    });
-  } catch (err) {
-    throw { code: err.code || 500, message: err.message };
-  }
-};
-
-const addHoliday = async (req, res, next) => {
-  try {
-    const holiday = await addHolidayService(req.body.holiday, req.id);
-    return res.status(200).json({
-      holiday,
-      message: messages.holiday.updated
-    });
-  } catch (err) {
-    throw { code: err.code || 500, message: err.message };
-  }
-};
-
-const deleteHoliday = async (req, res, next) => {
-  try {
-    await deleteHolidayService(req.params.holidayId, req.id);
-    return res.status(200).json({
-      message: messages.holiday.deleted
     });
   } catch (err) {
     throw { code: err.code || 500, message: err.message };
@@ -149,9 +124,7 @@ export {
   updatePersonalInformation, 
   getTimezone, 
   updateTimezone, 
-  getHolidays, 
-  addHoliday, 
-  deleteHoliday, 
+  getHolidays,
   getDailyLunch, 
   updateDailyLunch, 
   getWeeklySchedule, 

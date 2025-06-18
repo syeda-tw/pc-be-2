@@ -53,15 +53,36 @@ const validateUpdateTimezoneMiddleware = (req, res, next) => {
   next();
 };
 
-const validateAddHolidayMiddleware = (req, res, next) => {
+const validateAddRecurringHolidayMiddleware = (req, res, next) => {
   const schema = Joi.object({
-    holiday: Joi.array().items(Joi.object({
-      name: Joi.string().trim().max(50).required(),
-      startDate: Joi.date().required(),
-      endDate: Joi.date().required()
-    })).required().messages({
-      'array.empty': 'Holiday is required',
-      'array.includes': 'Invalid data'
+    holiday: Joi.object({
+      name: Joi.string().trim().max(50).required().messages({
+        'string.empty': 'Holiday name is required',
+        'string.max': 'Holiday name cannot exceed 50 characters'
+      }),
+      startMonth: Joi.number().min(1).max(12).required().messages({
+        'number.base': 'Start month must be a number',
+        'number.min': 'Start month must be between 1 and 12',
+        'number.max': 'Start month must be between 1 and 12'
+      }),
+      startDay: Joi.number().min(1).max(31).required().messages({
+        'number.base': 'Start day must be a number',
+        'number.min': 'Start day must be between 1 and 31',
+        'number.max': 'Start day must be between 1 and 31'
+      }),
+      endMonth: Joi.number().min(1).max(12).required().messages({
+        'number.base': 'End month must be a number',
+        'number.min': 'End month must be between 1 and 12',
+        'number.max': 'End month must be between 1 and 12'
+      }),
+      endDay: Joi.number().min(1).max(31).required().messages({
+        'number.base': 'End day must be a number',
+        'number.min': 'End day must be between 1 and 31',
+        'number.max': 'End day must be between 1 and 31'
+      })
+    }).required().messages({
+      'object.base': 'Holiday is required',
+      'object.empty': 'Holiday data is required'
     })
   });
 
@@ -134,7 +155,7 @@ const validateWeeklyScheduleMiddleware = (req, res, next) => {
 export { 
   validateUpdatePersonalInformationMiddleware, 
   validateUpdateTimezoneMiddleware, 
-  validateAddHolidayMiddleware, 
+  validateAddRecurringHolidayMiddleware, 
   validateUpdateDailyLunchMiddleware, 
   validateWeeklyScheduleMiddleware 
 };
