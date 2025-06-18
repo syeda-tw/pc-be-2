@@ -148,13 +148,15 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
       throw { status: 404, message: messages.clientNotFound };
     }
 
-    // Get all relationship IDs from the payload
+    // Get all relationship IDs from the payload (ensure they're ObjectIds)
     const payloadRelationshipIds = sessions.map(s => s.relationshipId);
 
     // Archive relationships that weren't in the payload
     const relationshipsToArchive = await Relationship.find({
-      _id: { $in: client.relationships },
-      _id: { $nin: payloadRelationshipIds }
+      $and: [
+        { _id: { $in: client.relationships } },
+        { _id: { $nin: payloadRelationshipIds } }
+      ]
     });
 
     if (relationshipsToArchive.length > 0) {
@@ -199,7 +201,7 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
       }
     });
 
-    // 🚨 IMPORTANT: Only onboard client if payment + session booked
+    // Only onboard client if payment + session booked
     if (successfulSessions === 0 || successfulPayments === 0) {
       return res.status(400).json({
         message: messages.noSuccessfulSessions,
@@ -207,13 +209,13 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
       });
     }
 
-    // ✅ Update client status to onboarded
+    // Update client status to onboarded
     if (client) {
       client.status = "onboarded";
       await client.save();
     }
 
-    // ✅ Update relationship status for each successful session
+    // Update relationship status for each successful session
     for (const result of sessionResults) {
       if (result.success) {
         const relationship = await Relationship.findById(
@@ -224,6 +226,18 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
           await relationship.save();
         }
       }
+    }
+
+    // Set default relationship to the first active relationship
+    const activeRelationships = await Relationship.find({
+      _id: { $in: client.relationships },
+      status: "active"
+    });
+    
+    if (activeRelationships.length > 0) {
+      const firstActiveRelationship = activeRelationships[0];
+      client.defaultRelationship = firstActiveRelationship._id;
+      await client.save();
     }
 
     // Return response to client
