@@ -96,6 +96,62 @@ const validateAddRecurringHolidayMiddleware = (req, res, next) => {
   next();
 };
 
+const validateAddSingleHolidayMiddleware = (req, res, next) => {
+  const schema = Joi.object({
+    holiday: Joi.object({
+      name: Joi.string().trim().max(50).required().messages({
+        'string.empty': 'Holiday name is required',
+        'string.max': 'Holiday name cannot exceed 50 characters'
+      }),
+      startDate: Joi.date().required().messages({
+        'date.base': 'Start date must be a valid date',
+        'date.empty': 'Start date is required'
+      }),
+      endDate: Joi.date().required().messages({
+        'date.base': 'End date must be a valid date',
+        'date.empty': 'End date is required'
+      })
+    }).custom((value, helpers) => {
+      const { startDate, endDate } = value;
+      if (new Date(startDate) > new Date(endDate)) {
+        return helpers.message('Start date must be before or equal to end date');
+      }
+      return value;
+    }).required().messages({
+      'object.base': 'Holiday is required',
+      'object.empty': 'Holiday data is required'
+    })
+  });
+
+  const { error } = schema.validate(req.body);
+  if (error) {
+    throw {
+      code: 400,
+      message: error.details[0].message
+    };
+  }
+  next();
+};
+
+const validateDeleteHolidayMiddleware = (req, res, next) => {
+  const schema = Joi.object({
+    holidayId: Joi.string().length(24).hex().required().messages({
+      'string.empty': 'Holiday ID is required',
+      'string.length': 'Holiday ID must be a valid MongoDB ObjectId',
+      'string.hex': 'Holiday ID must be a valid MongoDB ObjectId'
+    })
+  });
+
+  const { error } = schema.validate(req.params);
+  if (error) {
+    throw {
+      code: 400,
+      message: error.details[0].message
+    };
+  }
+  next();
+};
+
 const validateUpdateDailyLunchMiddleware = (req, res, next) => {
   const schema = Joi.object({
     startTime: Joi.string().trim().required(),
@@ -155,7 +211,9 @@ const validateWeeklyScheduleMiddleware = (req, res, next) => {
 export { 
   validateUpdatePersonalInformationMiddleware, 
   validateUpdateTimezoneMiddleware, 
-  validateAddRecurringHolidayMiddleware, 
+  validateAddRecurringHolidayMiddleware,
+  validateAddSingleHolidayMiddleware,
+  validateDeleteHolidayMiddleware,
   validateUpdateDailyLunchMiddleware, 
   validateWeeklyScheduleMiddleware 
 };
