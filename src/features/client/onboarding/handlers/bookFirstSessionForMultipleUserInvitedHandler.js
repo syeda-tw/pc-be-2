@@ -223,6 +223,12 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
         );
         if (relationship) {
           relationship.status = "active";
+          
+          // Set areIntakeFormsFilled to true if there are no intake forms
+          if (relationship.intakeForms.length === 0) {
+            relationship.areIntakeFormsFilled = true;
+          }
+          
           await relationship.save();
         }
       }

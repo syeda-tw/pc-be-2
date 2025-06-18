@@ -105,14 +105,22 @@ const bookFirstSessionForSingleUserInvitedService = async (
 
     try {
       createdSession = await Session.create(session);
+      
       relationship.sessions.push(createdSession._id);
-      relationship.areIntakeFormsFilled = false;
-      relationship.intakeForms = relationship.user.forms.map((form) => ({
-        formId: form._id,
-        formName: form.name,
-        uploadedFiles: [],
-        isMarkedComplete: false,
-      }));
+      
+      // Set up intake forms based on user's forms
+      relationship.intakeForms = relationship.user.forms?.length > 0 
+        ? relationship.user.forms.map((form) => ({
+            formId: form._id,
+            formName: form.name,
+            uploadedFiles: [],
+            isMarkedComplete: false,
+          }))
+        : [];
+      
+      // Set areIntakeFormsFilled to true if there are no intake forms
+      relationship.areIntakeFormsFilled = relationship.intakeForms.length === 0;
+      
       await relationship.save();
     } catch (error) {
       throw { status: 500, message: messages.sessionCreationError };
@@ -133,8 +141,9 @@ const bookFirstSessionForSingleUserInvitedService = async (
       }
 
       // Create and confirm payment intent
+      const paymentAmount = Math.round(cost * 100);
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(cost * 100), // Ensure amount is in cents and is an integer
+        amount: paymentAmount,
         currency: "usd",
         automatic_payment_methods: { enabled: true },
         customer: client.stripeCustomerId,
@@ -204,7 +213,7 @@ async function handlePaymentError(
     try {
       await Session.findByIdAndDelete(session._id);
     } catch (cleanupError) {
-      console.error("Error rolling back session:", cleanupError);
+      // Silent cleanup error
     }
   }
 
@@ -213,7 +222,7 @@ async function handlePaymentError(
       relationship.sessions = originalRelationshipSessions;
       await relationship.save();
     } catch (cleanupError) {
-      console.error("Error rolling back relationship:", cleanupError);
+      // Silent cleanup error
     }
   }
 
@@ -222,7 +231,7 @@ async function handlePaymentError(
       client.status = originalClientStatus;
       await client.save();
     } catch (cleanupError) {
-      console.error("Error rolling back client status:", cleanupError);
+      // Silent cleanup error
     }
   }
 
@@ -233,20 +242,14 @@ async function handlePaymentError(
 }
 
 async function handleServiceError(error, stripe) {
-  console.error("Error in bookFirstSessionService:", error);
-
   if (error.raw?.payment_intent?.id && stripe) {
     try {
       const paymentIntent = await stripe.paymentIntents.retrieve(
         error.raw.payment_intent.id
       );
-      console.error("Payment intent details:", {
-        id: paymentIntent.id,
-        status: paymentIntent.status,
-        error: paymentIntent.last_payment_error,
-      });
+      // Payment intent details available for debugging if needed
     } catch (retrieveError) {
-      console.error("Error retrieving payment intent:", retrieveError);
+      // Silent retrieve error
     }
   }
 }
