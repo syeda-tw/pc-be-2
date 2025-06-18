@@ -33,3 +33,34 @@ export const createClientValidation = (req, res, next) => {
   }
   next();
 };
+
+export const createBulkClientsValidation = (req, res, next) => {
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "Please upload a CSV file",
+    });
+  }
+
+  // Check if file is CSV
+  const allowedMimeTypes = ['text/csv', 'application/csv', 'text/plain'];
+  const fileExtension = req.file.originalname.toLowerCase().split('.').pop();
+  
+  if (!allowedMimeTypes.includes(req.file.mimetype) && fileExtension !== 'csv') {
+    return res.status(400).json({
+      success: false,
+      message: "Please upload a valid CSV file",
+    });
+  }
+
+  // Check file size (limit to 5MB)
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  if (req.file.size > maxSize) {
+    return res.status(400).json({
+      success: false,
+      message: "File size too large. Please upload a file smaller than 5MB",
+    });
+  }
+
+  next();
+};
