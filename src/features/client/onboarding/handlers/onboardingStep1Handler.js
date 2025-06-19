@@ -63,6 +63,15 @@ const updateClientInformation = async (clientData, _id) => {
     client.stripeCustomerId = stripeCustomerId;
     await client.save();
 
+    // Update all relationships for this client with step 1 completion
+    const relationships = await Relationship.find({ client: _id });
+    if (relationships.length > 0) {
+        await Promise.all(relationships.map(async (relationship) => {
+            relationship.timeline.push(relationshipTimelineEntries.clientSubmittedStep1());
+            await relationship.save();
+        }));
+    }
+
     return client.toObject();
 };
 

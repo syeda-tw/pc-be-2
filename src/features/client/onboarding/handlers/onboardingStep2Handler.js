@@ -1,4 +1,5 @@
 import Client from "../../../../common/models/Client.js";
+import Relationship, { relationshipTimelineEntries } from "../../../../common/models/Relationship.js";
 import Stripe from "stripe";
 import { env } from "../../../../common/config/env.js";
 import { sanitizeUserAndAppendType } from "../../../common/utils.js";
@@ -43,6 +44,15 @@ const onboardingStep2Service = async (setupIntentId, clientId) => {
   client.defaultPaymentMethod = paymentMethod;
   client.status = "onboarding-step-3";
   await client.save();
+
+  // Update all relationships for this client with step 2 completion
+  const relationships = await Relationship.find({ client: clientId });
+  if (relationships.length > 0) {
+    await Promise.all(relationships.map(async (relationship) => {
+      relationship.timeline.push(relationshipTimelineEntries.clientSubmittedStep2());
+      await relationship.save();
+    }));
+  }
 
   return client.toObject();
 };

@@ -1,6 +1,7 @@
 import Client from "../../../../common/models/Client.js";
 import User from "../../../../common/models/User.js";
 import Relationship from "../../../../common/models/Relationship.js";
+import { relationshipTimelineEntries } from "../../../../common/models/Relationship.js";
 
 const messages = {
   success: "Great! We've successfully connected you with your provider",
@@ -14,9 +15,15 @@ const messages = {
 
 const activateSingleRelationshipAutomaticallyService = async (clientId) => {
   try {
-    // Get client and populate relationships
+    // Get client and populate relationships with user forms
     const client = await Client.findById(clientId).populate({
       path: 'relationships',
+      populate: {
+        path: 'user',
+        populate: {
+          path: 'forms'
+        }
+      }
     });
 
     if (!client) {
@@ -38,8 +45,33 @@ const activateSingleRelationshipAutomaticallyService = async (clientId) => {
     const relationship = client.relationships[0];
 
     try {
-      // update relationsip status to active
+      // Update relationship status to active
       relationship.status = "active";
+      
+      // Add relationship activation to timeline
+      relationship.timeline.push(relationshipTimelineEntries.relationshipActivated());
+      
+      // Set up intake forms based on user's forms using the new model structure
+      // Handle cases where user, user.forms, or forms array might be null/undefined/empty
+      const userForms = relationship.user?.forms || [];
+      
+      relationship.RelationshipIntakeForms = userForms.length > 0 
+        ? userForms.map((form) => ({
+            userIntakeFormId: form._id,
+            userIntakeFormName: form.name || `Form ${form._id}`, // Fallback name if form.name is missing
+            intakeFormResponsesUploadedByClient: [],
+            status: "user_added",
+          }))
+        : [];
+      
+      // Add timeline entries for each intake form added
+      relationship.RelationshipIntakeForms.forEach((intakeForm) => {
+        relationship.timeline.push(relationshipTimelineEntries.userAddedIntakeForm(intakeForm.userIntakeFormName));
+      });
+      
+      // Set areAllIntakeFormsFilled to true if there are no intake forms
+      relationship.areAllIntakeFormsFilled = relationship.RelationshipIntakeForms.length === 0;
+      
       await relationship.save();
       return relationship.user;
     } catch (saveError) {
@@ -51,7 +83,7 @@ const activateSingleRelationshipAutomaticallyService = async (clientId) => {
     }
   } catch (error) {
     console.error('Error in activateSingleRelationshipAutomaticallyService:', error);
-    res.status(error.code || 500).json({ message: error.message });
+    throw error;
   }
 };
 

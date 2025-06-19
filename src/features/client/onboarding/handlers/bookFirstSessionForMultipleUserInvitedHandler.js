@@ -1,9 +1,10 @@
 import Client from "../../../../common/models/Client.js";
-import Relationship from "../../../../common/models/Relationship.js";
+import Relationship, { relationshipTimelineEntries } from "../../../../common/models/Relationship.js";
 import Stripe from "stripe";
 import { env } from "../../../../common/config/env.js";
 import { sanitizeUserAndAppendType } from "../../../common/utils.js";
 import Session from "../../../../common/models/Session.js";
+import { formatSessionBookingDetails } from "../utils/dateFormatting.js";
 
 const messages = {
   notFound:
@@ -105,6 +106,19 @@ const processSingleSession = async (
       createdSession.paymentStatus = "paid";
       createdSession.billingInformation = paymentIntent;
       await createdSession.save();
+
+      // Add timeline entry for first session booked
+      const { bookedDate, startTimeFormatted, endTimeFormatted } = 
+        formatSessionBookingDetails(date, startTime, endTime);
+      
+      relationship.timeline.push(
+        relationshipTimelineEntries.firstSessionBooked(
+          bookedDate,
+          startTimeFormatted,
+          endTimeFormatted
+        )
+      );
+      await relationship.save();
 
       return {
         success: true,
@@ -220,14 +234,32 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
       if (result.success) {
         const relationship = await Relationship.findById(
           result.relationship._id
-        );
+        ).populate('user');
         if (relationship) {
           relationship.status = "active";
           
-          // Set areIntakeFormsFilled to true if there are no intake forms
-          if (relationship.intakeForms.length === 0) {
-            relationship.areIntakeFormsFilled = true;
-          }
+          // Set up intake forms based on user's forms using the new model structure
+          const userForms = relationship.user?.forms || [];
+          
+          relationship.RelationshipIntakeForms = userForms.length > 0 
+            ? userForms.map((form) => ({
+                userIntakeFormId: form._id,
+                userIntakeFormName: form.name || `Form ${form._id}`,
+                intakeFormResponsesUploadedByClient: [],
+                status: "user_added",
+              }))
+            : [];
+          
+          // Add timeline entries for each intake form added
+          relationship.RelationshipIntakeForms.forEach((intakeForm) => {
+            relationship.timeline.push(relationshipTimelineEntries.userAddedIntakeForm(intakeForm.userIntakeFormName));
+          });
+          
+          // Set areAllIntakeFormsFilled to true if there are no intake forms
+          relationship.areAllIntakeFormsFilled = relationship.RelationshipIntakeForms.length === 0;
+          
+          // Add timeline entry for relationship activation
+          relationship.timeline.push(relationshipTimelineEntries.relationshipActivated());
           
           await relationship.save();
         }

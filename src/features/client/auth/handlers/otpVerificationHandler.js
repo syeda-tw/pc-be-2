@@ -63,6 +63,7 @@ const otpVerificationService = async (phone, otp) => {
       relationship.client = client._id;
       relationship.clientModel = "Client";
       relationship.status = "pending";
+      relationship.timeline = [...relationship.timeline, relationshipTimelineEntries.clientRegistered()]
       await relationship.save();
       
       // Update the client with the new relationship

@@ -4,6 +4,8 @@ import Stripe from "stripe";
 import { env } from "../../../../common/config/env.js";
 import { sanitizeUserAndAppendType } from "../../../common/utils.js";
 import Session from "../../../../common/models/Session.js";
+import { relationshipTimelineEntries } from "../../../../common/models/Relationship.js";
+import { formatSessionBookingDetails } from "../utils/dateFormatting.js";
 
 // User-friendly error messages for different scenarios
 const messages = {
@@ -83,9 +85,7 @@ const bookFirstSessionForSingleUserInvitedService = async (
     originalClientStatus = client.status;
 
     // Step 2: Validate and fetch relationship
-    relationship = await Relationship.findById(relationshipId).populate(
-      "user.forms"
-    );
+    relationship = await Relationship.findById(relationshipId);
     if (!relationship) {
       throw { status: 404, message: messages.notFound };
     }
@@ -105,22 +105,9 @@ const bookFirstSessionForSingleUserInvitedService = async (
 
     try {
       createdSession = await Session.create(session);
-      
+
       relationship.sessions.push(createdSession._id);
-      
-      // Set up intake forms based on user's forms
-      relationship.intakeForms = relationship.user.forms?.length > 0 
-        ? relationship.user.forms.map((form) => ({
-            formId: form._id,
-            formName: form.name,
-            uploadedFiles: [],
-            isMarkedComplete: false,
-          }))
-        : [];
-      
-      // Set areIntakeFormsFilled to true if there are no intake forms
-      relationship.areIntakeFormsFilled = relationship.intakeForms.length === 0;
-      
+
       await relationship.save();
     } catch (error) {
       throw { status: 500, message: messages.sessionCreationError };
@@ -161,7 +148,9 @@ const bookFirstSessionForSingleUserInvitedService = async (
       await updateRecordsAfterSuccessfulPayment(
         createdSession,
         client,
-        paymentIntent
+        paymentIntent,
+        relationship,
+        date
       );
       return client.toObject();
     } catch (error) {
@@ -192,13 +181,28 @@ async function handleFailedPayment(client, session) {
 async function updateRecordsAfterSuccessfulPayment(
   session,
   client,
-  paymentIntent
+  paymentIntent,
+  relationship,
+  date
 ) {
   session.paymentStatus = "paid";
   session.billingInformation = paymentIntent;
   await session.save();
   client.status = "onboarded";
   await client.save();
+
+  // Add timeline entry for first session booked
+  const { bookedDate, startTimeFormatted, endTimeFormatted } = 
+    formatSessionBookingDetails(date, startTime, endTime);
+  
+  relationship.timeline.push(
+    relationshipTimelineEntries.firstSessionBooked(
+      bookedDate,
+      startTimeFormatted,
+      endTimeFormatted
+    )
+  );
+  await relationship.save();
 }
 
 async function handlePaymentError(
