@@ -3,7 +3,7 @@ import Joi from "joi";
 export const validateRegisterStep1Middleware = (req, res, next) => {
   const schema = Joi.object({
     phone: Joi.string()
-      .pattern(/^\+?1?[2-9]\d{9}$/, "US phone number")
+      .pattern(/^\+1\d{10}$/, "US phone number")
       .required()
       .messages({
         "string.pattern.name": "We need a valid US phone number to get started",

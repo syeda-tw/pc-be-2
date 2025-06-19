@@ -241,7 +241,7 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
           // Set up intake forms based on user's forms using the new model structure
           const userForms = relationship.user?.forms || [];
           
-          relationship.RelationshipIntakeForms = userForms.length > 0 
+          relationship.relationshipIntakeForms = userForms.length > 0 
             ? userForms.map((form) => ({
                 userIntakeFormId: form._id,
                 userIntakeFormName: form.name || `Form ${form._id}`,
@@ -251,12 +251,12 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
             : [];
           
           // Add timeline entries for each intake form added
-          relationship.RelationshipIntakeForms.forEach((intakeForm) => {
+          relationship.relationshipIntakeForms.forEach((intakeForm) => {
             relationship.timeline.push({ event: relationshipTimelineEntries.userAddedIntakeForm(intakeForm.userIntakeFormName) });
           });
           
           // Set areAllIntakeFormsFilled to true if there are no intake forms
-          relationship.areAllIntakeFormsFilled = relationship.RelationshipIntakeForms.length === 0;
+          relationship.areAllIntakeFormsFilled = relationship.relationshipIntakeForms.length === 0;
           
           // Add timeline entry for relationship activation
           relationship.timeline.push({ event: relationshipTimelineEntries.relationshipActivated() });

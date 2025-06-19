@@ -14,8 +14,8 @@ const getIntakeFormsService = async (relationshipId, userId) => {
     throw { status: 403, message: messages.forbidden };
   }
   return {
-    areIntakeFormsFilled: relationship.areIntakeFormsFilled,
-    intakeForms: relationship.intakeForms,
+    areAllIntakeFormsFilled: relationship.areAllIntakeFormsFilled,
+    relationshipIntakeForms: relationship.relationshipIntakeForms,
   };
 };
 

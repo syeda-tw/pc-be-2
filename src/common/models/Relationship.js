@@ -33,7 +33,7 @@ const relationshipSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    RelationshipIntakeForms: [
+    relationshipIntakeForms: [
       {
         userIntakeFormId: {
           type: mongoose.Schema.Types.ObjectId,

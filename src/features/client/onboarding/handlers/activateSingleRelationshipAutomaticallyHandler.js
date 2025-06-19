@@ -55,7 +55,7 @@ const activateSingleRelationshipAutomaticallyService = async (clientId) => {
       // Handle cases where user, user.forms, or forms array might be null/undefined/empty
       const userForms = relationship.user?.forms || [];
       
-      relationship.RelationshipIntakeForms = userForms.length > 0 
+      relationship.relationshipIntakeForms = userForms.length > 0 
         ? userForms.map((form) => ({
             userIntakeFormId: form._id,
             userIntakeFormName: form.name || `Form ${form._id}`, // Fallback name if form.name is missing
@@ -65,12 +65,12 @@ const activateSingleRelationshipAutomaticallyService = async (clientId) => {
         : [];
       
       // Add timeline entries for each intake form added
-      relationship.RelationshipIntakeForms.forEach((intakeForm) => {
+      relationship.relationshipIntakeForms.forEach((intakeForm) => {
         relationship.timeline.push({ event: relationshipTimelineEntries.userAddedIntakeForm(intakeForm.userIntakeFormName) });
       });
       
       // Set areAllIntakeFormsFilled to true if there are no intake forms
-      relationship.areAllIntakeFormsFilled = relationship.RelationshipIntakeForms.length === 0;
+      relationship.areAllIntakeFormsFilled = relationship.relationshipIntakeForms.length === 0;
       
       await relationship.save();
       return relationship.user;

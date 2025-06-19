@@ -24,14 +24,14 @@ router.get(
 
 // Get a specific intake form by its ID
 router.get(
-  "/single-form/:formId",
+  "/single-form/:userIntakeFormId",
   getSingleIntakeFormMiddleware,
   secureRequestMiddleware,
   getSingleIntakeFormHandler
 );
 
 router.get(
-  "/single-form-uploaded-by-client/:formId/:relationshipId/:formUploadedByClientId",
+  "/single-form-uploaded-by-client/:userIntakeFormId/:relationshipId/:formUploadedByClientId",
   getSingleFormUploadedByClientMiddleware,
   secureRequestMiddleware,
   getSingleFormUploadedByClientHandler
