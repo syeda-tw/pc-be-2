@@ -246,17 +246,17 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
                 userIntakeFormId: form._id,
                 userIntakeFormName: form.name || `Form ${form._id}`,
                 intakeFormResponsesUploadedByClient: [],
-                status: "user_added",
+                status: "userAdded",
               }))
             : [];
+
+            relationship.areIntakeFormsComplete = relationship.relationshipIntakeForms.length === 0;
+
           
           // Add timeline entries for each intake form added
           relationship.relationshipIntakeForms.forEach((intakeForm) => {
             relationship.timeline.push({ event: relationshipTimelineEntries.userAddedIntakeForm(intakeForm.userIntakeFormName) });
           });
-          
-          // Set areAllIntakeFormsFilled to true if there are no intake forms
-          relationship.areAllIntakeFormsFilled = relationship.relationshipIntakeForms.length === 0;
           
           // Add timeline entry for relationship activation
           relationship.timeline.push({ event: relationshipTimelineEntries.relationshipActivated() });

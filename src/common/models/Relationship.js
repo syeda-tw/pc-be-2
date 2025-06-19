@@ -29,7 +29,7 @@ const relationshipSchema = new mongoose.Schema(
         ref: "Session",
       },
     ],
-    areAllIntakeFormsFilled: {
+    areIntakeFormsComplete: {
       type: Boolean,
       default: false,
     },
@@ -64,12 +64,12 @@ const relationshipSchema = new mongoose.Schema(
           type: String,
           required: true,
           enum: [
-            "user_added",
-            "client_submitted",
+            "userAdded",
+            "clientSubmitted",
             "userAccepted",
-            "user_rejected",
+            "userRejected",
           ],
-          default: "user_added",
+          default: "userAdded",
         },
       },
     ],
@@ -113,7 +113,7 @@ const relationshipSchema = new mongoose.Schema(
         },
       },
     ],
-    },
+  },
   {
     timestamps: true, // Adds createdAt and updatedAt fields automatically
   }

@@ -60,7 +60,7 @@ const activateSingleRelationshipAutomaticallyService = async (clientId) => {
             userIntakeFormId: form._id,
             userIntakeFormName: form.name || `Form ${form._id}`, // Fallback name if form.name is missing
             intakeFormResponsesUploadedByClient: [],
-            status: "user_added",
+            status: "userAdded",
           }))
         : [];
       
@@ -69,8 +69,8 @@ const activateSingleRelationshipAutomaticallyService = async (clientId) => {
         relationship.timeline.push({ event: relationshipTimelineEntries.userAddedIntakeForm(intakeForm.userIntakeFormName) });
       });
       
-      // Set areAllIntakeFormsFilled to true if there are no intake forms
-      relationship.areAllIntakeFormsFilled = relationship.relationshipIntakeForms.length === 0;
+      // Set areIntakeFormsComplete to true if there are no intake forms
+      relationship.areIntakeFormsComplete = relationship.relationshipIntakeForms.length === 0;
       
       await relationship.save();
       return relationship.user;
