@@ -195,13 +195,13 @@ async function updateRecordsAfterSuccessfulPayment(
   const { bookedDate, startTimeFormatted, endTimeFormatted } = 
     formatSessionBookingDetails(date, startTime, endTime);
   
-  relationship.timeline.push(
-    relationshipTimelineEntries.firstSessionBooked(
+  relationship.timeline.push({
+    event: relationshipTimelineEntries.firstSessionBooked(
       bookedDate,
       startTimeFormatted,
       endTimeFormatted
     )
-  );
+  });
   await relationship.save();
 }
 

@@ -3,6 +3,7 @@ import Client from "../../../../common/models/Client.js";
 import User from "../../../../common/models/User.js";
 import { sanitizeUserAndAppendType } from "../../../common/utils.js";
 import { env } from "../../../../common/config/env.js";
+import Relationship, { relationshipTimelineEntries } from '../../../../common/models/Relationship.js';
 
 const messages = {
     success: "Your information has been updated successfully!",
@@ -67,7 +68,7 @@ const updateClientInformation = async (clientData, _id) => {
     const relationships = await Relationship.find({ client: _id });
     if (relationships.length > 0) {
         await Promise.all(relationships.map(async (relationship) => {
-            relationship.timeline.push(relationshipTimelineEntries.clientSubmittedStep1());
+            relationship.timeline.push({ event: relationshipTimelineEntries.clientSubmittedStep1() });
             await relationship.save();
         }));
     }

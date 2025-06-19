@@ -111,13 +111,13 @@ const processSingleSession = async (
       const { bookedDate, startTimeFormatted, endTimeFormatted } = 
         formatSessionBookingDetails(date, startTime, endTime);
       
-      relationship.timeline.push(
-        relationshipTimelineEntries.firstSessionBooked(
+      relationship.timeline.push({
+        event: relationshipTimelineEntries.firstSessionBooked(
           bookedDate,
           startTimeFormatted,
           endTimeFormatted
         )
-      );
+      });
       await relationship.save();
 
       return {
@@ -252,14 +252,14 @@ const bookFirstSessionForMultipleUserInvitedHandler = async (req, res) => {
           
           // Add timeline entries for each intake form added
           relationship.RelationshipIntakeForms.forEach((intakeForm) => {
-            relationship.timeline.push(relationshipTimelineEntries.userAddedIntakeForm(intakeForm.userIntakeFormName));
+            relationship.timeline.push({ event: relationshipTimelineEntries.userAddedIntakeForm(intakeForm.userIntakeFormName) });
           });
           
           // Set areAllIntakeFormsFilled to true if there are no intake forms
           relationship.areAllIntakeFormsFilled = relationship.RelationshipIntakeForms.length === 0;
           
           // Add timeline entry for relationship activation
-          relationship.timeline.push(relationshipTimelineEntries.relationshipActivated());
+          relationship.timeline.push({ event: relationshipTimelineEntries.relationshipActivated() });
           
           await relationship.save();
         }

@@ -49,7 +49,7 @@ const onboardingStep2Service = async (setupIntentId, clientId) => {
   const relationships = await Relationship.find({ client: clientId });
   if (relationships.length > 0) {
     await Promise.all(relationships.map(async (relationship) => {
-      relationship.timeline.push(relationshipTimelineEntries.clientSubmittedStep2());
+      relationship.timeline.push({ event: relationshipTimelineEntries.clientSubmittedStep2() });
       await relationship.save();
     }));
   }

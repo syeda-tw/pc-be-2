@@ -49,7 +49,7 @@ const activateSingleRelationshipAutomaticallyService = async (clientId) => {
       relationship.status = "active";
       
       // Add relationship activation to timeline
-      relationship.timeline.push(relationshipTimelineEntries.relationshipActivated());
+      relationship.timeline.push({ event: relationshipTimelineEntries.relationshipActivated() });
       
       // Set up intake forms based on user's forms using the new model structure
       // Handle cases where user, user.forms, or forms array might be null/undefined/empty
@@ -66,7 +66,7 @@ const activateSingleRelationshipAutomaticallyService = async (clientId) => {
       
       // Add timeline entries for each intake form added
       relationship.RelationshipIntakeForms.forEach((intakeForm) => {
-        relationship.timeline.push(relationshipTimelineEntries.userAddedIntakeForm(intakeForm.userIntakeFormName));
+        relationship.timeline.push({ event: relationshipTimelineEntries.userAddedIntakeForm(intakeForm.userIntakeFormName) });
       });
       
       // Set areAllIntakeFormsFilled to true if there are no intake forms

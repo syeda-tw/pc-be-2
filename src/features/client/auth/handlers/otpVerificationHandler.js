@@ -1,6 +1,6 @@
 import Client from "../../../../common/models/Client.js";
 import InvitedClient from "../../../../common/models/InvitedClient.js";
-import Relationship from "../../../../common/models/Relationship.js";
+import Relationship, { relationshipTimelineEntries } from "../../../../common/models/Relationship.js";
 import {
   generateToken,
   sanitizeUserAndAppendType,
@@ -63,7 +63,7 @@ const otpVerificationService = async (phone, otp) => {
       relationship.client = client._id;
       relationship.clientModel = "Client";
       relationship.status = "pending";
-      relationship.timeline = [...relationship.timeline, relationshipTimelineEntries.clientRegistered()]
+      relationship.timeline = [...relationship.timeline, { event: relationshipTimelineEntries.clientRegistered() }]
       await relationship.save();
       
       // Update the client with the new relationship
