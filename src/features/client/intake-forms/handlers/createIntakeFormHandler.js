@@ -7,6 +7,17 @@ export const createIntakeFormHandler = async (req, res, next) => {
     const { relationshipId, userIntakeFormId, formName } = req.body;
     const file = req.file;
 
+    // Validate required parameters
+    if (!clientId) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    if (!relationshipId || !userIntakeFormId || !formName || !file) {
+      return res.status(400).json({ 
+        message: "Missing required fields: relationshipId, userIntakeFormId, formName, and file are required" 
+      });
+    }
+
     const form = await createIntakeFormService(
       clientId,
       relationshipId,

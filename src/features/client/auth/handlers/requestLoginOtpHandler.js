@@ -11,21 +11,17 @@ const generateOtp = () => {
 };
 
 const requestLoginOtpService = async (phone) => {
-  try {
-    const client = await Client.findOne({ phone });
-    if (!client) {
-      throw {
-        code: 404,
-        message: messages.CLIENT_NOT_FOUND,
-      };
-    }
-    const otp = generateOtp();
-    client.loginOtp = otp;
-    client.loginOtpExpiresAt = new Date(Date.now() + 1000 * 60 * 5);
-    await client.save();
-  } catch (error) {
-    res.status(err.code || 500).json({ message: err.message });
+  const client = await Client.findOne({ phone });
+  if (!client) {
+    throw {
+      status: 404,
+      message: messages.CLIENT_NOT_FOUND,
+    };
   }
+  const otp = generateOtp();
+  client.loginOtp = otp;
+  client.loginOtpExpiresAt = new Date(Date.now() + 1000 * 60 * 5);
+  await client.save();
 };
 
 const requestLoginOtpHandler = async (req, res) => {
@@ -34,7 +30,7 @@ const requestLoginOtpHandler = async (req, res) => {
     await requestLoginOtpService(phone);
     res.status(200).json({ message: messages.OTP_SENT });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(error.status || 500).json({ message: error.message });
   }
 };
 

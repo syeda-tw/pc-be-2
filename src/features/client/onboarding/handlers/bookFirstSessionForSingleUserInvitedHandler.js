@@ -91,6 +91,10 @@ const bookFirstSessionForSingleUserInvitedService = async (
     }
     originalRelationshipSessions = [...relationship.sessions];
 
+    // Get user's session cost and add 10%
+    const userSessionCost = relationship.user.sessionCost || cost;
+    const adjustedCost = userSessionCost * 1.1;
+
     // Step 3: Create session record
     const session = {
       client: clientId,
@@ -107,7 +111,6 @@ const bookFirstSessionForSingleUserInvitedService = async (
       createdSession = await Session.create(session);
 
       relationship.sessions.push(createdSession._id);
-
       await relationship.save();
     } catch (error) {
       throw { status: 500, message: messages.sessionCreationError };
@@ -127,8 +130,8 @@ const bookFirstSessionForSingleUserInvitedService = async (
         throw { status: 400, message: messages.noPaymentMethod };
       }
 
-      // Create and confirm payment intent
-      const paymentAmount = Math.round(cost * 100);
+      // Create and confirm payment intent with adjusted cost
+      const paymentAmount = Math.round(adjustedCost * 100);
       const paymentIntent = await stripe.paymentIntents.create({
         amount: paymentAmount,
         currency: "usd",
@@ -188,12 +191,13 @@ async function updateRecordsAfterSuccessfulPayment(
   session.paymentStatus = "paid";
   session.billingInformation = paymentIntent;
   await session.save();
+
   client.status = "onboarded";
   await client.save();
 
   // Add timeline entry for first session booked
   const { bookedDate, startTimeFormatted, endTimeFormatted } = 
-    formatSessionBookingDetails(date, startTime, endTime);
+    formatSessionBookingDetails(date, session.startTime, session.endTime);
   
   relationship.timeline.push({
     event: relationshipTimelineEntries.firstSessionBooked(

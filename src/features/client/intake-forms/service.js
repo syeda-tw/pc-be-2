@@ -1,6 +1,6 @@
 import { env } from "../../../common/config/env.js";
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
-import Relationship from "../../../common/models/Relationship.js";
+import Relationship, { relationshipTimelineEntries } from "../../../common/models/Relationship.js";
 import mongoose from "mongoose";
 import Client from "../../../common/models/Client.js";
 import messages from "./messages.js";
@@ -55,10 +55,18 @@ export const createIntakeFormService = async (
     }
 
     // Check if form has already been submitted by client
-    if (existingForm.status === "client_submitted") {
+    if (existingForm.status === "clientSubmitted") {
       throw {
         status: 400,
         message: messages.formAlreadySubmitted,
+      };
+    }
+
+    // Validate file structure and content
+    if (!file) {
+      throw {
+        status: 400,
+        message: messages.invalidFileContent,
       };
     }
 
@@ -83,8 +91,10 @@ export const createIntakeFormService = async (
     // Add the response to the existing intake form
     existingForm.intakeFormResponsesUploadedByClient.push(responseForm);
     
-    // Update the status to client_submitted
-    existingForm.status = "client_submitted";
+    // Update the status to clientSubmitted
+    existingForm.status = "clientSubmitted";
+    relationship.timeline.push({ event: relationshipTimelineEntries.clientSubmittedIntakeForm(formName, existingForm.userIntakeFormName) });
+
 
     // Save the relationship
     await relationship.save();

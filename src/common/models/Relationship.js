@@ -135,5 +135,11 @@ export const relationshipTimelineEntries = {
   firstSessionBooked: (bookedDate, startTime, endTime) =>
     `First session booked for ${bookedDate} ${startTime}-${endTime}`,
   userAddedIntakeForm: (intakeFormName) =>
-    `Client asked to submit response for ${intakeFormName} intake form`,
+    `Client is asked to submit response for ${intakeFormName} intake form`,
+  userRemovedIntakeForm: (intakeFormName) =>
+    `${intakeFormName} intake form has been removed`,
+  intakeFormsMarkedAsComplete: () => "Client has marked intake forms as complete",
+  intakeFormsMarkedAsIncomplete: () => "Client has marked intake forms as incomplete",
+  clientSubmittedIntakeForm: (clientSubmittedIntakeFormName, userIntakeFormName) =>
+    `Client has submitted response for ${clientSubmittedIntakeFormName} intake form as a respose to ${userIntakeFormName} intake form`,
 };

@@ -14,7 +14,7 @@ const getIntakeFormsService = async (relationshipId, userId) => {
     throw { status: 403, message: messages.forbidden };
   }
   return {
-    areAllIntakeFormsFilled: relationship.areAllIntakeFormsFilled,
+    areIntakeFormsComplete: relationship.areIntakeFormsComplete,
     relationshipIntakeForms: relationship.relationshipIntakeForms,
   };
 };
@@ -24,6 +24,7 @@ const getIntakeFormsHandler = async (req, res, next) => {
   const userId = req.id;
   try {
     const intakeForms = await getIntakeFormsService(relationshipId, userId);
+    console.log("🔍 Intake forms:", intakeForms);
     res.status(200).json(intakeForms);
   } catch (error) {
     next(error);

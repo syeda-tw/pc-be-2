@@ -1,7 +1,7 @@
 import { env } from "../../../../common/config/env.js";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import User from "../../../../common/models/User.js";
-import Relationship from "../../../../common/models/Relationship.js";
+import Relationship, { relationshipTimelineEntries } from "../../../../common/models/Relationship.js";
 import messages from "../messages.js";
 
 const s3Client = new S3Client({
@@ -15,15 +15,15 @@ const s3Client = new S3Client({
 export const deleteIntakeFormService = async (formId, userId) => {
   try {
     // Find the form
-    const user = await User.findById(userId).select('forms');
-    if (!user || !user.forms.some(form => form._id.toString() === formId)) {
+    const user = await User.findById(userId).select("forms");
+    if (!user || !user.forms.some((form) => form._id.toString() === formId)) {
       throw {
         status: 404,
         message: messages.formNotFound,
       };
     }
 
-    const form = user.forms.find(form => form._id.toString() === formId);
+    const form = user.forms.find((form) => form._id.toString() === formId);
 
     // Delete from S3
     const deleteParams = {
@@ -49,16 +49,27 @@ export const deleteIntakeFormService = async (formId, userId) => {
 
       // Find and update all relationships for this user
       const relationships = await Relationship.find({ user: userId });
-      
+
       for (const relationship of relationships) {
         // Remove the form from relationshipIntakeForms array
-        relationship.relationshipIntakeForms = relationship.relationshipIntakeForms.filter(
-          intakeForm => intakeForm.userIntakeFormId && intakeForm.userIntakeFormId.toString() !== formId
-        );
+        relationship.relationshipIntakeForms =
+          relationship.relationshipIntakeForms.filter(
+            (intakeForm) =>
+              intakeForm.userIntakeFormId &&
+              intakeForm.userIntakeFormId.toString() !== formId
+          );
+        relationship.timeline.push({
+          event: relationshipTimelineEntries.userRemovedIntakeForm(form.name),
+        });
 
         // Update areIntakeFormsComplete
-        relationship.areIntakeFormsComplete = relationship.relationshipIntakeForms.length === 0 || relationship.relationshipIntakeForms.every(form => form.status === "userAccepted");
-
+        relationship.areIntakeFormsComplete =
+          relationship.relationshipIntakeForms.length === 0;
+        if (relationship.areIntakeFormsComplete) {
+          relationship.timeline.push({
+            event: relationshipTimelineEntries.intakeFormsMarkedAsComplete(),
+          });
+        }
         await relationship.save();
       }
     } catch (error) {
@@ -75,7 +86,7 @@ export const deleteIntakeFormService = async (formId, userId) => {
       message: error.message || messages.failedToRemoveFormFromUserDocument,
     };
   }
-}; 
+};
 
 export const deleteIntakeFormHandler = async (req, res, next) => {
   try {

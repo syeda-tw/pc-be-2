@@ -1,7 +1,7 @@
 import { env } from "../../../../common/config/env.js";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import User from "../../../../common/models/User.js";
-import Relationship from "../../../../common/models/Relationship.js";
+import Relationship, { relationshipTimelineEntries } from "../../../../common/models/Relationship.js";
 import messages from "../messages.js";
 
 const s3Client = new S3Client({
@@ -24,7 +24,7 @@ export const createIntakeFormService = async (id, file, formName) => {
       };
     }
 
-    const formDetails = { 
+    const formDetails = {
       name: formName,
     };
 
@@ -63,6 +63,10 @@ export const createIntakeFormService = async (id, file, formName) => {
         intakeFormResponsesUploadedByClient: [],
         status: "userAdded",
       });
+      relationship.timeline.push(
+        { event: relationshipTimelineEntries.userAddedIntakeForm(formName) },
+        { event: relationshipTimelineEntries.intakeFormsMarkedAsIncomplete() }
+      );
       relationship.areIntakeFormsComplete = false;
       await relationship.save();
     }
@@ -93,7 +97,6 @@ export const createIntakeFormService = async (id, file, formName) => {
     };
   }
 };
-
 
 export const createIntakeFormHandler = async (req, res, next) => {
   try {
