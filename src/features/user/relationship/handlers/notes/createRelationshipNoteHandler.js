@@ -1,4 +1,5 @@
-import Relationship from "../../../../common/models/Relationship.js";
+import Relationship from "../../../../../common/models/Relationship.js";
+import { relationshipTimelineEntries } from "../../../../../common/models/Relationship.js";
 
 const messages = {
   noteCreated: "Note created successfully",
@@ -29,7 +30,15 @@ const createReltationshipNoteService = async (id, relationshipId, content) => {
 
   const newNote = await Relationship.findByIdAndUpdate(
     relationshipId,
-    { $push: { notes: note } },
+    { 
+      $push: { 
+        notes: note,
+        timeline: {
+          event: relationshipTimelineEntries.clientAddedNote(content, relationship.notes.length + 1),
+          createdAt: new Date()
+        }
+      } 
+    },
     { new: true }
   );
   

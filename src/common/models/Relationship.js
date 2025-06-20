@@ -138,12 +138,15 @@ export const relationshipTimelineEntries = {
     `Client is asked to submit response for ${intakeFormName} intake form`,
   userRemovedIntakeForm: (intakeFormName) =>
     `${intakeFormName} intake form has been removed`,
-  intakeFormsMarkedAsComplete: () => "Client has marked intake forms as complete",
-  intakeFormsMarkedAsIncomplete: () => "Client has marked intake forms as incomplete",
+  intakeFormsMarkedAsComplete: () => "You have marked intake forms as complete",
+  intakeFormsMarkedAsIncomplete: () => "You have marked intake forms as incomplete",
   intakeFormResponseAccepted: (intakeFormName, userIntakeFormName) =>
-    `Client has accepted response for ${intakeFormName} intake form as a respose to ${userIntakeFormName} intake form`,
+    `You have accepted response for ${intakeFormName} intake form as a respose to ${userIntakeFormName} intake form`,
   intakeFormResponseRejected: (intakeFormName, userIntakeFormName) =>
-    `Client has rejected response for ${intakeFormName} intake form as a respose to ${userIntakeFormName} intake form`,
+    `You have rejected response for ${intakeFormName} intake form as a respose to ${userIntakeFormName} intake form`,
   clientSubmittedIntakeForm: (clientSubmittedIntakeFormName, userIntakeFormName) =>
     `Client has submitted response for ${clientSubmittedIntakeFormName} intake form as a respose to ${userIntakeFormName} intake form`,
+  clientAddedNote: (noteContent, noteNumber) => `Client has added note #${noteNumber}: ${noteContent}`,
+  clientUpdatedNote: (previousNoteContent, newNoteContent, noteNumber) => `Client has updated note #${noteNumber}: ${previousNoteContent} to ${newNoteContent}`,
+  clientDeletedNote: (noteContent, noteNumber) => `Client has deleted note #${noteNumber}: ${noteContent}`,
 };

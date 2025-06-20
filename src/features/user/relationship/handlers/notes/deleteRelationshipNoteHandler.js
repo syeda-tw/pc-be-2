@@ -1,4 +1,5 @@
-import Relationship from "../../../../common/models/Relationship.js";
+import Relationship from "../../../../../common/models/Relationship.js";
+import { relationshipTimelineEntries } from "../../../../../common/models/Relationship.js";
 
 const messages = {
   success: {
@@ -27,6 +28,16 @@ const deleteRelationshipNoteService = async (userId, relationshipId, noteId) => 
   if (!note) {
     throw { status: 404, message: messages.error.noteNotFound };
   }
+
+  const noteContent = note.content;
+  const noteIndex = relationship.notes.findIndex(n => n._id.toString() === noteId);
+  const noteNumber = noteIndex + 1;
+
+  // Add timeline entry for note deletion before removing the note
+  relationship.timeline.push({
+    event: relationshipTimelineEntries.clientDeletedNote(noteContent, noteNumber),
+    createdAt: new Date()
+  });
 
   // Remove the note from the array
   relationship.notes.pull(noteId);

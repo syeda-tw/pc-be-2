@@ -1,4 +1,4 @@
-import Relationship from "../../../../common/models/Relationship.js";
+import Relationship from "../../../../../common/models/Relationship.js";
 
 const messages = {
   success: {

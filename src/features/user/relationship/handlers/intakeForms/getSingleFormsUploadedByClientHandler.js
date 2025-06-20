@@ -1,6 +1,6 @@
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { env } from "../../../../common/config/env.js";
-import Relationship from "../../../../common/models/Relationship.js";
+import { env } from "../../../../../common/config/env.js";
+import Relationship from "../../../../../common/models/Relationship.js";
 import { Readable } from "stream";
 
 const messages = {

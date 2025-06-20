@@ -1,4 +1,5 @@
-import Relationship from "../../../../common/models/Relationship.js";
+import Relationship from "../../../../../common/models/Relationship.js";
+import { relationshipTimelineEntries } from "../../../../../common/models/Relationship.js";
 
 const messages = {
   success: {
@@ -33,9 +34,19 @@ const editRelationshipNoteService = async (userId, relationshipId, noteId, conte
     throw { status: 404, message: messages.error.noteNotFound };
   }
 
+  const previousContent = note.content;
+  const noteIndex = relationship.notes.findIndex(n => n._id.toString() === noteId);
+  const noteNumber = noteIndex + 1;
+
   // Update only the note content and updatedAt timestamp
   note.content = content;
   note.updatedAt = new Date();
+
+  // Add timeline entry for note update
+  relationship.timeline.push({
+    event: relationshipTimelineEntries.clientUpdatedNote(previousContent, content, noteNumber),
+    createdAt: new Date()
+  });
 
   await relationship.save();
 

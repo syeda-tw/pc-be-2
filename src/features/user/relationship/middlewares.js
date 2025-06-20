@@ -248,3 +248,24 @@ export const validateDeleteNote = (req, res, next) => {
   req.params = value;
   next();
 };
+
+const getRelationshipTimelineSchema = Joi.object({
+  relationshipId: Joi.string().required().messages({
+    "any.required": messages.relationshipIdRequired,
+    "string.base": messages.relationshipIdRequired,
+  }),
+});
+
+export const validateGetRelationshipTimeline = (req, res, next) => {
+  const { error, value } = getRelationshipTimelineSchema.validate(
+    req.params,
+    { abortEarly: false }
+  );
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  req.params = value;
+  next();
+};

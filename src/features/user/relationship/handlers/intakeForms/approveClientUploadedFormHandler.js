@@ -1,4 +1,4 @@
-import Relationship, { relationshipTimelineEntries } from "../../../../common/models/Relationship.js";
+import Relationship, { relationshipTimelineEntries } from "../../../../../common/models/Relationship.js";
 
 const messages = {
   success: {

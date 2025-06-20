@@ -9,17 +9,19 @@ import {
   validateCreateNote,
   validateUpdateNote,
   validateDeleteNote,
+  validateGetRelationshipTimeline,
 } from "./middlewares.js";
 import getRelationshipHandler from "./handlers/getRelationshipHandler.js";
 import getRelationshipSessionsHandler from "./handlers/getRelationshipSessionsHandler.js";
-import getIntakeFormsHandler from "./handlers/getIntakeFormsHandler.js";
-import getSingleFormsUploadedByClientHandler from "./handlers/getSingleFormsUploadedByClientHandler.js";
-import approveClientUploadedFormHandler from "./handlers/approveClientUploadedFormHandler.js";
-import rejectClientUploadedFormHandler from "./handlers/rejectClientUploadedFormHandler.js";
-import getRelationshipNotesHandler from "./handlers/getRelationshipNotesHandler.js";
-import createRelationshipNoteHandler from "./handlers/createRelationshipNoteHandler.js";
-import editRelationshipNoteHandler from "./handlers/editRelationshipNoteHandler.js";
-import deleteRelationshipNoteHandler from "./handlers/deleteRelationshipNoteHandler.js";
+import getIntakeFormsHandler from "./handlers/intakeForms/getIntakeFormsHandler.js";
+import getSingleFormsUploadedByClientHandler from "./handlers/intakeForms/getSingleFormsUploadedByClientHandler.js";
+import approveClientUploadedFormHandler from "./handlers/intakeForms/approveClientUploadedFormHandler.js";
+import rejectClientUploadedFormHandler from "./handlers/intakeForms/rejectClientUploadedFormHandler.js";
+import getRelationshipNotesHandler from "./handlers/notes/getRelationshipNotesHandler.js";
+import createRelationshipNoteHandler from "./handlers/notes/createRelationshipNoteHandler.js";
+import editRelationshipNoteHandler from "./handlers/notes/editRelationshipNoteHandler.js";
+import deleteRelationshipNoteHandler from "./handlers/notes/deleteRelationshipNoteHandler.js";
+import getRelationshipTimelineHandler from "./handlers/timeline/getRelationshipTimelineHandler.js";
 
 const router = Router();
 
@@ -77,7 +79,14 @@ router.delete(
   "/:relationshipId/notes/:noteId",
   secureRequestMiddleware,
   validateDeleteNote,
-  deleteRelationshipNoteHandler
+  deleteRelationshipNoteHandler 
+);
+
+router.get(
+  "/:relationshipId/timeline",
+  secureRequestMiddleware,
+  validateGetRelationshipTimeline,
+  getRelationshipTimelineHandler
 );
 
 export default router;
