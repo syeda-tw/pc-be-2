@@ -1,4 +1,4 @@
-import Relationship from "../../../../common/models/Relationship.js";
+import Relationship, { relationshipTimelineEntries } from "../../../../common/models/Relationship.js";
 
 const messages = {
   success: {
@@ -12,15 +12,8 @@ const messages = {
 const approveClientUploadedFormService = async (
   relationshipId,
   userId,
-  formId,
-  formUploadedByClientId
+  userIntakeFormId,
 ) => {
-  console.log(
-    "approveClientUploadedFormService",
-    relationshipId,
-    userId,
-    formId
-  );
   const relationship = await Relationship.findOne({
     _id: relationshipId,
     user: userId,
@@ -33,8 +26,8 @@ const approveClientUploadedFormService = async (
     };
   }
 
-  const form = relationship.intakeForms.find(
-    (form) => form._id.toString() === formId.toString()
+  const form = relationship.relationshipIntakeForms.find(
+    (form) => form.userIntakeFormId.toString() === userIntakeFormId.toString()
   );
 
   if (!form) {
@@ -44,37 +37,52 @@ const approveClientUploadedFormService = async (
     };
   }
 
-  form.isMarkedComplete = true;
+  form.status = "userAccepted";
 
-  // Check if all forms are approved
-  const hasPendingForms = relationship.intakeForms.some(
-    (form) => !form.isMarkedComplete
+  // Add timeline entry for form acceptance
+  const timelineEntry = relationshipTimelineEntries.intakeFormResponseAccepted(
+    form.intakeFormResponsesUploadedByClient[0]?.reponseFormName || "form response",
+    form.userIntakeFormName
+  );
+  
+  relationship.timeline.push({
+    event: timelineEntry
+  });
+
+  const hasPendingForms = relationship.relationshipIntakeForms.some(
+    (form) => form.status !== "userAccepted"
   );
 
-  // If no pending forms, mark relationship as having all intake forms filled
   if (!hasPendingForms) {
-    relationship.areIntakeFormsFilled = true;
+    relationship.areIntakeFormsComplete = true;
+    // Add timeline entry for all forms being complete
+    const completeTimelineEntry = relationshipTimelineEntries.intakeFormsMarkedAsComplete();
+    relationship.timeline.push({
+      event: completeTimelineEntry
+    });
   }
 
   await relationship.save();
-  return {
-    areIntakeFormsFilled: relationship.areIntakeFormsFilled,
+  
+  const result = {
+    areIntakeFormsComplete: relationship.areIntakeFormsComplete,
   };
+  return result;
 };
 
 const approveClientUploadedFormHandler = async (req, res, next) => {
-  const { relationshipId, formId } = req.params;
+  const { relationshipId, userIntakeFormId } = req.params;
   const userId = req.id;
 
   try {
-    const { areIntakeFormsFilled } = await approveClientUploadedFormService(
+    const { areIntakeFormsComplete } = await approveClientUploadedFormService(
       relationshipId,
       userId,
-      formId,
+      userIntakeFormId,
     );
     res.status(200).json({
       message: messages.success.approveClientUploadedForm,
-      areIntakeFormsFilled,
+      areIntakeFormsComplete,
     });
   } catch (err) {
     next(err);

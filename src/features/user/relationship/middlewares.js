@@ -35,7 +35,7 @@ export const validateGetRelationshipSessions = (req, res, next) => {
 
 const messages = {
   relationshipIdRequired: "Relationship ID is required.",
-  formIdRequired: "Form ID is required.",
+  userIntakeFormIdRequired: "User intake form ID is required.",
   formUploadedByClientIdRequired: "Form uploaded by client ID is required.",
   invalidParams: "Invalid parameters provided.",
   noteIdRequired: "Note ID is required.",
@@ -49,8 +49,8 @@ const getSingleFormUploadedByClientSchema = Joi.object({
     "string.base": messages.relationshipIdRequired,
   }),
   userIntakeFormId: Joi.string().required().messages({
-    "any.required": messages.formIdRequired,
-    "string.base": messages.formIdRequired,
+    "any.required": messages.userIntakeFormIdRequired,
+    "string.base": messages.userIntakeFormIdRequired,
   }),
   formUploadedByClientId: Joi.string().required().messages({
     "any.required": messages.formUploadedByClientIdRequired,
@@ -80,14 +80,42 @@ const approveClientUploadedFormSchema = Joi.object({
     "any.required": messages.relationshipIdRequired,
     "string.base": messages.relationshipIdRequired,
   }),
-  formId: Joi.string().required().messages({
-    "any.required": messages.formIdRequired,
-    "string.base": messages.formIdRequired,
+  userIntakeFormId: Joi.string().required().messages({
+    "any.required": messages.userIntakeFormIdRequired,
+    "string.base": messages.userIntakeFormIdRequired,
   }),
 });
 
 export const validateApproveClientUploadedForm = (req, res, next) => {
   const { error, value } = approveClientUploadedFormSchema.validate(
+    req.params,
+    { abortEarly: false }
+  );
+
+  if (error) {
+    throw {
+      status: 400,
+      message: error.details[0].message,
+    };
+  }
+
+  req.params = value; // validated and defaulted params
+  next();
+};
+
+const rejectClientUploadedFormSchema = Joi.object({
+  relationshipId: Joi.string().required().messages({
+    "any.required": messages.relationshipIdRequired,
+    "string.base": messages.relationshipIdRequired,
+  }),
+  userIntakeFormId: Joi.string().required().messages({
+    "any.required": messages.userIntakeFormIdRequired,
+    "string.base": messages.userIntakeFormIdRequired,
+  }),
+});
+
+export const validateRejectClientUploadedForm = (req, res, next) => {
+  const { error, value } = rejectClientUploadedFormSchema.validate(
     req.params,
     { abortEarly: false }
   );

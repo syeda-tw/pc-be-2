@@ -140,6 +140,10 @@ export const relationshipTimelineEntries = {
     `${intakeFormName} intake form has been removed`,
   intakeFormsMarkedAsComplete: () => "Client has marked intake forms as complete",
   intakeFormsMarkedAsIncomplete: () => "Client has marked intake forms as incomplete",
+  intakeFormResponseAccepted: (intakeFormName, userIntakeFormName) =>
+    `Client has accepted response for ${intakeFormName} intake form as a respose to ${userIntakeFormName} intake form`,
+  intakeFormResponseRejected: (intakeFormName, userIntakeFormName) =>
+    `Client has rejected response for ${intakeFormName} intake form as a respose to ${userIntakeFormName} intake form`,
   clientSubmittedIntakeForm: (clientSubmittedIntakeFormName, userIntakeFormName) =>
     `Client has submitted response for ${clientSubmittedIntakeFormName} intake form as a respose to ${userIntakeFormName} intake form`,
 };

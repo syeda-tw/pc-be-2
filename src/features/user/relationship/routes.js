@@ -4,6 +4,7 @@ import {
   validateGetRelationshipSessions,
   validateGetSingleFormUploadedByClient,
   validateApproveClientUploadedForm,
+  validateRejectClientUploadedForm,
   validateGetNotes,
   validateCreateNote,
   validateUpdateNote,
@@ -14,6 +15,7 @@ import getRelationshipSessionsHandler from "./handlers/getRelationshipSessionsHa
 import getIntakeFormsHandler from "./handlers/getIntakeFormsHandler.js";
 import getSingleFormsUploadedByClientHandler from "./handlers/getSingleFormsUploadedByClientHandler.js";
 import approveClientUploadedFormHandler from "./handlers/approveClientUploadedFormHandler.js";
+import rejectClientUploadedFormHandler from "./handlers/rejectClientUploadedFormHandler.js";
 import getRelationshipNotesHandler from "./handlers/getRelationshipNotesHandler.js";
 import createRelationshipNoteHandler from "./handlers/createRelationshipNoteHandler.js";
 import editRelationshipNoteHandler from "./handlers/editRelationshipNoteHandler.js";
@@ -36,10 +38,17 @@ router.get(
   getSingleFormsUploadedByClientHandler
 );
 router.put(
-  "/approve-client-uploaded-form/:relationshipId/:formId",
+  "/approve-client-uploaded-form/:relationshipId/:userIntakeFormId",
   secureRequestMiddleware,
   validateApproveClientUploadedForm,
   approveClientUploadedFormHandler
+);
+
+router.put(
+  "/reject-client-uploaded-form/:relationshipId/:userIntakeFormId",
+  secureRequestMiddleware,
+  validateRejectClientUploadedForm,
+  rejectClientUploadedFormHandler
 );
 
 // Notes routes
