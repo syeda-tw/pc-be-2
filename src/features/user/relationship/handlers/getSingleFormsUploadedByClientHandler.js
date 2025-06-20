@@ -35,10 +35,10 @@ const s3Client = new S3Client({
 const getSingleFormsUploadedByClientService = async (
   relationshipId,
   userId,
-  formId,
+  userIntakeFormId,
   formUploadedByClientId
 ) => {
-  if (!relationshipId || !userId || !formId || !formUploadedByClientId) {
+  if (!relationshipId || !userId || !userIntakeFormId || !formUploadedByClientId) {
     throw {
       code: 400,
       message: messages.error.invalidParams,
@@ -58,11 +58,22 @@ const getSingleFormsUploadedByClientService = async (
       };
     }
 
-    const uploadedForm = relationship.intakeForms
-      .find((form) => form._id.toString() === formId.toString())
-      ?.formsUploadedByClient.find(
-        (form) => form._id.toString() === formUploadedByClientId.toString()
-      );
+    // Find the intake form in relationshipIntakeForms
+    const intakeForm = relationship.relationshipIntakeForms.find(
+      (form) => form.userIntakeFormId && form.userIntakeFormId.toString() === userIntakeFormId.toString()
+    );
+
+    if (!intakeForm) {
+      throw {
+        code: 404,
+        message: messages.error.formNotFound,
+      };
+    }
+
+    // Find the uploaded form response
+    const uploadedForm = intakeForm.intakeFormResponsesUploadedByClient.find(
+      (response) => response._id.toString() === formUploadedByClientId.toString()
+    );
 
     if (!uploadedForm) {
       throw {
@@ -95,7 +106,7 @@ const getSingleFormsUploadedByClientService = async (
 };
 
 const getSingleFormsUploadedByClientHandler = async (req, res, next) => {
-  const { relationshipId, formId, formUploadedByClientId } = req.params;
+  const { relationshipId, userIntakeFormId, formUploadedByClientId } = req.params;
   const userId = req.id;
 
   try {
@@ -103,14 +114,14 @@ const getSingleFormsUploadedByClientHandler = async (req, res, next) => {
       await getSingleFormsUploadedByClientService(
         relationshipId,
         userId,
-        formId,
+        userIntakeFormId,
         formUploadedByClientId
       );
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${uploadedForm.name || "form"}.pdf"`
+      `attachment; filename="${uploadedForm.reponseFormName || "form"}.pdf"`
     );
 
     fileStream.pipe(res);

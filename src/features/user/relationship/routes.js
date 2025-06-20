@@ -30,7 +30,7 @@ router.get(
 router.get("/intake-forms", secureRequestMiddleware, getIntakeFormsHandler);
 router.get("/:relationshipId", secureRequestMiddleware, getRelationshipHandler);
 router.get(
-  "/single-form-uploaded-by-client/:formId/:relationshipId/:formUploadedByClientId",
+  "/single-form-uploaded-by-client/:relationshipId/:userIntakeFormId/:formUploadedByClientId",
   secureRequestMiddleware,
   validateGetSingleFormUploadedByClient,
   getSingleFormsUploadedByClientHandler

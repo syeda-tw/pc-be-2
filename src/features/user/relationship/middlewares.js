@@ -48,7 +48,7 @@ const getSingleFormUploadedByClientSchema = Joi.object({
     "any.required": messages.relationshipIdRequired,
     "string.base": messages.relationshipIdRequired,
   }),
-  formId: Joi.string().required().messages({
+  userIntakeFormId: Joi.string().required().messages({
     "any.required": messages.formIdRequired,
     "string.base": messages.formIdRequired,
   }),

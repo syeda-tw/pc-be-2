@@ -18,7 +18,10 @@ const getIntakeFormsService = async (relationshipId, id) => {
   if (relationship.user.toString() !== id.toString()) {
     throw { status: 403, message: messages.error.unauthorized };
   }
-  return relationship.intakeForms;
+  return {
+    areIntakeFormsComplete: relationship.areIntakeFormsComplete,
+    relationshipIntakeForms: relationship.relationshipIntakeForms,
+  };
 };
 
 const getIntakeFormsHandler = async (req, res, next) => {
